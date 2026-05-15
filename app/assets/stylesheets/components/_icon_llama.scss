@@ -1,0 +1,164 @@
+.icon-llama {
+  --mouseX: 0;
+  --mouseY: 0;
+
+  display: grid;
+  place-items: center;
+  width: 100%;
+  height: 100%;
+
+  svg {
+    width: 200px;
+    height: auto;
+    clip-path: polygon(0 0, 50% 0, 99% 0, 100% 75%, 50% 99%, 0 75%);
+    transform: scale(0);
+    transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275), 2s;
+    overflow: visible;
+
+    &.loaded {
+      transform: scale(0.75);
+    }
+
+    #outer {
+      transform-origin: bottom;
+    }
+
+    #llama {
+      transform: translateY(200px);
+      transform-origin: bottom;
+      transition: 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.025);
+
+      &:hover {
+        cursor: pointer;
+      }
+
+      &:hover:active {
+        cursor: grab;
+
+        #outer {
+          transform: scaleY(0.9) scaleX(1.1);
+        }
+
+        #innerleft {
+          transform: rotate(-15deg);
+        }
+
+        #innerwrap {
+          transform: translateY(1.5px);
+        }
+
+        #bolt {
+          animation: wiggle2 0.05s ease-in-out infinite alternate;
+        }
+
+        #lefteye,
+        #righteye {
+          animation-play-state: paused;
+
+          #innerleft,
+          #innerright {
+            clip-path: polygon(0 42%, 100% 42%, 100% 50%, 0 50%);
+          }
+
+          > g:not([id]) {
+            opacity: 0;
+          }
+        }
+      }
+
+      &.animate {
+        animation: zoom 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.025) 1 forwards 2.15s;
+      }
+    }
+
+    #lefteye,
+    #righteye {
+      transform: scaleY(calc(1 - (var(--mouseY) / 12.5))) translate(calc(var(--mouseX) * 2px), calc(var(--mouseY) * -1px));
+      animation: blink 5s ease-in-out infinite 0.5s;
+
+      #innerleft,
+      #innerright {
+        transform-origin: 40% 50%;
+        clip-path: polygon(0 0, 100% 0, 100% 100%, 0% 100%);
+        transition: 0.3s ease-in-out;
+      }
+
+      > g:not([id]) {
+        transition: 0s cubic-bezier(0.175, 0.885, 0.32, 1.025);
+        transform: translate(calc(var(--mouseX) * 2px), calc(var(--mouseY) * -2px));
+      }
+    }
+
+    #mouth {
+      transform: translate(calc(var(--mouseX) * 3px), calc(var(--mouseY) * -5px));
+
+      #mouthshadow {
+        transform: translate(calc(var(--mouseX) * -1px), calc(var(--mouseY) * 1px));
+
+        path {
+          fill: #e0dcf7;
+        }
+      }
+
+      #mouthinner {
+        transition: 0s cubic-bezier(0.175, 0.885, 0.32, 1.025);
+        transform: translate(calc(var(--mouseX) * 1.5px), calc(var(--mouseY) * -1.5px));
+      }
+    }
+
+    #bolt {
+      transform-origin: bottom;
+      animation: wiggle 5s ease-in-out infinite;
+    }
+
+    #shadow {
+      path {
+        fill: #efefef;
+        transform-origin: 50% 20%;
+        transform: rotate(calc(var(--mouseX) * 5deg)) translate(calc(var(--mouseX) * -0.5px), calc(var(--mouseY) * -1.5px));
+      }
+    }
+  }
+}
+
+@keyframes zoom {
+  from {
+    transform: translateY(200px);
+  }
+  to {
+    transform: rotate(calc(var(--mouseX) * 5deg)) scaleY(calc(1 + (var(--mouseY) / 12.5))) translateY(clamp(0px, calc(var(--mouseY) * 10px), 25px)) translateX(calc(var(--mouseX) * 2px));
+  }
+}
+
+@keyframes blink {
+  20%,
+  24% {
+    clip-path: polygon(0 0, 100% 0, 100% 100%, 0% 100%);
+  }
+  22% {
+    clip-path: polygon(0 50%, 100% 50%, 100% 50%, 0 50%);
+  }
+}
+
+@keyframes wiggle {
+  90% {
+    transform: rotate(0deg);
+  }
+  93%,
+  97% {
+    transform: rotate(-1deg);
+  }
+  95%,
+  99% {
+    transform: rotate(1deg);
+  }
+}
+
+@keyframes wiggle2 {
+  0% {
+    transform: rotate(-1deg);
+  }
+  100% {
+    transform: rotate(1deg);
+  }
+}

@@ -1,0 +1,2 @@
+module Specialist::ProfilesHelper
+end

@@ -1,0 +1,134 @@
+.page-articles {
+  &__content {
+    padding: 30px 0;
+  }
+
+  .articles-list {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-gap: 30px;
+    grid-auto-rows: min-content;
+  }
+
+  .article {
+    display: flex;
+    align-self: start;
+    flex-direction: column;
+    background: #ffffff;
+    border: 1px solid $dash-base-border;
+    border-radius: 3px;
+
+    &__image-container {
+    }
+
+    &__image {
+      width: 100%;
+      height: 180px;
+      border-top-left-radius: 3px;
+      border-top-right-radius: 3px;
+      object-fit: cover;
+    }
+
+    &__content {
+      padding: 20px 30px 25px;
+      border-top: 1px solid $dash-base-border;
+
+      &__title {
+        font-size: var(--text-xl);
+        padding-bottom: 3px;
+      }
+
+      &__link {
+        color: $dash-base;
+        font-size: var(--text-sm);
+        text-decoration: underline;
+        margin-bottom: 10px;
+      }
+
+      &__text {
+        color: $dash-text-light;
+        font-size: var(--text-sm);
+      }
+
+      &__info {
+        display: flex;
+        align-items: center;
+        color: $dash-base;
+        gap: 10px;
+        font-size: var(--text-sm);
+        margin-bottom: 15px;
+
+        &__item {
+          font-weight: 400;
+        }
+      }
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .page-articles {
+    &__content {
+      padding: 20px 0;
+    }
+  }
+
+  .articles-list {
+    grid-template-columns: repeat(2, 1fr);
+    grid-gap: 20px;
+  }
+
+  .article {
+    &__image {
+      height: 150px;
+    }
+
+    &__content {
+      padding: 15px 20px 20px;
+
+      &__title {
+        font-size: var(--text-lg);
+      }
+    }
+  }
+}
+
+@media (max-width: 640px) {
+  .page-articles {
+    &__content {
+      padding: 15px 0;
+    }
+  }
+
+  .articles-list {
+    grid-template-columns: 1fr;
+    grid-gap: 15px;
+  }
+
+  .article {
+    &__image {
+      height: 120px;
+    }
+
+    &__content {
+      padding: 12px 15px 15px;
+
+      &__title {
+        font-size: var(--text-base);
+      }
+
+      &__link {
+        font-size: var(--text-xs);
+      }
+
+      &__text {
+        font-size: var(--text-xs);
+      }
+
+      &__info {
+        font-size: var(--text-xs);
+        margin-bottom: 10px;
+      }
+    }
+  }
+}

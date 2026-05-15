@@ -1,0 +1,54 @@
+<div class="page-group">
+  <div class="dash-flash-messages">
+    <%= turbo_frame_tag "flash" do %>
+      <%= render "shared/dash_flash" %>
+    <% end %>
+  </div>
+  <div class="page-group__content">
+    <div class="group">
+      <%= render "groups/header" %>
+      <%= render "groups/nav" %>
+      <div class="group__content">
+        <div class="add-post" id="new_post_form">
+          <p class="add-post__label">Add a post in group:</p>
+          <%= form_with(model: @group.posts.new, url: group_posts_path(group_id: @group.id), html: { class: "add-post-form" },
+              data: { controller: "reset-form", action: "turbo:submit-end->reset-form#clear" }) do |f| %>
+            <%= f.text_area :body, data: { controller: "textarea-autogrow" }, class: "add-post-form__body",
+                placeholder: "Write what's on your mind"%>
+            <footer class="add-post-form__footer">
+              <div class="add-post-form__actions">
+                <span class="add-post-form__action">
+                  <i class="ri-emoji-sticker-line"></i>
+                </span>
+                <span class="add-post-form__action">
+                  <i class="ri-file-gif-line"></i>
+                </span>
+                <span class="add-post-form__action">
+                  <i class="ri-image-add-line"></i>
+                </span>
+              </div>
+              <%= button_tag type: :submit, class: "add-post-form__submit" do %>
+                <i class="ri-send-plane-2-fill"></i>
+              <% end %>
+            </footer>
+          <% end %>
+        </div>
+        <div class="group-posts">
+          <% if @posts.none? %>
+            <%= turbo_frame_tag "empty_group_posts_#{@group.id}" do %>
+              <p class="group-posts__empty">No posts in group.</p>
+            <% end %>
+          <% end %>
+          <div class="dash-posts-container" id="group_posts_<%= @group.id %>">
+            <% @posts.each do |post| %>
+              <%= render partial: "groups/posts/post", locals: { post:, group: @group, liked_posts: @liked_posts } %>
+            <% end %>
+          </div>
+        </div>
+        <%= turbo_frame_tag :group_pagination do %>
+          <%= render "pagination" %>
+        <% end %>
+      </div>
+    </div>
+  </div>
+</div>

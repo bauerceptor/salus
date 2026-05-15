@@ -1,0 +1,14 @@
+<%= turbo_frame_tag dom_id model do %>
+  <div class="symptom-update">
+    <p class="symptom-update__text">
+      <%= t('.intensity_change') %>
+      <span class="symptom-update__info"><%= t('.intensity_info', intensity: model.intensity) %></span> -
+      <%= intensity_to_emoji(model.intensity) %> <%= t('.update_date', update_date: l(model.update_date, format: :long)) %>
+    </p>
+    <%= button_to disease_symptom_update_path(disease_id: @disease.id, symptom_id: @disease_symptom.id, id: model.id, locale: I18n.locale),
+      class: "symptom-update__delete", method: :delete,
+      form: { data: { turbo_confirm: t(".button.delete.turbo.confirm") } } do %>
+      <i class="ri-close-line"></i>
+    <% end %>
+  </div>
+<% end %>

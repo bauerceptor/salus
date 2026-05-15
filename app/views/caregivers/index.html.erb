@@ -1,0 +1,81 @@
+<div class="page-caregivers-index">
+  <header class="dash-header">
+    <div class="dash-header__left">
+      <h1 class="dash-header__title">
+        <i class="ri-user-follow-line dash-header__title__icon"></i>
+        <%= t(".title") %>
+      </h1>
+      <%= render "shared/breadcrumbs" %>
+    </div>
+    <div class="dash-header__right">
+      <%= link_to new_caregiver_path, class: "dash-button dash-button--new" do %>
+        <i class="ri-add-line dash-button__icon"></i>
+        <%= t(".add_caregiver") %>
+      <% end %>
+    </div>
+  </header>
+  <div class="dash-flash-messages">
+    <%= turbo_frame_tag "flash" do %>
+      <%= render "shared/dash_flash" %>
+    <% end %>
+  </div>
+  <div class="page-caregivers-index__content">
+    <% if @caregivers.any? %>
+      <div class="dash-table-container">
+        <table class="dash-table">
+          <thead>
+            <tr>
+              <th><%= t(".table.name") %></th>
+              <th><%= t(".table.relationship") %></th>
+              <th><%= t(".table.permissions") %></th>
+              <th><%= t(".table.actions") %></th>
+            </tr>
+          </thead>
+          <tbody>
+            <% @caregivers.each do |caregiver| %>
+              <tr>
+                <td>
+                  <%= link_to caregiver_path(id: caregiver.id, locale: I18n.locale) do %>
+                    <%= caregiver.caregiver_account.full_name %>
+                  <% end %>
+                </td>
+                <td><%= caregiver.relationship %></td>
+                <td>
+                  <% if caregiver.can_view_medications %>
+                    <span class="dash-badge"><%= t(".permissions.medication") %></span>
+                  <% end %>
+                  <% if caregiver.can_view_measurements %>
+                    <span class="dash-badge"><%= t(".permissions.measurement") %></span>
+                  <% end %>
+                  <% if caregiver.can_view_diseases %>
+                    <span class="dash-badge"><%= t(".permissions.disease") %></span>
+                  <% end %>
+                </td>
+                <td>
+                  <%= link_to caregiver_path(id: caregiver.id, locale: I18n.locale), class: "dash-button dash-button--small" do %>
+                    <i class="ri-eye-line"></i>
+                  <% end %>
+                  <%= button_to caregiver_path(id: caregiver.id, locale: I18n.locale), method: :delete,
+                      class: "dash-button dash-button--small dash-button--danger",
+                      data: { confirm: t(".confirm_delete") } do %>
+                    <i class="ri-delete-bin-line"></i>
+                  <% end %>
+                </td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
+      <%== pagy_nav(@pagy) if @pagy.pages > 1 %>
+    <% else %>
+      <div class="dash-empty-state">
+        <i class="ri-user-follow-line dash-empty-state__icon"></i>
+        <p class="dash-empty-state__text"><%= t(".empty") %></p>
+        <%= link_to new_caregiver_path, class: "dash-button dash-button--new" do %>
+          <i class="ri-add-line dash-button__icon"></i>
+          <%= t(".add_first") %>
+        <% end %>
+      </div>
+    <% end %>
+  </div>
+</div>

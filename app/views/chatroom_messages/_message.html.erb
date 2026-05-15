@@ -1,0 +1,165 @@
+<%
+  is_own_message = message.account == current_account
+%>
+
+<div class="flex <%= is_own_message ? 'justify-end' : 'justify-start' %> mb-2 group" data-message-id="<%= message.id %>">
+  <% unless is_own_message %>
+    <div class="w-8 h-8 rounded-full bg-[#d1d7db] flex items-center justify-center mr-2 flex-shrink-0 self-end">
+      <% if message.account&.image&.present? && message.account.image.attached? %>
+        <%= image_tag message.account.image, class: "w-8 h-8 rounded-full object-cover" %>
+      <% else %>
+        <span class="text-sm font-medium text-[#54656f]"><%= (message.account&.username || 'U').first.upcase %></span>
+      <% end %>
+    </div>
+  <% end %>
+
+  <div class="max-w-[75%] <%= is_own_message ? 'bg-[#d9fdd3]' : 'bg-white' %> rounded-lg <%= is_own_message ? 'rounded-tr-none' : 'rounded-tl-none' %> shadow-sm px-3 py-2 relative">
+    <% if message.reply_to_message %>
+      <div class="border-l-4 border-[#00a884] pl-3 mb-2 py-1 bg-[#f0f2f5] rounded">
+        <p class="text-xs text-[#00a884] font-medium"><%= message.reply_to_message.account&.username || 'User' %></p>
+        <p class="text-sm text-[#667781] truncate"><%= message.reply_to_message.body.presence || '[Media]' %></p>
+      </div>
+    <% end %>
+
+    <% if message.attachment.present? && message.attachment.attached? %>
+      <% if message.attachment.content_type&.start_with?('image/') %>
+        <div class="mb-2">
+          <%= image_tag message.attachment, class: "rounded-lg max-w-full max-h-64 object-cover cursor-pointer hover:opacity-90" %>
+        </div>
+      <% elsif message.attachment.content_type&.start_with?('video/') %>
+        <div class="mb-2">
+          <video controls class="rounded-lg max-w-full max-h-64">
+            <source src="<%= url_for(message.attachment) %>">
+          </video>
+        </div>
+      <% elsif message.voice_note? %>
+        <div class="voice-note-player mb-2 relative" data-audio-url="<%= url_for(message.attachment) %>" data-message-id="<%= message.id %>">
+          <div class="flex items-center gap-3 p-2 bg-[#f0f2f5] rounded-lg w-fit">
+            <button class="play-btn w-10 h-10 rounded-full bg-[#00a884] flex items-center justify-center text-white hover:bg-[#008069] transition-colors flex-shrink-0 shadow-sm">
+              <svg class="play-icon w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M8 5v14l11-7z"/>
+              </svg>
+              <svg class="pause-icon w-5 h-5 hidden" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>
+              </svg>
+            </button>
+            <div class="flex-1 flex flex-col gap-1 min-w-[160px]">
+              <div class="waveform-container h-8 relative flex items-center overflow-hidden rounded-sm">
+                <div class="waveform-placeholder absolute inset-0 flex items-center gap-[3px] px-1">
+                  <% 25.times do %>
+                    <div class="w-1 bg-[#c5c9c7] rounded-full" style="height: <%= rand(30..100) %>%;"></div>
+                  <% end %>
+                </div>
+                <div class="waveform-progress absolute inset-0 flex items-center gap-[3px] px-1 overflow-hidden" style="width: 0%;">
+                  <% 25.times do %>
+                    <div class="w-1 bg-[#00a884] rounded-full" style="height: <%= rand(30..100) %>%;"></div>
+                  <% end %>
+                </div>
+              </div>
+              <span class="duration text-[10px] text-[#667781] font-mono">0:00</span>
+            </div>
+          </div>
+        </div>
+      <% else %>
+        <div class="flex items-center gap-3 p-2 bg-[#f0f2f5] rounded-lg mb-2">
+          <div class="w-10 h-10 rounded-full bg-[#00a884] flex items-center justify-center">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+            </svg>
+          </div>
+          <div class="flex-1 min-w-0">
+            <p class="text-sm font-medium text-[#111b21] truncate"><%= message.attachment.filename %></p>
+            <p class="text-xs text-[#667781]"><%= number_to_human_size(message.attachment.byte_size) %></p>
+          </div>
+        </div>
+      <% end %>
+    <% end %>
+
+    <% if message.body.present? %>
+      <p class="text-[#111b21] break-words whitespace-pre-wrap"><%= message.body %></p>
+    <% end %>
+
+    <div class="flex items-center justify-end gap-1 mt-1">
+      <span class="text-[10px] text-[#667781]"><%= message.created_at.strftime("%H:%M") %></span>
+      <% if is_own_message %>
+        <% if message.read_at.present? %>
+          <div class="flex items-center gap-0.5">
+            <div class="w-4 h-4 rounded-full bg-[#34c759] flex items-center justify-center">
+              <svg class="h-2.5 w-2.5 text-white" viewBox="0 0 12 10" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M1 4.5L4.5 8L11 1" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+            <div class="w-4 h-4 rounded-full bg-[#34c759] flex items-center justify-center -ml-1.5">
+              <svg class="h-2.5 w-2.5 text-white" viewBox="0 0 12 10" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M1 4.5L4.5 8L11 1" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+          </div>
+        <% else %>
+          <div class="flex items-center gap-0.5">
+            <div class="w-4 h-4 rounded-full bg-[#8e8e93] flex items-center justify-center">
+              <svg class="h-2.5 w-2.5 text-white" viewBox="0 0 12 10" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M1 4.5L4.5 8L11 1" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+            <div class="w-4 h-4 rounded-full bg-[#8e8e93] flex items-center justify-center -ml-1.5">
+              <svg class="h-2.5 w-2.5 text-white" viewBox="0 0 12 10" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M1 4.5L4.5 8L11 1" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+          </div>
+        <% end %>
+      <% end %>
+    </div>
+
+    <div class="absolute top-0 -right-16 opacity-0 group-hover:opacity-100 transition-opacity">
+      <div class="dropdown dropdown-end">
+        <button tabindex="0" class="btn btn-circle btn-ghost btn-sm text-[#54656f]">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z" />
+          </svg>
+        </button>
+        <ul tabindex="0" class="dropdown-content z-50 menu p-2 shadow-xl bg-white rounded-2xl w-52">
+          <li>
+            <button onclick="replyToMessage(<%= message.id %>)" class="flex items-center gap-3 px-4 py-3 text-sm text-[#111b21] hover:bg-[#f0f2f5] rounded-xl w-full">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-[#54656f]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6" />
+              </svg>
+              <span>Reply</span>
+            </button>
+          </li>
+          <% if message.attachment.present? && message.attachment.attached? %>
+            <li>
+              <a href="<%= url_for(message.attachment) %>" download="<%= message.attachment.filename %>" class="flex items-center gap-3 px-4 py-3 text-sm text-[#111b21] hover:bg-[#f0f2f5] rounded-xl">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-[#54656f]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                </svg>
+                <span>Download</span>
+              </a>
+            </li>
+          <% end %>
+          <% unless message.voice_note? %>
+            <li>
+              <button onclick="copyMessageText(<%= message.id %>)" class="flex items-center gap-3 px-4 py-3 text-sm text-[#111b21] hover:bg-[#f0f2f5] rounded-xl w-full">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-[#54656f]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                </svg>
+                <span>Copy</span>
+              </button>
+            </li>
+          <% end %>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <% if is_own_message %>
+    <div class="w-8 h-8 rounded-full bg-[#00a884] flex items-center justify-center ml-2 flex-shrink-0 self-end">
+      <% if message.account&.image&.present? && message.account.image.attached? %>
+        <%= image_tag message.account.image, class: "w-8 h-8 rounded-full object-cover" %>
+      <% else %>
+        <span class="text-sm font-medium text-white"><%= (message.account&.username || 'U').first.upcase %></span>
+      <% end %>
+    </div>
+  <% end %>
+</div>

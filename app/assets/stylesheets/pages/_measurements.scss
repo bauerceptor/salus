@@ -1,0 +1,385 @@
+.page-measurements {
+  &__content {
+    padding: $space-sm 0;
+    display: flex;
+    flex-direction: column;
+    gap: $space-xl;
+  }
+
+  &__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-bottom: $space-lg;
+    margin-bottom: $space-lg;
+    border-bottom: 1px solid $dash-base-border;
+    gap: $space-md;
+    flex-wrap: wrap;
+  }
+
+  &__title {
+    display: flex;
+    align-items: center;
+    gap: $space-md;
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: $dash-text-dark;
+
+    i {
+      color: $dash-base;
+    }
+  }
+
+  &__actions {
+    display: flex;
+    gap: $space-sm;
+  }
+}
+
+.measurements-latest {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: $space-lg;
+
+  @media (max-width: 1200px) {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  @media (max-width: 768px) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.measurement-container {
+  display: flex;
+  flex-direction: column;
+  gap: $space-sm;
+}
+
+.measurement-card {
+  background: #ffffff;
+  border: 1px solid $dash-base-border;
+  border-radius: $radius-lg;
+  padding: $space-lg;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: $space-md;
+  transition: box-shadow 0.15s ease, transform 0.15s ease;
+
+  &:hover {
+    box-shadow: $shadow-md;
+    transform: translateY(-2px);
+  }
+
+  &--dangerous {
+    border-color: rgba($color-danger, 0.3);
+    background: linear-gradient(180deg, rgba($color-danger, 0.02) 0%, rgba($color-danger, 0.05) 100%);
+  }
+
+  &__header {
+    display: flex;
+    align-items: center;
+    gap: $space-sm;
+  }
+
+  &__title {
+    font-size: 0.75rem;
+    text-align: center;
+    padding: $space-xs $space-md;
+    font-weight: 600;
+    border-radius: 9999px;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+
+    &--weight {
+      background: rgba(#10b981, 0.1);
+      color: darken(#10b981, 10%);
+    }
+
+    &--heart_beat {
+      background: rgba(#ef4444, 0.1);
+      color: #ef4444;
+    }
+
+    &--blood_pressure {
+      background: rgba(#8b5cf6, 0.1);
+      color: #7c3aed;
+    }
+
+    &--sugar {
+      background: rgba(#f59e0b, 0.1);
+      color: darken(#f59e0b, 10%);
+    }
+
+    &--spo2 {
+      background: rgba(#0ea5e9, 0.1);
+      color: #0284c7;
+    }
+  }
+
+  &__warning {
+    font-size: 0.6875rem;
+    text-align: center;
+    padding: 2px $space-sm;
+    font-weight: 600;
+    color: #ffffff;
+    background: $color-danger;
+    border-radius: 9999px;
+  }
+
+  &__body {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: $space-xs;
+  }
+
+  &__value {
+    font-weight: 700;
+    font-size: 1.75rem;
+    color: $dash-text-dark;
+    line-height: 1;
+  }
+
+  &__symbol {
+    font-size: 0.875rem;
+    color: $dash-text-light;
+  }
+
+  &__date {
+    font-size: 0.75rem;
+    color: $dash-text-light;
+    display: flex;
+    align-items: center;
+    gap: $space-xs;
+  }
+
+  &__footer {
+    width: 100%;
+  }
+}
+
+.add-measurement-btn {
+  width: 100%;
+  padding: $space-sm $space-md;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  text-align: center;
+  border-radius: $radius-md;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: $space-xs;
+  transition: all 0.15s ease;
+  cursor: pointer;
+  border: 1px solid;
+
+  &:hover {
+    transform: translateY(-1px);
+  }
+
+  &--weight {
+    color: darken(#10b981, 10%);
+    background: rgba(#10b981, 0.1);
+    border-color: rgba(#10b981, 0.2);
+
+    &:hover {
+      background: rgba(#10b981, 0.15);
+    }
+  }
+
+  &--heart_beat {
+    color: #ef4444;
+    background: rgba(#ef4444, 0.1);
+    border-color: rgba(#ef4444, 0.2);
+
+    &:hover {
+      background: rgba(#ef4444, 0.15);
+    }
+  }
+
+  &--blood_pressure {
+    color: #7c3aed;
+    background: rgba(#8b5cf6, 0.1);
+    border-color: rgba(#8b5cf6, 0.2);
+
+    &:hover {
+      background: rgba(#8b5cf6, 0.15);
+    }
+  }
+
+  &--sugar {
+    color: darken(#f59e0b, 10%);
+    background: rgba(#f59e0b, 0.1);
+    border-color: rgba(#f59e0b, 0.2);
+
+    &:hover {
+      background: rgba(#f59e0b, 0.15);
+    }
+  }
+
+  &--spo2 {
+    color: #0284c7;
+    background: rgba(#0ea5e9, 0.1);
+    border-color: rgba(#0ea5e9, 0.2);
+
+    &:hover {
+      background: rgba(#0ea5e9, 0.15);
+    }
+  }
+}
+
+.measurements-calendar {
+  background: #ffffff;
+  border: 1px solid $dash-base-border;
+  border-radius: $radius-lg;
+  padding: $space-xl;
+
+  &__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: $space-lg;
+    padding-bottom: $space-md;
+    border-bottom: 1px solid $dash-base-border;
+  }
+
+  &__title {
+    display: flex;
+    align-items: center;
+    gap: $space-sm;
+    font-size: 1rem;
+    font-weight: 600;
+    color: $dash-text-dark;
+
+    i {
+      color: $dash-base;
+    }
+  }
+
+  .simple-calendar {
+    .calendar-heading {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: $space-lg;
+      margin-bottom: $space-lg;
+    }
+
+    .calendar-title {
+      font-weight: 600;
+      font-size: 1.125rem;
+      color: $dash-text-dark;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      border-radius: $radius-md;
+      overflow: hidden;
+    }
+
+    tr {
+      border-collapse: collapse;
+    }
+
+    th {
+      padding: $space-sm;
+      text-align: center;
+      font-weight: 600;
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: $dash-text-light;
+      background: $dash-bg;
+
+      &:first-letter {
+        text-transform: uppercase;
+      }
+    }
+
+    td {
+      padding: $space-md $space-sm;
+      position: relative;
+      border: 1px solid $dash-base-border;
+      background: #ffffff;
+      min-height: 80px;
+      vertical-align: top;
+    }
+
+    .day {
+      background: #ffffff;
+    }
+
+    .today {
+      background: rgba($dash-base, 0.05);
+
+      .date-day {
+        font-weight: 700;
+        color: $dash-base;
+      }
+    }
+
+    .past {
+    }
+
+    .future {
+    }
+
+    .start-date {
+    }
+
+    .prev-month,
+    .next-month {
+      background: $dash-bg;
+
+      .date-day {
+        color: $dash-text-light;
+      }
+    }
+
+    .current-month {
+    }
+
+    .has-events {
+    }
+
+    .date-day {
+      position: absolute;
+      top: $space-sm;
+      right: $space-sm;
+      font-size: 0.875rem;
+      font-weight: 500;
+      color: $dash-text-dark;
+    }
+
+    .day-with-measurements {
+      .date-day {
+        font-weight: 700;
+        color: $dash-base;
+      }
+    }
+
+    .measurements-indicator {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+      margin-top: $space-xl;
+      justify-content: center;
+    }
+
+    .measurement-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: $dash-base;
+
+      &--weight { background: #10b981; }
+      &--heart_beat { background: #ef4444; }
+      &--blood_pressure { background: #8b5cf6; }
+      &--sugar { background: #f59e0b; }
+      &--spo2 { background: #0ea5e9; }
+    }
+  }
+}

@@ -1,0 +1,41 @@
+<%= groups_size = @group.posts.size %>
+
+<%= turbo_stream.prepend "group_posts_#{@group.id}" do %>
+  <%= render partial: "groups/posts/post",
+      locals: { post: @post, group: @group, liked_posts: @liked_posts } %>
+<% end %>
+
+<%= turbo_stream.update :group_pagination do %>
+  <%= render "pagination" %>
+<% end %>
+
+<%= turbo_stream.replace "new_post_form" do %>
+  <div class="add-post" id="new_post_form">
+    <p class="add-post__label">Add a post in group:</p>
+    <%= form_with(model: @group.posts.new, url: group_posts_path(group_id: @group.id), html: { class: "add-post-form" },
+        data: { controller: "reset-form", action: "turbo:submit-end->reset-form#clear" }) do |f| %>
+      <%= f.text_area :body, data: { controller: "textarea-autogrow" }, class: "add-post-form__body",
+          placeholder: "Write what's on your mind"%>
+      <footer class="add-post-form__footer">
+        <div class="add-post-form__actions">
+          <span class="add-post-form__action">
+            <i class="ri-emoji-sticker-line"></i>
+          </span>
+          <span class="add-post-form__action">
+            <i class="ri-file-gif-line"></i>
+          </span>
+          <span class="add-post-form__action">
+            <i class="ri-image-add-line"></i>
+          </span>
+        </div>
+        <%= button_tag type: :submit, class: "add-post-form__submit" do %>
+          <i class="ri-send-plane-2-fill"></i>
+        <% end %>
+      </footer>
+    <% end %>
+  </div>
+<% end %>
+
+<% if groups_size > 0 %>
+  <%= turbo_stream.remove "empty_group_posts_#{@group.id}" %>
+<% end %>

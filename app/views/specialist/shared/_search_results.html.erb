@@ -1,0 +1,25 @@
+<div class="quick-actions-toolbar__search-results">
+  <% if patients.any? %>
+    <% patients.each do |account| %>
+      <%= link_to specialist_patient_path(id: account.id, locale: I18n.locale),
+                  class: "quick-actions-toolbar__search-result-item",
+                  data: { action: "quick-actions#navigateToPatient" } do %>
+        <div class="quick-actions-toolbar__search-result-avatar">
+          <%= render "shared/avatar", account: account, css_class: "", alt: "" %>
+        </div>
+        <div class="quick-actions-toolbar__search-result-info">
+          <p class="quick-actions-toolbar__search-result-name"><%= account.full_name %></p>
+          <p class="quick-actions-toolbar__search-result-meta">
+            <% if account.diseases.any? %>
+              <%= account.diseases.first.predefined_disease&.name || account.diseases.first.name %>
+            <% else %>
+              No conditions
+            <% end %>
+          </p>
+        </div>
+      <% end %>
+    <% end %>
+  <% else %>
+    <p class="quick-actions-toolbar__search-empty">No patients found</p>
+  <% end %>
+</div>

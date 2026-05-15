@@ -1,0 +1,33 @@
+<div class="dash-home">
+  <div class="dash-home__content">
+    <header class="dash-header">
+      <div class="dash-header__left">
+        <h1 class="dash-header__title">
+          <i class="ri-user-star-line dash-header__title__icon"></i>
+          <%= @specialist.account&.full_name || @specialist.email %>
+        </h1>
+        <p class="dash-header__desc">Specialist Details</p>
+      </div>
+      <div class="dash-header__right">
+        <%= link_to "Back", admin_specialists_path, class: "dash-btn" %>
+      </div>
+    </header>
+
+    <div class="dash-home__content">
+      <div class="dash-card">
+        <h3>Account Information</h3>
+        <p><strong>Email:</strong> <%= @specialist.email %></p>
+        <p><strong>Name:</strong> <%= @specialist.account&.full_name || "N/A" %></p>
+        <p><strong>Username:</strong> <%= @specialist.account&.username || "N/A" %></p>
+      </div>
+
+      <div class="dash-card">
+        <h3>Professional Information</h3>
+        <p><strong>Field of Expertise:</strong> <%= @specialist.specialist&.field_of_expertise %></p>
+        <p><strong>Specialization:</strong> <%= @specialist.specialist&.specialization %></p>
+        <p><strong>License Number:</strong> <%= @specialist.specialist&.license_number %></p>
+        <p><strong>Status:</strong> <%= @specialist.specialist&.status %></p>
+      </div>
+    </div>
+  </div>
+</div>

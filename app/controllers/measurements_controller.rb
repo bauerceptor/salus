@@ -1,0 +1,233 @@
+class MeasurementsController < BaseController
+  before_action :set_measurement, only: %i[show edit update destroy]
+  before_action :set_datetime, only: %i[details show_by_day generate_raport_by_day]
+  before_action :set_measurements, only: %i[all]
+  before_action :set_breadcrumbs
+
+  def index
+    @latest_measurements = []
+
+    @latest = {}
+    Measurement::TYPES.each do |type|
+      @latest[type.to_sym] = current_account.measurements
+                                            .joins(:measurement_type)
+                                            .where(measurement_type: { name: type })
+                                            .order(measurement_date: :desc)
+                                            .first
+    end
+
+    @measurements = current_account.measurements
+                                   .group_by { |m| m.measurement_date.to_date }
+                                   .transform_values(&:count)
+
+    @pagy, @measurements_list = pagy(
+      current_account.measurements
+        .includes(:measurement_type)
+        .order(measurement_date: :desc),
+      from: 1
+    )
+
+    load_measurement_charts
+  end
+
+  def details
+    @measurements =
+      current_account
+      .measurements
+      .includes(measurement_type: :unit)
+      .where(measurement_date: @selected_datetime.all_day)
+      .group_by(&:measurement_type).map do |type, measurements|
+        [type.name, measurements.count]
+      end
+
+    render partial: "measurements/details", locals: { date: @selected_datetime, measurements: @measurements }
+  end
+
+  def show_by_day
+    @pagy, @measurements = pagy(
+      @measurements =
+        current_account
+        .measurements
+        .includes(measurement_type: :unit)
+        .where(measurement_date: @selected_datetime.all_day)
+        .order(measurement_date: :asc)
+    )
+  end
+
+  def all; end
+
+  def new
+    measurement_type = MeasurementType.find_by!(name: params[:measurement_type])
+    @measurement = Measurement.new(measurement_type:, measurement_date: Time.current)
+  end
+
+  def create
+    measurement_type = MeasurementType.find_by!(name: params[:measurement_type])
+
+    Rails.logger.debug "=== DEBUG ==="
+    Rails.logger.debug "Params: #{params.inspect}"
+    Rails.logger.debug "measurement_params: #{measurement_params.inspect}"
+
+    @measurement = current_account.measurements.build(measurement_params)
+    @measurement.measurement_type = measurement_type
+    validation_context = get_validation_context(measurement_type.name)
+
+    Rails.logger.debug "@measurement.value before valid?: #{@measurement.value.inspect}"
+    Rails.logger.debug "validation_context: #{validation_context}"
+
+    respond_to do |format|
+      if @measurement.valid?(validation_context) && @measurement.save
+        format.html do
+          flash[:success] = t(".success")
+          redirect_to measurements_path
+        end
+      else
+        Rails.logger.debug "@measurement.errors: #{@measurement.errors.full_messages}"
+        format.html { render :new, status: :unprocessable_content }
+      end
+    end
+  end
+
+  def update
+    respond_to do |format|
+      validation_context = get_validation_context(@measurement.measurement_type.name)
+      if @measurement.update_with_context(measurement_params, validation_context)
+        format.html { redirect_to measurement_url(@measurement), notice: t(".success") }
+      else
+        format.html { render :edit, status: :unprocessable_content }
+      end
+    end
+  end
+
+  def destroy
+    @measurement.destroy
+
+    respond_to do |format|
+      format.html { redirect_to measurements_url, notice: t(".success") }
+    end
+  end
+
+  private
+
+  def set_measurement
+    @measurement = current_account.measurements.find(params[:id])
+  end
+
+  def measurement_params
+    params.expect(measurement: %i[value measurement_date])
+  end
+
+  def get_validation_context(measurement_type)
+    :"measurement_#{measurement_type}"
+  end
+
+  def set_datetime
+    @selected_datetime = parse_date(params[:day])
+
+    return unless @selected_datetime.nil?
+
+    flash[:error] = t(".invalid_date")
+    redirect_to measurements_path
+  end
+
+  def set_measurements
+    measurement_type = MeasurementType.find_by!(name: params[:measurement_type])
+
+    common_query =
+      current_account
+      .measurements
+      .includes(measurement_type: :unit)
+      .joins(measurement_type: :unit)
+      .where(measurement_type:)
+
+    @measurements =
+      common_query
+      .order(measurement_date: :desc)
+      .group_by_week(week_start: :monday, reverse: true, &:measurement_date)
+
+    @count_chart =
+      common_query
+      .group_by_week(:measurement_date, reverse: true, week_start: :monday)
+      .count
+
+    @monthly_chart =
+      common_query
+      .where(measurement_date: 1.month.ago..Time.zone.now)
+      .order(:measurement_date)
+      .pluck(:measurement_date, :value)
+      .map { |date, value| [l(date, format: "%d %b"), value] }
+  rescue ActiveRecord::RecordNotFound
+    flash[:error] = t(".invalid_measurement_type")
+    redirect_to measurements_path
+  end
+
+  def parse_date(date)
+    Date.parse(date)
+  rescue TypeError, Date::Error
+    nil
+  end
+
+  def set_breadcrumbs
+    add_breadcrumb t("breadcrumbs.home"), authenticated_root_path
+    add_breadcrumb t(".breadcrumbs.index"), measurements_path
+
+    case action_name.to_sym
+    when :new, :create
+      set_breadcrumbs_new
+    when :show
+      add_breadcrumb(
+        t(".breadcrumbs.show", date: l(@measurement.measurement_date, format: "%d %B %Yr.")),
+        measurement_path(params[:id])
+      )
+    when :show_by_day
+      add_breadcrumb(
+        t(".breadcrumbs.show_by_day", date: parse_date(params[:day])),
+        show_by_day_measurements_path(day: params[:day])
+      )
+    when :all
+      add_breadcrumb(
+        t(".breadcrumbs.all",
+          measurement_type: I18n.t("activerecord.attributes.measurement_types.#{params[:measurement_type]}")),
+        all_measurements_path(measurement_type: params[:measurement_type])
+      )
+    end
+  end
+
+  def load_measurement_charts
+    @measurement_types = MeasurementType.all
+
+    @chart_data = {}
+    @measurement_types.each do |type|
+      measurements = current_account.measurements
+                                    .where(measurement_type: type)
+                                    .where(measurement_date: 30.days.ago..)
+                                    .order(:measurement_date)
+
+      @chart_data[type.name] = {
+        labels: measurements.pluck(:measurement_date).map { |d| d.strftime("%m/%d") },
+        values: measurements.pluck(:value),
+        unit: type.unit&.symbol || ""
+      }
+    end
+  end
+
+  def set_breadcrumbs_new
+    case params[:measurement_type].to_sym
+    when :weight
+      add_breadcrumb t(".breadcrumbs.new.weight"),
+                     new_measurements_path(measurement_type: :weight)
+    when :heart_beat
+      add_breadcrumb t(".breadcrumbs.new.heart_beat"),
+                     new_measurements_path(measurement_type: :heart_beat)
+    when :blood_pressure
+      add_breadcrumb t(".breadcrumbs.new.blood_pressure"),
+                     new_measurements_path(measurement_type: :blood_pressure)
+    when :sugar
+      add_breadcrumb t(".breadcrumbs.new.sugar"),
+                     new_measurements_path(measurement_type: :sugar)
+    when :spo2
+      add_breadcrumb t(".breadcrumbs.new.spo2"),
+                     new_measurements_path(measurement_type: :spo2)
+    end
+  end
+end

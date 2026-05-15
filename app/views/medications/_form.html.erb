@@ -1,0 +1,166 @@
+<%= form_with(model: @medication, html: { class: "dash-form" }) do |form| %>
+  <div class="dash-form__container">
+    <div class="dash-form__group">
+      <div class="dash-form__group__container">
+        <div class="dash-form__group__left">
+          <div class="dash-form__group__title"><%= t(".name.title") %></div>
+          <p class="dash-form__group__description"><%= t(".name.description") %></p>
+        </div>
+        <div class="dash-form__group__right">
+          <%= form.text_field :name, class: "dash-form__input", placeholder: t(".name.placeholder") %>
+        </div>
+      </div>
+      <%= render DashFormErrorComponent.new(model: @medication, field: :name) %>
+    </div>
+  </div>
+  <div class="dash-form__container">
+    <div class="dash-form__group">
+      <div class="dash-form__group__container">
+        <div class="dash-form__group__left">
+          <div class="dash-form__group__title"><%= t(".dosage.title") %></div>
+          <p class="dash-form__group__description"><%= t(".dosage.description") %></p>
+        </div>
+        <div class="dash-form__group__right">
+          <%= form.text_field :dosage, class: "dash-form__input", placeholder: t(".dosage.placeholder") %>
+        </div>
+      </div>
+      <%= render DashFormErrorComponent.new(model: @medication, field: :dosage) %>
+    </div>
+  </div>
+  <div class="dash-form__container">
+    <div class="dash-form__group">
+      <div class="dash-form__group__container">
+        <div class="dash-form__group__left">
+          <div class="dash-form__group__title"><%= t(".frequency.title") %></div>
+          <p class="dash-form__group__description"><%= t(".frequency.description") %></p>
+        </div>
+        <div class="dash-form__group__right">
+          <%= form.select :frequency, options_for_select([
+            [t("medications.form.frequency.once_daily"), "once_daily"],
+            [t("medications.form.frequency.twice_daily"), "twice_daily"],
+            [t("medications.form.frequency.three_times_daily"), "three_times_daily"],
+            [t("medications.form.frequency.four_times_daily"), "four_times_daily"],
+            [t("medications.form.frequency.as_needed"), "as_needed"],
+            [t("medications.form.frequency.weekly"), "weekly"],
+            [t("medications.form.frequency.monthly"), "monthly"]
+          ], @medication.frequency), {}, class: "dash-form__input" %>
+        </div>
+      </div>
+      <%= render DashFormErrorComponent.new(model: @medication, field: :frequency) %>
+    </div>
+  </div>
+  <div class="dash-form__container">
+    <div class="dash-form__group">
+      <div class="dash-form__group__container">
+        <div class="dash-form__group__left">
+          <div class="dash-form__group__title"><%= t(".instructions.title") %></div>
+          <p class="dash-form__group__description"><%= t(".instructions.description") %></p>
+        </div>
+        <div class="dash-form__group__right">
+          <%= form.text_area :instructions, class: "dash-form__input dash-form__textarea",
+              placeholder: t(".instructions.placeholder") %>
+        </div>
+      </div>
+      <%= render DashFormErrorComponent.new(model: @medication, field: :instructions) %>
+    </div>
+  </div>
+  <div class="dash-form__container">
+    <div class="dash-form__group">
+      <div class="dash-form__group__container">
+        <div class="dash-form__group__left">
+          <div class="dash-form__group__title"><%= t(".start_date.title") %></div>
+        </div>
+        <div class="dash-form__group__right">
+          <%= form.date_field :start_date, class: "dash-form__input" %>
+        </div>
+      </div>
+      <%= render DashFormErrorComponent.new(model: @medication, field: :start_date) %>
+    </div>
+  </div>
+  <div class="dash-form__container">
+    <div class="dash-form__group">
+      <div class="dash-form__group__container">
+        <div class="dash-form__group__left">
+          <div class="dash-form__group__title"><%= t(".end_date.title") %></div>
+        </div>
+        <div class="dash-form__group__right">
+          <%= form.date_field :end_date, class: "dash-form__input" %>
+        </div>
+      </div>
+      <%= render DashFormErrorComponent.new(model: @medication, field: :end_date) %>
+    </div>
+  </div>
+  <div class="dash-form__container">
+    <div class="dash-form__group">
+      <div class="dash-form__group__container">
+        <div class="dash-form__group__left">
+          <div class="dash-form__group__title"><%= t(".disease_id.title") %></div>
+          <p class="dash-form__group__description"><%= t(".disease_id.description") %></p>
+        </div>
+        <div class="dash-form__group__right">
+          <%= form.select :disease_id, options_for_select(@diseases.map { |d| [d.predefined_disease.name, d.id] }, @medication.disease_id), { include_blank: true }, class: "dash-form__input" %>
+        </div>
+      </div>
+      <%= render DashFormErrorComponent.new(model: @medication, field: :disease_id) %>
+    </div>
+  </div>
+  <div class="dash-form__container">
+    <div class="dash-form__group">
+      <div class="dash-form__group__container">
+        <div class="dash-form__group__left">
+          <div class="dash-form__group__title"><%= t(".is_active.title") %></div>
+          <p class="dash-form__group__description"><%= t(".is_active.description") %></p>
+        </div>
+        <div class="dash-form__group__right">
+          <div class="dash-form__checkbox">
+            <%= form.check_box :is_active, class: "dash-form__checkbox__input" %>
+            <%= form.label :is_active, class: "dash-form__checkbox__label" do %>
+              <%= t(".is_active.label") %>
+            <% end %>
+          </div>
+        </div>
+      </div>
+      <%= render DashFormErrorComponent.new(model: @medication, field: :is_active) %>
+    </div>
+  </div>
+  <div class="dash-form__container">
+    <div class="dash-form__group">
+      <div class="dash-form__group__container">
+        <div class="dash-form__group__left">
+          <div class="dash-form__group__title"><%= t(".reminder_enabled.title") %></div>
+          <p class="dash-form__group__description"><%= t(".reminder_enabled.description") %></p>
+        </div>
+        <div class="dash-form__group__right">
+          <div class="dash-form__checkbox">
+            <%= form.check_box :reminder_enabled, class: "dash-form__checkbox__input" %>
+            <%= form.label :reminder_enabled, class: "dash-form__checkbox__label" do %>
+              <%= t(".reminder_enabled.label") %>
+            <% end %>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="dash-form__container">
+    <div class="dash-form__group">
+      <div class="dash-form__group__container">
+        <div class="dash-form__group__left">
+          <div class="dash-form__group__title"><%= t(".reminder_minutes_before.title") %></div>
+          <p class="dash-form__group__description"><%= t(".reminder_minutes_before.description") %></p>
+        </div>
+        <div class="dash-form__group__right">
+          <%= form.select :reminder_minutes_before, options_for_select([
+            [t(".reminder_minutes_before.at_time"), 0],
+            [t(".reminder_minutes_before.5_min"), 5],
+            [t(".reminder_minutes_before.15_min"), 15],
+            [t(".reminder_minutes_before.30_min"), 30],
+            [t(".reminder_minutes_before.1_hour"), 60]
+          ], @medication.reminder_minutes_before), {}, class: "dash-form__input" %>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="dash-form__group">
+    <%= form.submit t("dash_form.submit"), class: "dash-form__submit dash-button dash-button--new" %>
+  </div>
+<% end %>

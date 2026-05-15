@@ -1,0 +1,405 @@
+<div class="dash-home">
+  <div class="dash-home__content">
+    <header class="dash-home__header">
+      <div class="dash-home__header__left">
+        <h1 class="dash-home__header__title">
+          <i class="ri-calendar-check-line dash-home__header__title__icon"></i>
+          <%= t(".title") %>
+        </h1>
+        <p class="dash-home__header__text"><%= t(".subtitle") %></p>
+      </div>
+      <div class="dash-home__header__right">
+        <p class="dash-home__header__date">
+          <i class="ri-calendar-todo-line"></i>
+          <span><%= l Date.today, format: "%d %B %Y" %></span>
+        </p>
+      </div>
+    </header>
+
+    <div class="dash-home__flash">
+      <%= turbo_frame_tag "flash" do %>
+        <%= render "shared/dash_flash" %>
+      <% end %>
+    </div>
+
+    <div class="schedule-tabs">
+      <button class="schedule-tabs__tab schedule-tabs__tab--active" data-tab="daily">
+        <i class="ri-sun-line"></i>
+        <%= t(".tabs.daily") %>
+      </button>
+      <button class="schedule-tabs__tab" data-tab="weekly">
+        <i class="ri-calendar-line"></i>
+        <%= t(".tabs.weekly") %>
+      </button>
+      <button class="schedule-tabs__tab" data-tab="monthly">
+        <i class="ri-calendar-check-line"></i>
+        <%= t(".tabs.monthly") %>
+      </button>
+    </div>
+
+    <div class="schedule-content">
+      <div class="schedule-content__section" id="daily">
+        <div class="dash-group">
+          <header class="dash-group__header">
+            <h2 class="dash-group__title">
+              <i class="ri-sun-line dash-group__title__icon"></i>
+              <%= t(".daily.title", date: l(Date.today, format: "%d %B %Y")) %>
+            </h2>
+          </header>
+          <div class="dash-group__content">
+            <% if @daily_appointments.any? %>
+              <div class="appointment-list">
+                <% @daily_appointments.each do |apt| %>
+                  <div class="appointment-card">
+                    <div class="appointment-card__time">
+                      <span class="appointment-card__time__start"><%= apt.start_time %></span>
+                      <span class="appointment-card__time__separator">-</span>
+                      <span class="appointment-card__time__end"><%= apt.end_time %></span>
+                    </div>
+                    <div class="appointment-card__info">
+                      <p class="appointment-card__patient"><%= apt.patient.full_name %></p>
+                      <p class="appointment-card__type"><%= apt.schedule.appointment_type if apt.schedule %></p>
+                    </div>
+                    <div class="appointment-card__status">
+                      <span class="badge badge--<%= apt.status %>"><%= apt.status.humanize %></span>
+                    </div>
+                  </div>
+                <% end %>
+              </div>
+            <% else %>
+              <p class="dash-home__text"><%= t(".daily.empty") %></p>
+            <% end %>
+          </div>
+        </div>
+      </div>
+
+      <div class="schedule-content__section" id="weekly" style="display: none;">
+        <div class="dash-group">
+          <header class="dash-group__header">
+            <h2 class="dash-group__title">
+              <i class="ri-calendar-line dash-group__title__icon"></i>
+              <%= t(".weekly.title", start: l(Date.today.beginning_of_week, format: "%d %b"), end: l(Date.today.end_of_week, format: "%d %b %Y")) %>
+            </h2>
+          </header>
+          <div class="dash-group__content">
+            <% if @weekly_appointments.any? %>
+              <div class="appointment-list">
+                <% @weekly_appointments.group_by(&:appointment_date).sort.each do |date, appointments| %>
+                  <div class="appointment-day">
+                    <h3 class="appointment-day__title"><%= l(date, format: "%A, %d %B") %></h3>
+                    <% appointments.each do |apt| %>
+                      <div class="appointment-card">
+                        <div class="appointment-card__time">
+                          <span class="appointment-card__time__start"><%= apt.start_time %></span>
+                          <span class="appointment-card__time__separator">-</span>
+                          <span class="appointment-card__time__end"><%= apt.end_time %></span>
+                        </div>
+                        <div class="appointment-card__info">
+                          <p class="appointment-card__patient"><%= apt.patient.full_name %></p>
+                          <p class="appointment-card__type"><%= apt.schedule.appointment_type if apt.schedule %></p>
+                        </div>
+                        <div class="appointment-card__status">
+                          <span class="badge badge--<%= apt.status %>"><%= apt.status.humanize %></span>
+                        </div>
+                      </div>
+                    <% end %>
+                  </div>
+                <% end %>
+              </div>
+            <% else %>
+              <p class="dash-home__text"><%= t(".weekly.empty") %></p>
+            <% end %>
+          </div>
+        </div>
+      </div>
+
+      <div class="schedule-content__section" id="monthly" style="display: none;">
+        <div class="dash-group">
+          <header class="dash-group__header">
+            <h2 class="dash-group__title">
+              <i class="ri-calendar-check-line dash-group__title__icon"></i>
+              <%= t(".monthly.title", month: l(Date.today, format: "%B %Y")) %>
+            </h2>
+          </header>
+          <div class="dash-group__content">
+            <% if @monthly_appointments.any? %>
+              <div class="appointment-calendar">
+                <% @monthly_appointments.group_by(&:appointment_date).sort.each do |date, appointments| %>
+                  <div class="appointment-calendar__day">
+                    <div class="appointment-calendar__date">
+                      <span class="appointment-calendar__day-number"><%= date.day %></span>
+                      <span class="appointment-calendar__weekday"><%= date.strftime("%a") %></span>
+                    </div>
+                    <div class="appointment-calendar__appointments">
+                      <% appointments.each do |apt| %>
+                        <div class="appointment-calendar__item">
+                          <span class="appointment-calendar__time"><%= apt.start_time %></span>
+                          <span class="appointment-calendar__patient"><%= apt.patient.full_name %></span>
+                        </div>
+                      <% end %>
+                    </div>
+                  </div>
+                <% end %>
+              </div>
+            <% else %>
+              <p class="dash-home__text"><%= t(".monthly.empty") %></p>
+            <% end %>
+          </div>
+        </div>
+      </div>
+
+      <div class="schedule-sidebar">
+        <div class="dash-group">
+          <header class="dash-group__header">
+            <h2 class="dash-group__title">
+              <i class="ri-settings-3-line dash-group__title__icon"></i>
+              <%= t(".availability.title") %>
+            </h2>
+            <div class="dash-group__actions">
+              <%= link_to new_specialist_schedule_path,
+                  class: "dash-button dash-button--small dash-button--new" do %>
+                <i class="ri-add-line dash-button__icon"></i>
+                <%= t(".availability.add") %>
+              <% end %>
+            </div>
+          </header>
+          <div class="dash-group__content">
+            <% if @schedules.any? %>
+              <div class="availability-list">
+                <% @schedules.each do |schedule| %>
+                  <div class="availability-item">
+                    <div class="availability-item__day">
+                      <%= t(".days.#{schedule.day_of_week}") %>
+                    </div>
+                    <div class="availability-item__time">
+                      <%= schedule.start_time %> - <%= schedule.end_time %>
+                    </div>
+                    <div class="availability-item__type">
+                      <%= schedule.appointment_type %>
+                    </div>
+                    <div class="availability-item__actions">
+                      <%= link_to edit_specialist_schedule_path(id: schedule.id, locale: I18n.locale),
+                          class: "dash-button dash-button--small dash-button--gray" do %>
+                        <i class="ri-edit-line"></i>
+                      <% end %>
+                      <%= button_to specialist_schedule_path(id: schedule.id, locale: I18n.locale),
+                          method: :delete,
+                          class: "dash-button dash-button--small dash-button--delete",
+                          data: { confirm: t(".confirm_delete") } do %>
+                        <i class="ri-delete-bin-line"></i>
+                      <% end %>
+                    </div>
+                  </div>
+                <% end %>
+              </div>
+            <% else %>
+              <p class="dash-home__text"><%= t(".availability.empty") %></p>
+            <% end %>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  .schedule-tabs {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 30px;
+    padding: 10px;
+    background: #ffffff;
+    border: 1px solid var(--color-border);
+    border-radius: 3px;
+  }
+
+  .schedule-tabs__tab {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 24px;
+    background: transparent;
+    border: none;
+    border-radius: 3px;
+    font-size: var(--text-sm);
+    font-weight: 500;
+    color: var(--color-text-light);
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+
+  .schedule-tabs__tab:hover {
+    background: var(--color-bg);
+    color: var(--color-text-dark);
+  }
+
+  .schedule-tabs__tab--active {
+    background: var(--color-primary);
+    color: #ffffff;
+  }
+
+  .schedule-content {
+    display: grid;
+    grid-template-columns: 1fr 350px;
+    gap: 30px;
+  }
+
+  .appointment-list {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+  }
+
+  .appointment-card {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    padding: 20px;
+    background: #ffffff;
+    border: 1px solid var(--color-border);
+    border-radius: 3px;
+  }
+
+  .appointment-card__time {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-width: 80px;
+    font-weight: 500;
+    color: var(--color-text-dark);
+  }
+
+  .appointment-card__time__separator {
+    color: var(--color-text-light);
+    font-size: var(--text-xs);
+  }
+
+  .appointment-card__info {
+    flex-grow: 1;
+  }
+
+  .appointment-card__patient {
+    font-weight: 500;
+    color: var(--color-text-dark);
+  }
+
+  .appointment-card__type {
+    font-size: var(--text-xs);
+    color: var(--color-text-light);
+  }
+
+  .appointment-day {
+    margin-bottom: 20px;
+  }
+
+  .appointment-day__title {
+    font-size: var(--text-base);
+    font-weight: 500;
+    color: var(--color-primary);
+    margin-bottom: 15px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .appointment-calendar {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 10px;
+  }
+
+  .appointment-calendar__day {
+    background: #ffffff;
+    border: 1px solid var(--color-border);
+    border-radius: 3px;
+    overflow: hidden;
+  }
+
+  .appointment-calendar__date {
+    background: var(--color-primary);
+    color: #ffffff;
+    padding: 10px;
+    text-align: center;
+  }
+
+  .appointment-calendar__day-number {
+    display: block;
+    font-size: var(--text-lg);
+    font-weight: 600;
+  }
+
+  .appointment-calendar__weekday {
+    font-size: var(--text-xs);
+    opacity: 0.8;
+  }
+
+  .appointment-calendar__appointments {
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+  }
+
+  .appointment-calendar__item {
+    font-size: var(--text-xs);
+    padding: 5px;
+    background: var(--color-bg);
+    border-radius: 2px;
+  }
+
+  .appointment-calendar__time {
+    font-weight: 500;
+    color: var(--color-primary);
+  }
+
+  .availability-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .availability-item {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 15px;
+    background: #ffffff;
+    border: 1px solid var(--color-border);
+    border-radius: 3px;
+  }
+
+  .availability-item__day {
+    font-weight: 600;
+    color: var(--color-primary);
+    min-width: 100px;
+  }
+
+  .availability-item__time {
+    flex-grow: 1;
+    color: var(--color-text-dark);
+  }
+
+  .availability-item__type {
+    font-size: var(--text-xs);
+    color: var(--color-text-light);
+  }
+
+  .availability-item__actions {
+    display: flex;
+    gap: 5px;
+  }
+</style>
+
+<script>
+  document.querySelectorAll('.schedule-tabs__tab').forEach(tab => {
+    tab.addEventListener('click', function() {
+      document.querySelectorAll('.schedule-tabs__tab').forEach(t => t.classList.remove('schedule-tabs__tab--active'));
+      this.classList.add('schedule-tabs__tab--active');
+
+      const tabId = this.dataset.tab;
+      document.querySelectorAll('.schedule-content__section').forEach(section => {
+        section.style.display = 'none';
+      });
+      document.getElementById(tabId).style.display = 'block';
+    });
+  });
+</script>

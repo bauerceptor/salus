@@ -1,0 +1,290 @@
+.treatment-requests-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: $space-lg;
+}
+
+.treatment-request-card {
+  background: #ffffff;
+  border: 1px solid $dash-base-border;
+  border-radius: $radius-lg;
+  padding: $space-lg;
+  transition: box-shadow 0.15s ease, transform 0.15s ease;
+
+  &:hover {
+    box-shadow: $shadow-md;
+    transform: translateY(-2px);
+  }
+
+  &__status {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.25rem 0.625rem;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    margin-bottom: $space-md;
+
+    &--pending {
+      background: rgba($color-warning, 0.1);
+      color: #d97706;
+    }
+
+    &--approved {
+      background: rgba($color-success, 0.1);
+      color: #059669;
+    }
+
+    &--rejected {
+      background: rgba($color-danger, 0.1);
+      color: $color-danger;
+    }
+  }
+
+  &__title {
+    font-size: $font-size-lg;
+    font-weight: 600;
+    color: $dash-text-dark;
+    margin-bottom: $space-sm;
+  }
+
+  &__description {
+    font-size: $font-size-sm;
+    color: $dash-text-light;
+    margin-bottom: $space-md;
+    line-height: $line-height-relaxed;
+  }
+
+  &__meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: $space-md;
+    font-size: 0.8125rem;
+    color: $dash-text-light;
+    margin-bottom: $space-md;
+
+    span {
+      display: flex;
+      align-items: center;
+      gap: $space-xs;
+
+      i {
+        color: $dash-base;
+      }
+    }
+  }
+
+  &__specialist {
+    font-size: $font-size-sm;
+    color: $dash-text-dark;
+    margin-bottom: $space-md;
+    display: flex;
+    align-items: center;
+    gap: $space-xs;
+
+    i {
+      color: $dash-base;
+    }
+  }
+
+  &__rejection {
+    font-size: $font-size-sm;
+    color: $color-danger;
+    margin-bottom: $space-md;
+    display: flex;
+    align-items: center;
+    gap: $space-xs;
+
+    i {
+      color: $color-danger;
+    }
+  }
+
+  &__actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: $space-sm;
+    padding-top: $space-md;
+    border-top: 1px solid $dash-base-border;
+  }
+}
+
+.treatment-requests-list {
+  display: flex;
+  flex-direction: column;
+  gap: $space-md;
+}
+
+.treatment-request-item {
+  background: #ffffff;
+  border: 1px solid $dash-base-border;
+  border-radius: $radius-lg;
+  padding: $space-lg;
+  transition: box-shadow 0.15s ease;
+
+  &:hover {
+    box-shadow: $shadow-sm;
+  }
+
+  &__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: $space-md;
+    gap: $space-md;
+  }
+
+  &__patient {
+    display: flex;
+    align-items: center;
+    gap: $space-md;
+  }
+
+  &__avatar {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    object-fit: cover;
+  }
+
+  &__patient-info {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  &__name {
+    font-size: $font-size-sm;
+    font-weight: 600;
+    color: $dash-text-dark;
+  }
+
+  &__date {
+    font-size: 0.8125rem;
+    color: $dash-text-light;
+  }
+
+  &__body {
+    margin-bottom: $space-md;
+  }
+
+  &__title {
+    font-size: $font-size-base;
+    font-weight: 600;
+    color: $dash-text-dark;
+    margin-bottom: $space-xs;
+  }
+
+  &__description {
+    font-size: $font-size-sm;
+    color: $dash-text-light;
+    margin-bottom: $space-sm;
+    line-height: $line-height-relaxed;
+  }
+
+  &__meta {
+    font-size: 0.8125rem;
+    color: $dash-text-light;
+    display: flex;
+    align-items: center;
+    gap: $space-xs;
+
+    i {
+      color: $dash-base;
+    }
+  }
+
+  &__actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: $space-sm;
+    padding-top: $space-md;
+    border-top: 1px solid $dash-base-border;
+  }
+}
+
+.prescriptions-list {
+  display: flex;
+  flex-direction: column;
+  gap: $space-md;
+}
+
+.prescription-item {
+  background: #ffffff;
+  border: 1px solid $dash-base-border;
+  border-radius: $radius-lg;
+  padding: $space-lg;
+  transition: box-shadow 0.15s ease;
+
+  &:hover {
+    box-shadow: $shadow-sm;
+  }
+
+  &__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: $space-md;
+    gap: $space-md;
+  }
+
+  &__patient {
+    display: flex;
+    align-items: center;
+    gap: $space-md;
+  }
+
+  &__avatar {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    object-fit: cover;
+  }
+
+  &__patient-info {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  &__name {
+    font-size: $font-size-sm;
+    font-weight: 600;
+    color: $dash-text-dark;
+  }
+
+  &__date {
+    font-size: 0.8125rem;
+    color: $dash-text-light;
+  }
+
+  &__body {
+    margin-bottom: $space-md;
+  }
+
+  &__title {
+    font-size: $font-size-base;
+    font-weight: 600;
+    color: $dash-text-dark;
+    margin-bottom: $space-xs;
+  }
+
+  &__notes {
+    font-size: $font-size-sm;
+    color: $dash-text-light;
+    margin-top: $space-xs;
+    line-height: $line-height-relaxed;
+  }
+
+  &--pending {
+    border-left: 4px solid $color-warning;
+  }
+
+  &--approved {
+    border-left: 4px solid $color-success;
+  }
+
+  &--rejected {
+    border-left: 4px solid $color-danger;
+  }
+}

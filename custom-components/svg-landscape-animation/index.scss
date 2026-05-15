@@ -1,0 +1,9 @@
+@import "bourbon";
+svg {
+  width: 666px;
+  height: 667px;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}

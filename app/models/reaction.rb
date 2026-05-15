@@ -1,0 +1,88 @@
+# == Schema Information
+#
+# Table name: reactions
+#
+#  id             :uuid             not null, primary key
+#  reactable_type :string           not null
+#  reaction_type  :string           default(""), not null
+#  created_at     :datetime         not null
+#  updated_at     :datetime         not null
+#  account_id     :uuid             not null
+#  reactable_id   :uuid             not null
+#
+# Indexes
+#
+#  index_reactions_on_account_id  (account_id)
+#  index_reactions_on_reactable   (reactable_type,reactable_id)
+#  index_unique_user_reactable    (account_id,reactable_id,reactable_type) UNIQUE
+#
+# Foreign Keys
+#
+#  fk_rails_...  (account_id => accounts.id)
+#
+class Reaction < ApplicationRecord
+  belongs_to :reactable, polymorphic: true
+  belongs_to :account
+
+  TYPES = %w[like dislike haha love sad angry].freeze
+
+  validates :reaction_type, presence: true, inclusion: { in: TYPES }
+  validates :account_id, uniqueness: { scope: %i[reactable_id reactable_type] }
+
+  after_create :create_karma_point, if: :post_reaction?
+  around_destroy :destroy_karma_point_around, if: :post_reaction?
+
+  def post_reaction?
+    reactable_type == "Post"
+  end
+
+  def karma_points_for_reaction
+    KarmaPoint.points_for(reaction_type)
+  end
+
+  private
+
+  def create_karma_point
+    return unless karma_points_for_reaction != 0
+
+    post = reactable
+    KarmaPoint.create!(
+      account: post.account,
+      post: post,
+      reaction_type: reaction_type,
+      points: karma_points_for_reaction
+    )
+  end
+
+  def destroy_karma_point_around
+    post = reactable
+    karma_points_for_reaction
+    yield
+    KarmaPoint.where(account: post.account, post: post, reaction_type: reaction_type)
+              .destroy_all
+  end
+
+  def like?
+    type == "like"
+  end
+
+  def dislike?
+    type == "dislike"
+  end
+
+  def haha?
+    type == "haha"
+  end
+
+  def love?
+    type == "love"
+  end
+
+  def sad?
+    type == "sad"
+  end
+
+  def angry?
+    type == "angry"
+  end
+end

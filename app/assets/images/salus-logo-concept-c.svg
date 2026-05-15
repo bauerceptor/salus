@@ -1,0 +1,78 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 80" role="img" aria-labelledby="logo-c-title logo-c-desc">
+  <title id="logo-c-title">Salus Logo - Pulse Network</title>
+  <desc id="logo-c-desc">Tech-forward geometric nodes forming a pulse wave representing health monitoring and connected care</desc>
+
+  <defs>
+    <linearGradient id="tealGradC" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#0d7377"/>
+      <stop offset="100%" style="stop-color:#14a3a8"/>
+    </linearGradient>
+    <linearGradient id="amberGradC" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#f59e0b"/>
+      <stop offset="100%" style="stop-color:#fbbf24"/>
+    </linearGradient>
+    <filter id="nodeGlow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="1.5" result="blur"/>
+      <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+    </filter>
+  </defs>
+
+  <!-- Icon: Node pattern forming pulse wave -->
+  <g transform="translate(8, 12)">
+    <!-- Baseline pulse wave -->
+    <path d="M4 36 L18 36 L24 20 L32 52 L40 24 L48 36 L60 36"
+          fill="none"
+          stroke="url(#tealGradC)"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          opacity="0.4"/>
+
+    <!-- Node network overlay -->
+    <!-- Node 1 (start) -->
+    <circle cx="4" cy="36" r="4" fill="url(#tealGradC)"/>
+
+    <!-- Node 2 (peak up) -->
+    <circle cx="24" cy="20" r="5" fill="url(#amberGradC)" filter="url(#nodeGlow)"/>
+
+    <!-- Node 3 (trough down) -->
+    <circle cx="32" cy="52" r="5" fill="url(#amberGradC)" filter="url(#nodeGlow)"/>
+
+    <!-- Node 4 (peak up) -->
+    <circle cx="40" cy="24" r="5" fill="url(#amberGradC)" filter="url(#nodeGlow)"/>
+
+    <!-- Node 5 (return) -->
+    <circle cx="48" cy="36" r="4" fill="url(#tealGradC)"/>
+
+    <!-- Node 6 (end) -->
+    <circle cx="60" cy="36" r="4" fill="url(#tealGradC)"/>
+
+    <!-- Connecting lines between nodes -->
+    <line x1="4" y1="36" x2="24" y2="20" stroke="#0d7377" stroke-width="1.5" opacity="0.5"/>
+    <line x1="24" y1="20" x2="32" y2="52" stroke="#f59e0b" stroke-width="1.5" opacity="0.5"/>
+    <line x1="32" y1="52" x2="40" y2="24" stroke="#f59e0b" stroke-width="1.5" opacity="0.5"/>
+    <line x1="40" y1="24" x2="48" y2="36" stroke="#0d7377" stroke-width="1.5" opacity="0.5"/>
+    <line x1="48" y1="36" x2="60" y2="36" stroke="#0d7377" stroke-width="1.5" opacity="0.5"/>
+
+    <!-- Floating accent nodes -->
+    <circle cx="14" cy="12" r="3" fill="#0d7377" opacity="0.4"/>
+    <circle cx="50" cy="8" r="2.5" fill="#f59e0b" opacity="0.6"/>
+    <circle cx="8" cy="52" r="2.5" fill="#0d7377" opacity="0.4"/>
+    <circle cx="56" cy="52" r="3" fill="#0d7377" opacity="0.4"/>
+  </g>
+
+  <!-- SALUS Wordmark -->
+  <text x="80" y="38"
+        font-family="'Source Sans 3', system-ui, -apple-system, sans-serif"
+        font-size="32"
+        font-weight="800"
+        fill="#0d7377"
+        letter-spacing="-0.5">SALUS</text>
+
+  <!-- Tagline -->
+  <text x="82" y="56"
+        font-family="'Source Sans 3', system-ui, sans-serif"
+        font-size="10"
+        fill="#64748b"
+        letter-spacing="2">CHRONIC CARE SUPPORT</text>
+</svg>

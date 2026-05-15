@@ -1,0 +1,66 @@
+service: salus
+
+image: ghcr.io/your-org/salus
+
+# Use the Dockerfiles directory for multi-stage build
+dockerfile: Dockerfile
+
+builder:
+  multiarch: false
+  secrets:
+    - name: rubygems-api-key
+      api_key: <%= ENV["RUBYGEMS_API_KEY"] %>
+
+registry:
+  username: your-org
+  password: <%= ENV["GITHUB_TOKEN"] %>
+
+server:
+  address: <%= ENV["DEPLOY_HOST"] %>
+  username: deploy
+  ssh:
+    keys:
+      - <%= ENV["SSH_KEY"] %>
+    port: 22
+
+env:
+  clear:
+    RAILS_ENV: production
+    RACK_ENV: production
+  secret:
+    - RAILS_MASTER_KEY
+    - RUBYGEMS_API_KEY
+    - POSTGRES_HOST
+    - POSTGRES_PORT
+    - POSTGRES_USERNAME
+    - POSTGRES_PASSWORD
+    - DB_NAME
+
+accessories:
+  db:
+    image: postgres:18
+    host: <%= ENV["DB_HOST"] %>
+    port: 5432
+    env:
+      secret:
+        - POSTGRES_PASSWORD
+    volumes:
+      - /var/lib/salus/postgresql:/var/lib/postgresql/data
+    options:
+      persist: true
+
+sectors:
+  web:
+    build:
+      args:
+        RUBY_VERSION: 3.4.9
+    roles:
+      - web
+
+  worker:
+    build:
+      args:
+        RUBY_VERSION: 3.4.9
+    cmd: bundle exec bin/rails solid_queue:work
+    roles:
+      - worker

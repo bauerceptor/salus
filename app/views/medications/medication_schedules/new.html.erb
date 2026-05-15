@@ -1,0 +1,46 @@
+<div class="p-6">
+  <header class="flex items-center justify-between mb-6 pb-4 border-b border-[var(--color-border)]">
+    <div>
+      <h1 class="text-xl font-semibold flex items-center gap-2 text-[var(--color-text-dark)]">
+        <i class="ri-calendar-check-line text-[var(--color-primary)]"></i>
+        <%= t(".title") %>
+      </h1>
+      <%= render "shared/breadcrumbs" %>
+    </div>
+    <div class="flex gap-2">
+      <%= link_to medication_path(id: @medication.id, locale: "en"),
+          class: "dash-button dash-button--back" do %>
+        <i class="ri-arrow-left-line"></i>
+      <% end %>
+    </div>
+  </header>
+
+  <%= turbo_frame_tag "flash" do %>
+    <%= render "shared/dash_flash" %>
+  <% end %>
+
+  <div class="max-w-lg">
+    <%= form_with(url: medication_medication_schedules_path(medication_id: @medication.id, locale: "en"), method: :post, local: true, scope: :medication_schedule, html: { class: "bg-white rounded border border-[var(--color-border)] p-6" }) do |form| %>
+      <div class="mb-4">
+        <label class="block text-sm font-medium mb-2 text-[var(--color-text-light)]"><%= t(".scheduled_time.title") %></label>
+        <p class="text-xs mb-2 text-[var(--color-text-light)]"><%= t(".scheduled_time.description") %></p>
+        <%= form.time_field :scheduled_time, class: "w-full px-3 py-2 rounded text-sm bg-[#f0f9ff] border border-[var(--color-border)]" %>
+      </div>
+
+      <div class="mb-4">
+        <label class="block text-sm font-medium mb-2 text-[var(--color-text-light)]"><%= t(".time_of_day.title") %></label>
+        <p class="text-xs mb-2 text-[var(--color-text-light)]"><%= t(".time_of_day.description") %></p>
+        <%= form.select :time_of_day, options_for_select([
+          [t("medications.schedule_form.time_of_day.morning"), "morning"],
+          [t("medications.schedule_form.time_of_day.afternoon"), "afternoon"],
+          [t("medications.schedule_form.time_of_day.evening"), "evening"],
+          [t("medications.schedule_form.time_of_day.night"), "night"]
+        ], @medication_schedule.time_of_day), { include_blank: true }, class: "w-full px-3 py-2 rounded text-sm bg-[#f0f9ff] border border-[var(--color-border)]" %>
+      </div>
+
+      <div class="flex gap-2">
+        <%= form.submit t("dash_form.submit"), class: "dash-button" %>
+      </div>
+    <% end %>
+  </div>
+</div>

@@ -1,0 +1,74 @@
+<div class="page-schedules-edit">
+  <header class="page-header">
+    <div class="page-header__left">
+      <h1 class="page-header__title">
+        <i class="ri-calendar-check-line"></i>
+        <%= t(".title") %>
+      </h1>
+      <%= render "shared/breadcrumbs" %>
+    </div>
+    <div class="page-header__right">
+      <%= link_to specialist_schedules_path, class: "dash-button dash-button--back" do %>
+        <i class="ri-arrow-left-line"></i>
+      <% end %>
+    </div>
+  </header>
+
+  <%= turbo_frame_tag "flash" do %>
+    <%= render "shared/dash_flash" %>
+  <% end %>
+
+  <div class="page-content">
+    <div class="dash-form dash-form--simple">
+      <%= form_with model: @schedule, url: specialist_schedule_path(id: @schedule.id, locale: I18n.locale), method: :patch do |f| %>
+        <div class="dash-form__group">
+          <%= f.label :day_of_week, t(".day_of_week"), class: "dash-form__label" %>
+          <%= f.select :day_of_week,
+              options_for_select([
+                [t(".days.monday"), 1],
+                [t(".days.tuesday"), 2],
+                [t(".days.wednesday"), 3],
+                [t(".days.thursday"), 4],
+                [t(".days.friday"), 5],
+                [t(".days.saturday"), 6],
+                [t(".days.sunday"), 7]
+              ], @schedule.day_of_week),
+              { prompt: t(".select_day") },
+              class: "dash-form__input dash-form__select" %>
+        </div>
+
+        <div class="dash-form__group">
+          <%= f.label :start_time, t(".start_time"), class: "dash-form__label" %>
+          <%= f.time_field :start_time, class: "dash-form__input", value: @schedule.start_time %>
+        </div>
+
+        <div class="dash-form__group">
+          <%= f.label :end_time, t(".end_time"), class: "dash-form__label" %>
+          <%= f.time_field :end_time, class: "dash-form__input", value: @schedule.end_time %>
+        </div>
+
+        <div class="dash-form__group">
+          <%= f.label :appointment_type, t(".appointment_type"), class: "dash-form__label" %>
+          <%= f.text_field :appointment_type, class: "dash-form__input", value: @schedule.appointment_type, placeholder: t(".appointment_type_placeholder") %>
+        </div>
+
+        <div class="dash-form__group">
+          <%= f.label :duration_minutes, t(".duration_minutes"), class: "dash-form__label" %>
+          <%= f.number_field :duration_minutes, class: "dash-form__input", value: @schedule.duration_minutes, min: 15, max: 120 %>
+        </div>
+
+        <div class="dash-form__group">
+          <div class="dash-form__checkbox">
+            <%= f.check_box :is_active, { checked: @schedule.is_active }, true, false %>
+            <%= f.label :is_active, t(".is_active"), class: "dash-form__checkbox__label" %>
+          </div>
+        </div>
+
+        <div class="dash-form__group">
+          <%= f.submit t(".submit"), class: "dash-button dash-button--new" %>
+          <%= link_to t(".cancel"), specialist_schedules_path, class: "dash-button dash-button--gray" %>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</div>

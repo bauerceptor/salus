@@ -1,0 +1,51 @@
+<div class="specialist-dashboard">
+  <div class="specialist-content">
+    <header class="specialist-header">
+      <h1><i class="ri-file-list-3-line"></i> Recommendations</h1>
+      <p class="specialist-header__desc">Manage your patient recommendations</p>
+    </header>
+
+    <div class="specialist-table">
+      <% if @recommendations.any? %>
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Patient</th>
+              <th>Type</th>
+              <th>Name</th>
+              <th>Dosage</th>
+              <th>Status</th>
+              <th>Date</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% @recommendations.each do |rec| %>
+              <tr>
+                <td><%= rec.account&.full_name || "N/A" %></td>
+                <td><span class="badge badge--<%= rec.recommendation_type %>"><%= rec.recommendation_type.titleize %></span></td>
+                <td><%= rec.name %></td>
+                <td><%= rec.dosage.presence || "-" %></td>
+                <td><span class="badge badge--<%= rec.status %>"><%= rec.status.titleize %></span></td>
+                <td><%= rec.created_at.strftime("%b %d, %Y") %></td>
+                <td>
+                  <%= link_to "View", edit_specialist_recommendation_path(id: rec.id, locale: I18n.locale), class: "btn btn--small" %>
+                  <%= link_to "Delete", specialist_recommendation_path(id: rec.id, locale: I18n.locale), method: :delete, data: { confirm: "Are you sure?" }, class: "btn btn--small btn--danger" %>
+                </td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+        <div class="pagination">
+          <%== pagy_nav(@pagy) if @pagy %>
+        </div>
+      <% else %>
+        <div class="empty-state">
+          <i class="ri-file-list-3-line"></i>
+          <h3>No recommendations yet</h3>
+          <p>Recommendations you create for patients will appear here.</p>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</div>

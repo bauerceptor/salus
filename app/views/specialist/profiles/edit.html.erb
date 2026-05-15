@@ -1,0 +1,85 @@
+<div class="dash-home">
+  <div class="dash-home__content">
+    <header class="dash-home__header">
+      <div class="dash-home__header__left">
+        <h1 class="dash-home__header__title">
+          <i class="ri-user-settings-line dash-home__header__title__icon"></i>
+          <%= t(".title") %>
+        </h1>
+        <p class="dash-home__header__text"><%= t(".subtitle") %></p>
+      </div>
+    </header>
+
+    <div class="profile-edit-grid">
+      <div class="dash-group">
+        <header class="dash-group__header">
+          <h2 class="dash-group__title">
+            <i class="ri-user-line dash-group__title__icon"></i>
+            <%= t(".personal_info") %>
+          </h2>
+        </header>
+        <div class="dash-group__content">
+          <%= form_with model: @account, url: specialist_profile_path, method: :patch, class: "dash-form dash-form--simple" do |f| %>
+            <div class="dash-form__group">
+              <%= f.label :first_name, t(".first_name"), class: "dash-form__label" %>
+              <%= f.text_field :first_name, class: "dash-form__input", value: @account.first_name %>
+            </div>
+
+            <div class="dash-form__group">
+              <%= f.label :last_name, t(".last_name"), class: "dash-form__label" %>
+              <%= f.text_field :last_name, class: "dash-form__input", value: @account.last_name %>
+            </div>
+
+            <div class="dash-form__group">
+              <%= f.label :phone_number, t(".phone"), class: "dash-form__label" %>
+              <%= f.telephone_field :phone_number, class: "dash-form__input", value: @account.phone_number %>
+            </div>
+
+            <div class="dash-form__group">
+              <%= f.submit t(".save_personal"), class: "dash-button dash-button--new" %>
+            </div>
+          <% end %>
+        </div>
+      </div>
+
+      <div class="dash-group">
+        <header class="dash-group__header">
+          <h2 class="dash-group__title">
+            <i class="ri-nurse-line dash-group__title__icon"></i>
+            <%= t(".professional_info") %>
+          </h2>
+        </header>
+        <div class="dash-group__content">
+          <%= form_with model: @specialist, url: specialist_profile_path, method: :patch, class: "dash-form dash-form--simple" do |f| %>
+            <div class="dash-form__group">
+              <%= f.label :specialization, t(".specialization"), class: "dash-form__label" %>
+              <%= f.text_field :specialization, class: "dash-form__input", value: @specialist.specialization %>
+            </div>
+
+            <div class="dash-form__group">
+              <%= f.label :field_of_expertise, t(".field_of_expertise"), class: "dash-form__label" %>
+              <%= f.text_field :field_of_expertise, class: "dash-form__input", value: @specialist.field_of_expertise %>
+            </div>
+
+            <div class="dash-form__group">
+              <%= f.label :specialization_description, t(".description"), class: "dash-form__label" %>
+              <%= f.text_area :specialization_description, class: "dash-form__input dash-form__textarea", value: @specialist.specialization_description %>
+            </div>
+
+            <div class="dash-form__group">
+              <%= f.submit t(".save_professional"), class: "dash-button dash-button--new" %>
+            </div>
+          <% end %>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  .profile-edit-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 30px;
+  }
+</style>

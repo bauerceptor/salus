@@ -1,0 +1,21 @@
+.under-construction {
+  height: 100%;
+  min-height: 100vh;
+  display: grid;
+  place-content: center center;
+
+  &__title {
+    font-size: 2.25em;
+    font-family: "Helvetica Neue", "Helvetica", system-ui, sans-serif;
+    font-weight: 700;
+    margin: 0 0 1em;
+    text-align: center;
+    color: $dash-text-dark;
+  }
+
+  &__canvas {
+    height: 160px;
+    image-rendering: pixelated;
+    width: 264px;
+  }
+}

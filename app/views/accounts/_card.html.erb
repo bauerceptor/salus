@@ -1,0 +1,111 @@
+<div class="profile">
+  <div class="profile__card">
+    <div class="profile__card__background <%= "profile__card__background--specialist" if role_specialist? @account.user %>"
+         style="<%= @account.background&.url ? "background-image: url(#{@account.background.url});" : "" %>">
+    </div>
+    <div class="profile__card__content">
+      <div class="profile__card__top">
+        <%= render "shared/avatar", account: @account, css_class: "profile__card__avatar", alt: "" %>
+        <div class="profile__card__buttons">
+          <% if policy(@account).show? && current_account != @account %>
+            <%= link_to chatrooms_path(user_id: @account.id, locale: I18n.locale), method: :post, class: "dash-button dash-button--line" do %>
+              <i class="ri-chat-3-line dash-button__icon"></i>
+              <%= t(".send_message") %>
+            <% end %>
+          <% end %>
+          <% unless current_account == @account %>
+            <% if current_account.friend?(@account) %>
+              <div class="dash-button dash-button--line">
+                <i class="ri-user-follow-line dash-button__icon"></i>
+              </div>
+            <% elsif current_account.friend_request_sent?(@account) %>
+              <div class="dash-button dash-button--light-blue">
+                <i class="ri-mail-send-line dash-button__icon"></i>
+                <%= t(".request_sent") %>
+              </div>
+            <% elsif current_account.friend_request_received?(@account) %>
+              <div class="dash-button dash-button--blue">
+                <i class="ri-mail-send-line dash-button__icon"></i>
+                <%= t(".accept_request") %>
+              </div>
+            <% else %>
+              <%= button_to friend_requests_path(account_id: @account), method: :post,
+                  class: "dash-button dash-button--new" do %>
+                <i class="ri-user-add-line dash-button__icon"></i>
+                <%= t(".add_friend") %>
+              <% end %>
+            <% end %>
+          <% end %>
+          <% if current_account != @account %>
+            <div data-controller="dropdown" class="dash-dropdown dash-dropdown--big">
+              <button class="dash-dropdown__button" type="button" data-action="dropdown#toggle click@window->dropdown#hide">
+                <i class="ri-more-fill"></i>
+              </button>
+              <div
+                data-dropdown-target="menu"
+                class="hidden transition transform origin-top-right dash-dropdown__list "
+                data-transition-enter-from="opacity-0 scale-95"
+                data-transition-enter-to="opacity-100 scale-100"
+                data-transition-leave-from="opacity-100 scale-100"
+                data-transition-leave-to="opacity-0 scale-95"
+              >
+                <%= link_to settings_settings_path, class: "dash-dropdown__item" do %>
+                  <i class="ri-alert-line dash-dropdown__item__icon"></i>
+                  <%= t(".report") %>
+                <% end %>
+              </div>
+            </div>
+          <% end %>
+        </div>
+      </div>
+      <div class="profile__card__middle">
+        <div class="profile__card__middle__left">
+          <h1 class="profile__card__name">
+            <%= @account.full_name %>
+            <% if role_specialist? @account.user %>
+              <span class="mark-specialist">
+                <i class="ri-check-line"></i>
+              </span>
+            <% end %>
+          </h1>
+          <p class="profile__card__description">@<%= @account.username %></p>
+        </div>
+        <div class="profile__card__middle__right">
+          <% if role_specialist? @account.user %>
+            <div class="profile__card__specialist">
+              <%= @account.user.specialist.field_of_expertise %>
+            </div>
+            <div class="profile__card__specialist-overtitle">
+              <%= t(".specialization") %>
+            </div>
+            <div class="profile__card__specialist-text">
+              <%= @account.user.specialist.specialization.blank? ? '-' : @account.user.specialist.specialization %>
+            </div>
+          <% end %>
+        </div>
+      </div>
+      <nav class="profile__card__nav">
+        <ul class="profile__card__nav__list">
+          <li class="profile__card__nav__item">
+            <%= link_to account_path(id: @account.id, locale: I18n.locale),
+                class: "profile__card__nav__link #{'profile__card__nav__link--active' if current_page?(account_path(id: @account.id, locale: I18n.locale))}" do %>
+              <%= t(".informations") %>
+            <% end %>
+          </li>
+          <li class="profile__card__nav__item">
+            <%= link_to account_friends_path(account_id: @account.id, locale: I18n.locale),
+                class: "profile__card__nav__link #{'profile__card__nav__link--active' if current_page?(account_friends_path(account_id: @account.id, locale: I18n.locale))}" do %>
+              <%= t(".friends") %>
+            <% end %>
+          </li>
+          <li class="profile__card__nav__item">
+            <%= link_to account_posts_path(account_id: @account.id, locale: I18n.locale),
+                class: "profile__card__nav__link #{'profile__card__nav__link--active' if current_page?(account_posts_path(account_id: @account.id, locale: I18n.locale))}" do %>
+              <%= t(".disease_statuses") %>
+            <% end %>
+          </li>
+        </ul>
+      </nav>
+    </div>
+  </div>
+</div>

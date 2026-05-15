@@ -1,0 +1,78 @@
+<div class="dash-home">
+  <div class="dash-home__content">
+    <header class="dash-header">
+      <div class="dash-header__left">
+        <h1 class="dash-header__title">
+          <i class="ri-message-3-line dash-header__title__icon"></i>
+          Chat Health Monitor
+        </h1>
+        <p class="dash-header__desc">WhatsApp-style chat observability per specialist</p>
+      </div>
+    </header>
+
+    <% if @specialist_stats.any? %>
+      <div class="dash-group">
+        <div class="dash-group__header">
+          <h2 class="dash-group__title">
+            <i class="ri-user-star-line dash-group__title__icon"></i>
+            Specialist Chat Status (<%= @specialist_stats.count %>)
+          </h2>
+        </div>
+        <div class="dash-group__content">
+          <div class="chat-health-grid">
+            <% @specialist_stats.each do |stat| %>
+              <div class="chat-health-card">
+                <div class="chat-health-card__header">
+                  <div class="chat-health-card__specialist">
+                    <div class="chat-health-card__avatar">
+                      <i class="ri-user-3-line"></i>
+                    </div>
+                    <div class="chat-health-card__info">
+                      <h3 class="chat-health-card__name"><%= stat[:specialist_name] %></h3>
+                      <p class="chat-health-card__role"><%= stat[:specialization] %></p>
+                    </div>
+                  </div>
+                  <div class="chat-health-card__status <%= stat[:messages_sent_last_30d] > 0 ? 'chat-health-card__status--active' : 'chat-health-card__status--inactive' %>">
+                    <span class="chat-health-card__status-dot"></span>
+                    <span><%= stat[:messages_sent_last_30d] > 0 ? 'Active' : 'No Activity' %></span>
+                  </div>
+                </div>
+                <div class="chat-health-card__stats">
+                  <div class="chat-health-card__stat">
+                    <span class="chat-health-card__stat-value"><%= stat[:messages_sent_last_30d] %></span>
+                    <span class="chat-health-card__stat-label">Messages (30d)</span>
+                  </div>
+                  <div class="chat-health-card__stat">
+                    <span class="chat-health-card__stat-value <%= stat[:zero_history_patients] > 0 ? 'chat-health-card__stat-value--warning' : '' %>"><%= stat[:zero_history_patients] %></span>
+                    <span class="chat-health-card__stat-label">No Chat History</span>
+                  </div>
+                  <div class="chat-health-card__stat chat-health-card__stat--wide">
+                    <span class="chat-health-card__stat-value"><%= stat[:last_message_at] ? time_ago_in_words(stat[:last_message_at]) + ' ago' : 'Never' %></span>
+                    <span class="chat-health-card__stat-label">Last Message</span>
+                  </div>
+                </div>
+                <% if stat[:zero_history_patients] > 0 %>
+                  <div class="chat-health-card__alert">
+                    <i class="ri-alert-line"></i>
+                    <span><%= stat[:zero_history_patients] %> patient(s) with no chat history</span>
+                  </div>
+                <% end %>
+              </div>
+            <% end %>
+          </div>
+        </div>
+      </div>
+    <% else %>
+      <div class="dash-group">
+        <div class="dash-group__content">
+          <div class="dash-empty-state">
+            <div class="dash-empty-state__icon-wrapper">
+              <i class="ri-message-3-line dash-empty-state__icon"></i>
+            </div>
+            <p class="dash-empty-state__text">No specialists found</p>
+          </div>
+        </div>
+      </div>
+    <% end %>
+  </div>
+</div>

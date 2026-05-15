@@ -1,0 +1,69 @@
+<div class="page-group">
+  <div class="dash-flash-messages">
+    <%= turbo_frame_tag "flash" do %>
+      <%= render "shared/dash_flash" %>
+    <% end %>
+  </div>
+  <div class="page-group__content">
+    <div class="group">
+      <%= render "groups/header" %>
+      <%= render "groups/nav" %>
+      <div class="group__content">
+        <div class="group-symptoms">
+          <div class="dash-group">
+            <header class="dash-group__header">
+              <h2 class="dash-group__title">
+                <i class="ri-hospital-line dash-group__title__icon"></i>
+                <%= t(".title") %>
+              </h2>
+              <div class="dash-group__actions"></div>
+            </header>
+            <div class="dash-group__content">
+              <div class="group-treatments">
+                <p class="group-treatments__text"><%= t(".description") %></p>
+                <% if @treatments.to_a.any? %>
+                  <div class="group-treatments__list">
+                    <% @treatments.each do |treatment| %>
+                      <div class="treatment">
+                        <h2 class="treatment__title">
+                          <%= treatment.title %>
+                          <% if treatment.is_finished? %>
+                            <div class="treatment__finished" title="Treatment finished">
+                              <i class="ri-check-double-fill"></i>
+                            </div>
+                          <% end %>
+                        </h2>
+                        <p class="treatment__username">
+                          @<%= treatment.account.username %>
+                        </p>
+                        <div class="treatment__footer">
+                          <span class="treatment__date">
+                            <i class="ri-calendar-line treatment__icon"></i>
+                            <%= t(".treatment.duration", duration: treatment.days_difference) %>
+                          </span>
+                          <%= link_to t(".treatment.show"), treatment_path(id: treatment.id, locale: I18n.locale), class: "treatment__button" %>
+                        </div>
+                      </div>
+                    <% end %>
+                  </div>
+                <% else %>
+                  <p class="no-results">
+                    <%= t(".no_results") %>
+                  </p>
+                <% end %>
+              </div>
+            </div>
+            <div class="dash-pagination">
+              <div class="dash-pagination__controls">
+                <%== pagy_nav(@pagy) if @pagy.pages > 1 %>
+              </div>
+              <div class="dash-pagination__info">
+                <%== pagy_info(@pagy) %>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,104 @@
+# == Schema Information
+#
+# Table name: disease_statuses
+#
+#  id         :uuid             not null, primary key
+#  content    :text             default(""), not null
+#  mood       :integer          default(3), not null
+#  status     :string           default(""), not null
+#  created_at :datetime         not null
+#  updated_at :datetime         not null
+#  disease_id :uuid             not null
+#
+# Indexes
+#
+#  index_disease_statuses_on_disease_id  (disease_id)
+#
+# Foreign Keys
+#
+#  fk_rails_...  (disease_id => diseases.id)
+#
+class DiseaseStatus < ApplicationRecord
+  belongs_to :disease, inverse_of: :statuses
+
+  has_many :comments, as: :commentable, dependent: :destroy
+  has_many :reactions, as: :reactable, dependent: :destroy
+
+  STATUSES = %w[diagnosed suspicion deterioration significant_deterioration
+                improvement significant_improvement cured relapsed].freeze
+
+  validates :content, presence: true, length: { maximum: 500 }
+  validates :mood, presence: true,
+                   numericality: {
+                     only_integer: true,
+                     greater_than_or_equal_to: 1,
+                     less_than_or_equal_to: 3
+                   }
+  validates :status, presence: true, inclusion: { in: STATUSES }
+
+  scope :visible, -> { where(hidden: false) }
+
+  before_validation :set_defaults
+
+  def hidden?
+    hidden
+  end
+
+  def hide!
+    update!(hidden: true, hidden_at: Time.current)
+  end
+
+  def unhide!
+    update!(hidden: false, hidden_at: nil)
+  end
+
+  def diagnosed?
+    status == "diagnosed"
+  end
+
+  def suspicion?
+    status == "suspicion"
+  end
+
+  def deterioration?
+    status == "deterioration"
+  end
+
+  def significant_deterioration?
+    status == "significant_deterioration"
+  end
+
+  def improvement?
+    status == "improvement"
+  end
+
+  def significant_improvement?
+    status == "significant_improvement"
+  end
+
+  def cured?
+    status == "cured"
+  end
+
+  def relapsed?
+    status == "relapsed"
+  end
+
+  private
+
+  def set_defaults
+    self.status ||= "diagnosed"
+    self.mood = mood_from_status if STATUSES.include?(status)
+  end
+
+  def mood_from_status
+    case status
+    when "deterioration", "significant_deterioration"
+      1
+    when "improvement", "significant_improvement", "cured"
+      3
+    else
+      2
+    end
+  end
+end

@@ -1,0 +1,12 @@
+#!/bin/bash
+# Stop PostgreSQL container for Salus project
+
+CONTAINER_NAME="salus-postgres"
+
+if podman ps -q --filter "name=${CONTAINER_NAME}" | grep -q .; then
+    echo "Stopping container '${CONTAINER_NAME}'..."
+    podman stop "${CONTAINER_NAME}"
+    echo "Container stopped"
+else
+    echo "Container '${CONTAINER_NAME}' is not running"
+fi

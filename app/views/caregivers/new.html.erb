@@ -1,0 +1,118 @@
+<div class="page-caregivers-new">
+  <header class="dash-header">
+    <div class="dash-header__left">
+      <h1 class="dash-header__title">
+        <i class="ri-user-follow-line dash-header__title__icon"></i>
+        <%= t(".title") %>
+      </h1>
+      <%= render "shared/breadcrumbs" %>
+    </div>
+    <div class="dash-header__right">
+      <%= link_to caregivers_path, class: "dash-button dash-button--back" do %>
+        <i class="ri-arrow-left-line dash-button__icon"></i>
+      <% end %>
+    </div>
+  </header>
+  <div class="dash-flash-messages">
+    <%= turbo_frame_tag "flash" do %>
+      <%= render "shared/dash_flash" %>
+    <% end %>
+  </div>
+  <div class="page-caregivers-new__content">
+    <%= form_with(model: @caregiver, url: caregivers_path, html: { class: "dash-form" }) do |form| %>
+      <div class="dash-form__container">
+        <div class="dash-form__group">
+          <div class="dash-form__group__container">
+            <div class="dash-form__group__left">
+              <div class="dash-form__group__title"><%= t(".caregiver.title") %></div>
+              <p class="dash-form__group__description"><%= t(".caregiver.description") %></p>
+            </div>
+            <div class="dash-form__group__right">
+              <%= form.collection_select :caregiver_account_id, @potential_caregivers, :id, :full_name, { include_blank: true }, class: "dash-form__input" %>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="dash-form__container">
+        <div class="dash-form__group">
+          <div class="dash-form__group__container">
+            <div class="dash-form__group__left">
+              <div class="dash-form__group__title"><%= t(".relationship.title") %></div>
+            </div>
+            <div class="dash-form__group__right">
+              <%= form.select :relationship, options_for_select([
+                [t(".relationship.parent"), "parent"],
+                [t(".relationship.child"), "child"],
+                [t(".relationship.spouse"), "spouse"],
+                [t(".relationship.sibling"), "sibling"],
+                [t(".relationship.friend"), "friend"],
+                [t(".relationship.other"), "other"]
+              ]), {}, class: "dash-form__input" %>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="dash-form__container">
+        <div class="dash-form__group">
+          <div class="dash-form__group__container">
+            <div class="dash-form__group__left">
+              <div class="dash-form__group__title"><%= t(".permissions.title") %></div>
+            </div>
+            <div class="dash-form__group__right">
+              <div class="dash-form__checkbox">
+                <%= form.check_box :can_view_medications, class: "dash-form__checkbox__input" %>
+                <%= form.label :can_view_medications, class: "dash-form__checkbox__label" do %>
+                  <%= t(".permissions.can_view_medications") %>
+                <% end %>
+              </div>
+              <div class="dash-form__checkbox">
+                <%= form.check_box :can_view_measurements, class: "dash-form__checkbox__input" %>
+                <%= form.label :can_view_measurements, class: "dash-form__checkbox__label" do %>
+                  <%= t(".permissions.can_view_measurements") %>
+                <% end %>
+              </div>
+              <div class="dash-form__checkbox">
+                <%= form.check_box :can_view_diseases, class: "dash-form__checkbox__input" %>
+                <%= form.label :can_view_diseases, class: "dash-form__checkbox__label" do %>
+                  <%= t(".permissions.can_view_diseases") %>
+                <% end %>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="dash-form__container">
+        <div class="dash-form__group">
+          <div class="dash-form__group__container">
+            <div class="dash-form__group__left">
+              <div class="dash-form__group__title"><%= t(".notifications.title") %></div>
+            </div>
+            <div class="dash-form__group__right">
+              <div class="dash-form__checkbox">
+                <%= form.check_box :notify_on_missed_dose, class: "dash-form__checkbox__input" %>
+                <%= form.label :notify_on_missed_dose, class: "dash-form__checkbox__label" do %>
+                  <%= t(".notifications.notify_on_missed_dose") %>
+                <% end %>
+              </div>
+              <div class="dash-form__checkbox">
+                <%= form.check_box :notify_on_low_adherence, class: "dash-form__checkbox__input" %>
+                <%= form.label :notify_on_low_adherence, class: "dash-form__checkbox__label" do %>
+                  <%= t(".notifications.notify_on_low_adherence") %>
+                <% end %>
+              </div>
+              <div class="dash-form__checkbox">
+                <%= form.check_box :notify_on_abnormal_measurement, class: "dash-form__checkbox__input" %>
+                <%= form.label :notify_on_abnormal_measurement, class: "dash-form__checkbox__label" do %>
+                  <%= t(".notifications.notify_on_abnormal_measurement") %>
+                <% end %>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="dash-form__group">
+        <%= form.submit t("dash_form.submit"), class: "dash-form__submit dash-button dash-button--new" %>
+      </div>
+    <% end %>
+  </div>
+</div>

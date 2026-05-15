@@ -1,0 +1,41 @@
+<%= form_with(model: @measurement, url: @measurement.new_record? ? create_measurements_path(measurement_type: params[:measurement_type], locale: I18n.locale) : nil,
+    method: @measurement.new_record? ? :post : nil, html: { class: "dash-form" }) do |f| %>
+  <div class="dash-form__container">
+    <div class="dash-form__group">
+      <div class="dash-form__group__container">
+        <div class="dash-form__group__left">
+          <div class="dash-form__group__title"><%= t(".value.title") %></div>
+          <p class="dash-form__group__description"><%= t(".value.description") %></p>
+        </div>
+        <div class="dash-form__group__right">
+          <div class="dash-form__input-container">
+            <%= f.text_field :value, class: "dash-form__input" %>
+            <div class="dash-form__input-icon">
+              <%= @measurement.measurement_type.unit.symbol %>
+            </div>
+          </div>
+        </div>
+      </div>
+      <%= render DashFormErrorComponent.new(model: @measurement, field: :value) %>
+    </div>
+  </div>
+
+  <div class="dash-form__container">
+    <div class="dash-form__group">
+      <div class="dash-form__group__container">
+        <div class="dash-form__group__left">
+          <div class="dash-form__group__title"><%= t(".measurement_date.title") %></div>
+          <p class="dash-form__group__description"><%= t(".measurement_date.description") %></p>
+        </div>
+        <div class="dash-form__group__right">
+          <%= f.datetime_field :measurement_date, class: "dash-form__input" %>
+        </div>
+      </div>
+      <%= render DashFormErrorComponent.new(model: @measurement, field: :measurement_date) %>
+    </div>
+  </div>
+
+  <div class="dash-form__group">
+    <%= f.submit t("dash_form.submit"), class: "dash-form__submit dash-button dash-button--new" %>
+  </div>
+<% end %>

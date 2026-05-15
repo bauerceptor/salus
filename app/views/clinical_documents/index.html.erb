@@ -1,0 +1,77 @@
+<div class="salus-page-container">
+  <header class="salus-page-header">
+    <div class="salus-page-header__left">
+      <h1 class="salus-page-header__title">
+        <i class="ri-file-text-line salus-page-header__icon"></i>
+        Clinical Documents
+      </h1>
+      <%= render "shared/breadcrumbs" %>
+    </div>
+    <div class="salus-page-header__actions">
+      <%= link_to specialist_patient_path(id: @patient.id), class: "salus-btn salus-btn--secondary" do %>
+        <i class="ri-arrow-left-line salus-btn__icon"></i>
+      <% end %>
+    </div>
+  </header>
+
+  <% if @documents.any? %>
+    <div class="salus-card">
+      <div class="salus-table-wrapper">
+        <table class="salus-table">
+          <thead>
+            <tr>
+              <th>Document Type</th>
+              <th>Filename</th>
+              <th>Imported</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% @documents.each do |doc| %>
+              <tr>
+                <td>
+                  <span class="salus-badge salus-badge--info">
+                    <%= doc.document_type.humanize %>
+                  </span>
+                </td>
+                <td><%= doc.file_data["filename"] || "Unnamed document" %></td>
+                <td><%= doc.created_at.strftime("%B %d, %Y at %I:%M %p") %></td>
+                <td>
+                  <% if doc.ai_processed? %>
+                    <span class="salus-badge salus-badge--success">AI Processed</span>
+                  <% else %>
+                    <span class="salus-badge salus-badge--warning">Pending</span>
+                  <% end %>
+                </td>
+                <td>
+                  <div style="display: flex; gap: var(--space-xs);">
+                    <%= link_to clinical_document_path(id: doc, format: :pdf), target: "_blank",
+                                class: "salus-btn salus-btn--primary salus-btn--sm salus-btn--icon",
+                                title: "View PDF" do %>
+                      <i class="ri-eye-line"></i>
+                    <% end %>
+                    <%= button_to clinical_document_path(id: doc), method: :delete,
+                                   form: { style: "display: inline;" },
+                                   class: "salus-btn salus-btn--danger salus-btn--sm salus-btn--icon",
+                                   title: "Delete",
+                                   data: { confirm: "Are you sure you want to delete this document?" } do %>
+                      <i class="ri-delete-bin-line"></i>
+                    <% end %>
+                  </div>
+                </td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  <% else %>
+    <div class="salus-card">
+      <div style="text-align: center; padding: var(--space-xl); color: var(--color-text-muted);">
+        <i class="ri-file-text-line" style="font-size: 3rem; margin-bottom: var(--space-md); display: block;"></i>
+        <p>No documents imported yet.</p>
+      </div>
+    </div>
+  <% end %>
+</div>

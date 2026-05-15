@@ -1,0 +1,72 @@
+<% return unless alert&.id %>
+<div class="notification notification--<%= alert.notification_color %>" data-controller="alert-ack">
+  <div class="notification__icon notification__icon--<%= alert.notification_color %>">
+    <i class="<%= alert.notification_icon %>"></i>
+  </div>
+  <div class="notification__body">
+    <div class="notification__content">
+      <div class="notification__header">
+        <span class="notification__title"><%= alert.title %></span>
+      </div>
+      <p class="notification__text"><%= alert.message %></p>
+      <div class="notification__meta">
+        <span class="notification__patient">
+          <i class="ri-user-line"></i>
+          <%= alert.patient.full_name %>
+        </span>
+        <span class="notification__time">
+          <i class="ri-time-line"></i>
+          <%= time_ago_in_words(alert.created_at) %> ago
+        </span>
+      </div>
+    </div>
+    <div class="notification__actions">
+      <%= link_to specialist_patient_path(id: alert.patient.id, locale: I18n.locale),
+          class: "notification__action notification__action--view" do %>
+        <i class="ri-eye-line"></i>
+        <span>View</span>
+      <% end %>
+      <button class="notification__action notification__action--resolve"
+              data-action="alert-ack#openResolveModal"
+              data-alert-id="<%= alert.id %>">
+        <i class="ri-check-line"></i>
+        <span>Resolve</span>
+      </button>
+    </div>
+  </div>
+
+  <div id="resolve_alert_<%= alert.id %>" class="resolve-modal" data-alert-ack-target="resolveModal">
+    <div class="resolve-modal__backdrop"></div>
+    <div class="resolve-modal__content">
+      <div class="modal-box">
+        <h3 class="font-bold text-lg">Resolve Alert</h3>
+        <%= form_with url: specialist_notification_acknowledgment_path(notification_id: alert.id) do |f| %>
+          <div class="form-group">
+            <%= f.label :note, "Clinical Note", class: "form-label" %>
+            <%= f.text_area :note, required: true, rows: 4,
+                            placeholder: "Add a note about this alert...",
+                            class: "form-textarea" %>
+          </div>
+          <div class="form-group">
+            <%= f.label :defer_until, "Remind Me", class: "form-label" %>
+            <%= f.select :defer_until, [
+              ["Don't defer", ""],
+              ["In 1 hour", 1.hour.from_now],
+              ["In 4 hours", 4.hours.from_now],
+              ["In 1 day", 1.day.from_now],
+              ["In 3 days", 3.days.from_now],
+              ["In 1 week", 1.week.from_now]
+            ], {}, class: "form-select" %>
+          </div>
+          <div class="modal-action">
+            <%= f.submit "Resolve", class: "btn btn-primary" %>
+            <%= button_tag type: "button", class: "btn",
+                           data: { action: "alert-ack#closeResolveModal" } do %>
+              Cancel
+            <% end %>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  </div>
+</div>

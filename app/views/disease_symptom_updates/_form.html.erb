@@ -1,0 +1,19 @@
+<%= form_with(
+      model: @disease_symptom_update,
+      url: disease_symptom_updates_path(disease_id: @disease.id, symptom_id: @disease_symptom.id, locale: I18n.locale),
+      html: { class: "dash-form dash-form--simple" },
+      data: { controller: "reset-form", action: "turbo:submit-end->reset-form#clear" }
+    ) do |form|
+%>
+  <div class="dash-form__simple-group">
+    <%= form.label :intensity, t(".intensity.title"), class: "dash-form__label" %>
+    <%= form.number_field :intensity, min: 1, max: 5, value: 1, class: "dash-form__input" %>
+    <%= render DashFormErrorComponent.new(model: @disease_symptom_update, field: :intensity) %>
+  </div>
+  <div class="dash-form__simple-group">
+    <%= form.label :update_date, t(".update_date.title"), class: "dash-form__label" %>
+    <%= form.date_field :update_date, class: "dash-form__input" %>
+    <%= render DashFormErrorComponent.new(model: @disease_symptom_update, field: :update_date) %>
+  </div>
+  <%= form.submit t(".submit"), class: "dash-form__submit dash-button dash-button--new" %>
+<% end %>

@@ -1,0 +1,62 @@
+<div class="page-treatments">
+  <header class="dash-header">
+    <div class="dash-header__left">
+      <h1 class="dash-header__title">
+        <i class="ri-hospital-line dash-header__title__icon"></i>
+        <%= t(".title") %>
+      </h1>
+      <%= render "shared/breadcrumbs" %>
+    </div>
+    <div class="dash-header__right">
+      <%= link_to disease_path(id: @disease.id, locale: I18n.locale), class: "dash-button dash-button--back" do %>
+        <i class="ri-arrow-left-line dash-button__icon"></i>
+      <% end %>
+    </div>
+  </header>
+  <div class="dash-flash-messages">
+    <%= turbo_frame_tag "flash" do %>
+      <%= render "shared/dash_flash" %>
+    <% end %>
+  </div>
+  <div class="page-treatments__content">
+    <% if @treatments.to_a.any? %>
+      <% @treatments.each do |treatment| %>
+        <div class="treatment-card">
+          <div class="treatment-card__status">
+            <%= effectiveness_to_emoji(treatment.effectiveness) %>
+          </div>
+          <h2 class="treatment-card__title">
+            <%= treatment.title %>
+            <% if treatment.is_finished? %>
+              <div class="treatment-card__finished" title="Treatment finished">
+                <i class="ri-check-double-fill"></i>
+              </div>
+            <% end %>
+          </h2>
+          <p class="treatment-card__diseases">
+            <%= t(".treatment.diseases_treated", diseases: @treatments.size) %>
+          </p>
+          <div class="treatment-card__footer">
+            <span class="treatment-card__date">
+              <i class="ri-calendar-line treatment-card__icon"></i>
+              <%= t(".treatment.duration", duration: treatment.days_difference) %>
+            </span>
+            <%= link_to t(".treatment.details"), treatment_path(id: treatment.id, locale: I18n.locale), class: "treatment-card__button" %>
+          </div>
+        </div>
+      <% end %>
+    <% else %>
+      <p class="no-results">
+        <%= t(".no_results") %>
+      </p>
+    <% end %>
+  </div>
+  <div class="dash-pagination">
+    <div class="dash-pagination__controls">
+      <%== pagy_nav(@pagy) if @pagy.pages > 1 %>
+    </div>
+    <div class="dash-pagination__info">
+      <%== pagy_info(@pagy) %>
+    </div>
+  </div>
+</div>

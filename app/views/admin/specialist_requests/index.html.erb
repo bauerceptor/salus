@@ -1,0 +1,147 @@
+<div class="dash-home">
+  <div class="dash-home__content">
+    <header class="dash-header">
+      <div class="dash-header__left">
+        <h1 class="dash-header__title">
+          <i class="ri-file-list-3-line dash-header__title__icon"></i>
+          Specialist Request Vetting
+        </h1>
+        <p class="dash-header__desc">Review and approve or reject specialist registration requests</p>
+      </div>
+      <div class="dash-header__right">
+        <span class="dash-stat__badge dash-stat__badge--warning">
+          <i class="ri-time-line"></i>
+          <%= @admin_specialist_requests.count %> pending
+        </span>
+      </div>
+    </header>
+
+    <% if @admin_specialist_requests.any? %>
+      <div class="vetting-cards">
+        <% @admin_specialist_requests.each_with_index do |req, index| %>
+          <div class="vetting-card vetting-card--enhanced" data-vetting-id="<%= req.id %>">
+            <div class="vetting-card__header">
+              <div class="vetting-card__specialist">
+                <div class="vetting-card__avatar vetting-card__avatar--large">
+                  <%= req.specialist.account.full_name.split.map(&:first).join.first(2).upcase %>
+                </div>
+                <div class="vetting-card__info">
+                  <h3 class="vetting-card__name"><%= req.specialist.account.full_name %></h3>
+                  <p class="vetting-card__specialization">
+                    <i class="ri-stethoscope-line"></i>
+                    <%= req.specialization %>
+                  </p>
+                  <p class="vetting-card__email">
+                    <i class="ri-mail-line"></i>
+                    <%= req.specialist.email %>
+                  </p>
+                </div>
+              </div>
+              <div class="vetting-card__meta">
+                <div class="vetting-card__status-badge vetting-card__status-badge--pending">
+                  <i class="ri-time-line"></i>
+                  Pending
+                </div>
+                <div class="vetting-card__urgency">
+                  <i class="ri-calendar-todo-line"></i>
+                  <%= time_ago_in_words(req.created_at) %> ago
+                </div>
+              </div>
+            </div>
+
+            <div class="vetting-card__body">
+              <div class="vetting-card__grid">
+                <div class="vetting-card__field">
+                  <span class="vetting-card__field-label">
+                    <i class="ri-book-open-line"></i>
+                    Field of Expertise
+                  </span>
+                  <span class="vetting-card__field-value vetting-card__field-value--highlight"><%= req.field_of_expertise %></span>
+                </div>
+                <div class="vetting-card__field">
+                  <span class="vetting-card__field-label">
+                    <i class="ri-file-text-line"></i>
+                    Description
+                  </span>
+                  <span class="vetting-card__field-value"><%= req.specialization_description.presence || "No description provided" %></span>
+                </div>
+              </div>
+
+              <% if req.message.present? %>
+                <div class="vetting-card__message">
+                  <div class="vetting-card__message-header">
+                    <i class="ri-double-quotes-l"></i>
+                    Message from Applicant
+                  </div>
+                  <p class="vetting-card__message-body"><%= req.message %></p>
+                </div>
+              <% end %>
+
+            </div>
+
+            <div class="vetting-card__actions">
+              <div class="vetting-card__actions-left">
+                <%= link_to admin_specialist_request_path(id: req.id, locale: I18n.locale),
+                    class: "dash-button dash-button--gray dash-button--small" do %>
+                  <i class="ri-eye-line dash-button__icon"></i>
+                  View Details
+                <% end %>
+              </div>
+              <div class="vetting-card__actions-right">
+                <%= button_to reject_admin_specialist_request_path(id: req.id, locale: I18n.locale),
+                    method: :post,
+                    class: "dash-button dash-button--delete dash-button--small",
+                    data: { confirm: "Are you sure you want to reject #{req.specialist.account.full_name}'s request?" } do %>
+                  <i class="ri-close-line dash-button__icon"></i>
+                  Reject
+                <% end %>
+                <%= button_to approve_admin_specialist_request_path(id: req.id, locale: I18n.locale),
+                    method: :post,
+                    class: "dash-button dash-button--new dash-button--small" do %>
+                  <i class="ri-check-line dash-button__icon"></i>
+                  Approve
+                <% end %>
+              </div>
+            </div>
+
+            <div class="vetting-card__timeline">
+              <div class="vetting-card__timeline-item vetting-card__timeline-item--completed">
+                <div class="vetting-card__timeline-dot"></div>
+                <div class="vetting-card__timeline-content">
+                  <span class="vetting-card__timeline-label">Request Submitted</span>
+                  <span class="vetting-card__timeline-time"><%= req.created_at.strftime("%b %d, %Y") %></span>
+                </div>
+              </div>
+              <div class="vetting-card__timeline-item vetting-card__timeline-item--active">
+                <div class="vetting-card__timeline-dot"></div>
+                <div class="vetting-card__timeline-content">
+                  <span class="vetting-card__timeline-label">Awaiting Review</span>
+                  <span class="vetting-card__timeline-time">In progress</span>
+                </div>
+              </div>
+              <div class="vetting-card__timeline-item">
+                <div class="vetting-card__timeline-dot"></div>
+                <div class="vetting-card__timeline-content">
+                  <span class="vetting-card__timeline-label">Decision</span>
+                  <span class="vetting-card__timeline-time">Pending</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    <% else %>
+      <div class="dash-group">
+        <div class="dash-group__content">
+          <div class="dash-empty-state dash-empty-state--success">
+            <div class="dash-empty-state__icon-wrapper">
+              <i class="ri-checkbox-circle-line dash-empty-state__icon"></i>
+            </div>
+            <p class="dash-empty-state__text">No pending specialist requests</p>
+            <p class="dash-empty-state__desc">All requests have been reviewed. Check back later for new submissions.</p>
+          </div>
+        </div>
+      </div>
+    <% end %>
+  </div>
+</div>

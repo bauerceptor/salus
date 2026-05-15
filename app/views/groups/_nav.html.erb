@@ -1,0 +1,46 @@
+<nav class="group__nav">
+  <ul class="group__nav__list">
+    <li class="group__nav__item">
+      <%= link_to group_posts_path(group_id: @group.id), class: "group__nav__link
+          #{"group__nav__link--active" if current_page?(group_posts_path(group_id: @group.id))}" do %>
+        <i class="ri-question-answer-line"></i>
+        <%= t(".posts") %>
+      <% end %>
+    </li>
+    <li class="group__nav__item">
+      <%= link_to group_disease_statuses_path(group_id: @group.id), class: "group__nav__link
+          #{"group__nav__link--active" if current_page?(group_disease_statuses_path(group_id: @group.id))}" do %>
+        <i class="ri-hearts-line"></i>
+        <%= t(".statuses") %>
+      <% end %>
+    </li>
+    <li class="group__nav__item">
+      <%= link_to group_disease_symptoms_path(group_id: @group.id), class: "group__nav__link
+          #{"group__nav__link--active" if current_page?(group_disease_symptoms_path(group_id: @group.id))}" do %>
+        <i class="ri-thermometer-line"></i>
+        <%= t(".symptoms") %>
+      <% end %>
+    </li>
+    <li class="group__nav__item">
+      <%= link_to group_disease_risk_factors_path(group_id: @group.id), class: "group__nav__link
+          #{"group__nav__link--active" if current_page?(group_disease_risk_factors_path(group_id: @group.id))}" do %>
+        <i class="ri-fire-line"></i>
+        <%= t(".risk_factors") %>
+      <% end %>
+    </li>
+    <li class="group__nav__item">
+      <%= link_to group_treatments_path(group_id: @group.id), class: "group__nav__link
+          #{"group__nav__link--active" if current_page?(group_treatments_path(group_id: @group.id))}" do %>
+        <i class="ri-hospital-line"></i>
+        <%= t(".treatments") %>
+      <% end %>
+    </li>
+    <li class="group__nav__item">
+      <%= link_to group_disease_photos_path(group_id: @group.id), class: "group__nav__link
+          #{"group__nav__link--active" if current_page?(group_disease_photos_path(group_id: @group.id))}" do %>
+        <i class="ri-camera-3-line"></i>
+        <%= t(".photos") %>
+      <% end %>
+    </li>
+  </ul>
+</nav>

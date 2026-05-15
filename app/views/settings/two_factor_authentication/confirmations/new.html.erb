@@ -1,0 +1,42 @@
+<div class="page-setup-2fa">
+  <header class="dash-header">
+    <div class="dash-header__left">
+      <h1 class="dash-header__title"><%= t(".title") %></h1>
+      <%= render "shared/breadcrumbs" %>
+    </div>
+    <div class="dash-header__right">
+      <%= link_to settings_security_path, class: "dash-button dash-button--back" do %>
+        <i class="ri-arrow-left-line dash-button__icon"></i>
+      <% end %>
+    </div>
+  </header>
+  <div class="dash-flash-messages">
+    <%= turbo_frame_tag "flash" do %>
+      <%= render "shared/dash_flash" %>
+    <% end %>
+  </div>
+  <div class="page-setup-2fa__content">
+    <%= turbo_frame_tag "page-setup-2fa" do %>
+      <div class="setup-2fa">
+        <div class="setup-2fa__left">
+          <div class="setup-2fa__qr-code">
+            <%= @qrcode.as_svg(
+                use_path: true,
+                viewbox: true,
+                shape_rendering: "crispEdges",
+                module_size: 11
+              ).html_safe
+          %>
+          </div>
+        </div>
+        <div class="setup-2fa__right">
+          <div class="setup-2fa__totp">
+            <p class="setup-2fa__totp__label"><%= t(".desc") %></p>
+            <p class="setup-2fa__totp__link"><%= @provision_url %></p>
+          </div>
+          <%= render "form" %>
+        </div>
+      </div>
+    <% end %>
+  </div>
+</div>

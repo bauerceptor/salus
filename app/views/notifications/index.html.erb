@@ -1,0 +1,96 @@
+<div class="page-notifications">
+  <header class="dash-header">
+    <div class="dash-header__left">
+      <h1 class="dash-header__title">
+        <i class="ri-notification-3-line dash-header__title__icon"></i>
+        <%= t(".title") %>
+      </h1>
+      <%= render "shared/breadcrumbs" %>
+    </div>
+    <div class="dash-header__right">
+      <% if @notifications.unread.any? %>
+        <%= button_to mark_all_read_notifications_path, method: :post,
+            class: "dash-button dash-button--light-blue" do %>
+          <i class="ri-check-double-line dash-button__icon"></i>
+          <%= t(".mark_all_read") %>
+        <% end %>
+      <% end %>
+      <%= link_to authenticated_root_path, class: "dash-button dash-button--back" do %>
+        <i class="ri-arrow-left-line dash-button__icon"></i>
+      <% end %>
+    </div>
+  </header>
+  <div class="dash-flash-messages">
+    <%= turbo_frame_tag "flash" do %>
+      <%= render "shared/dash_flash" %>
+    <% end %>
+  </div>
+  <div class="page-notifications__content">
+    <% if @notifications.to_a.any? %>
+      <div class="notifications-list">
+        <% @notifications.each do |notification| %>
+          <div class="notification notification--<%= notification.notification_type %> <%= notification.unread? ? 'notification--unread' : 'notification--read' %>">
+            <div class="notification__icon notification__icon--<%= notification.notification_type %>">
+              <i class="<%= notification_icon(notification.notification_type) %>"></i>
+            </div>
+            <div class="notification__body">
+              <div class="notification__content">
+                <div class="notification__header">
+                  <span class="notification__title"><%= notification.title %></span>
+                  <% if notification.unread? %>
+                    <span class="notification__badge">
+                      <i class="ri-circle-fill"></i>
+                    </span>
+                  <% end %>
+                </div>
+                <p class="notification__text"><%= notification.body %></p>
+                <div class="notification__meta">
+                  <span class="notification__type">
+                    <i class="<%= notification_icon(notification.notification_type) %>"></i>
+                    <%= notification.notification_type.humanize %>
+                  </span>
+                  <span class="notification__time">
+                    <i class="ri-time-line"></i>
+                    <%= time_ago_in_words(notification.created_at) %> ago
+                  </span>
+                </div>
+              </div>
+              <div class="notification__actions">
+                <% if notification.unread? %>
+                  <%= button_to notification_path(id: notification.id, locale: I18n.locale), method: :patch,
+                      class: "notification__action notification__action--mark-read",
+                      title: t(".notification.mark_read") do %>
+                    <i class="ri-check-line"></i>
+                    <span>Mark read</span>
+                  <% end %>
+                <% end %>
+                <%= button_to notification_path(id: notification.id, locale: I18n.locale), method: :delete,
+                    class: "notification__action notification__action--delete",
+                    data: { turbo_confirm: "Delete this notification?" } do %>
+                  <i class="ri-delete-bin-line"></i>
+                  <span>Delete</span>
+                <% end %>
+              </div>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    <% else %>
+      <div class="notifications-empty">
+        <div class="notifications-empty__icon">
+          <i class="ri-notification-off-line"></i>
+        </div>
+        <h2 class="notifications-empty__title"><%= t(".no_notifications") %></h2>
+        <p class="notifications-empty__text">You're all caught up!</p>
+      </div>
+    <% end %>
+  </div>
+  <div class="dash-pagination">
+    <div class="dash-pagination__controls">
+      <%== pagy_nav(@pagy) if @pagy.pages > 1 %>
+    </div>
+    <div class="dash-pagination__info">
+      <%== pagy_info(@pagy) %>
+    </div>
+  </div>
+</div>

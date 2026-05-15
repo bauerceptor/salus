@@ -1,0 +1,26 @@
+<p>Hello <%= @account.full_name %>,</p>
+
+<p>This is a friendly reminder to take your medication:</p>
+
+<table>
+  <tr>
+    <td><strong>Medication:</strong></td>
+    <td><%= @medication.name %></td>
+  </tr>
+  <tr>
+    <td><strong>Dosage:</strong></td>
+    <td><%= @medication.dosage %></td>
+  </tr>
+  <tr>
+    <td><strong>Scheduled for:</strong></td>
+    <td><%= @scheduled_time.strftime("%B %d, %Y at %I:%M %p") %></td>
+  </tr>
+</table>
+
+<% if @medication.instructions.present? %>
+<p><strong>Instructions:</strong> <%= @medication.instructions %></p>
+<% end %>
+
+<p>Open the Salus app to log your medication.</p>
+
+<p>Best regards,<br>Your Salus Health Team</p>

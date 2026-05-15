@@ -1,0 +1,55 @@
+<%= form_with(model: @specialist_request, html: { class: "dash-form" }) do |f| %>
+  <div class="dash-form__container">
+    <div class="dash-form__group">
+      <div class="dash-form__group__container">
+        <div class="dash-form__group__left">
+          <div class="dash-form__group__title"><%= t(".field_of_expertise.title") %></div>
+          <p class="dash-form__group__description"><%= t(".field_of_expertise.description") %></p>
+        </div>
+        <div class="dash-form__group__right">
+          <%= f.text_field :field_of_expertise, class: "dash-form__input",
+              placeholder: t(".field_of_expertise.placeholder") %>
+        </div>
+      </div>
+      <%= render DashFormErrorComponent.new(model: @specialist_request,
+          field: :field_of_expertise) %>
+    </div>
+  </div>
+
+  <div class="dash-form__container">
+    <div class="dash-form__group">
+      <div class="dash-form__group__container">
+        <div class="dash-form__group__left">
+          <div class="dash-form__group__title"><%= t(".specialization.title") %></div>
+          <p class="dash-form__group__description"><%= t(".specialization.description") %>z</p>
+        </div>
+        <div class="dash-form__group__right">
+          <%= f.text_field :specialization, class: "dash-form__input",
+              placeholder: t(".specialization.placeholder") %>
+        </div>
+      </div>
+      <%= render DashFormErrorComponent.new(model: @specialist_request, field: :specialization) %>
+    </div>
+  </div>
+
+  <div class="dash-form__container">
+    <div class="dash-form__group">
+      <div class="dash-form__group__container">
+        <div class="dash-form__group__left">
+          <div class="dash-form__group__title"><%= t(".description.title") %></div>
+          <p class="dash-form__group__description"><%= t(".description.description") %></p>
+        </div>
+        <div class="dash-form__group__right">
+          <%= f.text_area :specialization_description, class: "dash-form__input dash-form__textarea",
+              placeholder: t(".description.placeholder") %>
+        </div>
+      </div>
+      <%= render DashFormErrorComponent.new(model: @specialist_request,
+          field: :specialization_description) %>
+    </div>
+  </div>
+
+  <div class="dash-form__group">
+    <%= f.submit t("dash_form.submit"), class: "dash-form__submit dash-button dash-button--new" %>
+  </div>
+<% end %>

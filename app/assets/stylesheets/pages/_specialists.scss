@@ -1,0 +1,98 @@
+.page-specialists {
+  &__content {
+    padding: 30px 0;
+  }
+
+  .specialists-list {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+
+    .specialist {
+      padding: 20px 0 0;
+      background: #ffffff;
+      border: 1px solid $role-specialist-border;
+      border-radius: 3px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+
+      &__photo {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        margin-bottom: 15px;
+      }
+
+      &__name {
+        font-weight: 500;
+        margin-bottom: 3px;
+      }
+
+      &__speciality {
+        padding: 3px 20px;
+        border-radius: 3px;
+        background: $role-specialist-light;
+        color: $role-specialist-dark;
+        font-size: var(--text-sm);
+        font-weight: 500;
+        margin-bottom: 20px;
+      }
+
+      &__footer {
+        padding: 10px 20px;
+        background: $role-specialist-bg;
+        align-self: stretch;
+        border-top: 1px solid $role-specialist-border;
+        display: flex;
+        align-items: center;
+
+        &__left {
+          flex-grow: 1;
+        }
+        &__right {
+          display: flex;
+          justify-content: flex-end;
+        }
+      }
+
+      &__label {
+        font-size: var(--text-xs);
+        color: $dash-text-light;
+      }
+
+      &__desc {
+        font-size: var(--text-sm);
+      }
+
+      &__button {
+        font-size: var(--text-xs);
+        color: $role-specialist-button-color;
+        font-weight: 500;
+        background: $role-specialist-button-bg;
+        padding: 8px 10px;
+        border-radius: 3px;
+        margin-left: 20px;
+      }
+    }
+  }
+}
+
+@media (max-width: 1024px) {
+  .specialists-list {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 640px) {
+  .specialists-list {
+    grid-template-columns: 1fr;
+  }
+
+  .specialist {
+    &__photo {
+      width: 60px;
+      height: 60px;
+    }
+  }
+}

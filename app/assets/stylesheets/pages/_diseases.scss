@@ -1,0 +1,191 @@
+.page-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  padding-bottom: $space-lg;
+  margin-bottom: $space-xl;
+  border-bottom: 1px solid $dash-base-border;
+  gap: $space-lg;
+  flex-wrap: wrap;
+
+  &__left {
+    display: flex;
+    flex-direction: column;
+    gap: $space-sm;
+  }
+
+  &__right {
+    display: flex;
+    align-items: center;
+    gap: $space-sm;
+  }
+
+  &__title {
+    display: flex;
+    align-items: center;
+    gap: $space-md;
+    font-size: $font-size-lg;
+    font-weight: 600;
+    color: $dash-text-dark;
+
+    i {
+      color: $dash-base;
+    }
+  }
+}
+
+.disease-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: $space-lg;
+}
+
+.disease-card {
+  background: #ffffff;
+  border: 1px solid $dash-base-border;
+  border-radius: $radius-lg;
+  padding: $space-xl;
+  display: flex;
+  flex-direction: column;
+  transition: box-shadow 0.15s ease, transform 0.15s ease;
+
+  &:hover {
+    box-shadow: $shadow-md;
+    transform: translateY(-2px);
+  }
+
+  &__header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: $space-md;
+    margin-bottom: $space-md;
+  }
+
+  &__name {
+    font-size: $font-size-base;
+    font-weight: 600;
+    color: $dash-text-dark;
+    display: flex;
+    align-items: center;
+    gap: $space-sm;
+  }
+
+  &__verified {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: rgba($color-success, 0.1);
+    color: $color-success;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: $font-size-xs;
+  }
+
+  &__footer {
+    margin-top: auto;
+    padding-top: $space-md;
+  }
+
+  &__link {
+    font-size: 0.8125rem;
+    color: $dash-base;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: $space-xs;
+
+    i {
+      transition: transform 0.15s ease;
+    }
+
+    &:hover i {
+      transform: translateX(4px);
+    }
+  }
+}
+
+.empty-state {
+  text-align: center;
+  padding: $space-3xl;
+  background: #ffffff;
+  border: 1px solid $dash-base-border;
+  border-radius: $radius-lg;
+
+  &__icon {
+    font-size: $font-size-3xl;
+    color: $dash-text-light;
+    margin-bottom: $space-md;
+    display: block;
+  }
+
+  &__text {
+    font-size: 0.9375rem;
+    color: $dash-text-light;
+  }
+}
+
+.pagination-container {
+  padding: $space-xl 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: $space-md;
+}
+
+.page-diseases {
+  &__content {
+    padding: $space-sm 0;
+  }
+}
+
+.dash-pagination__info {
+  font-size: $font-size-sm;
+  color: $dash-text-light;
+}
+
+.dash-pagination__nav {
+  display: flex;
+  gap: $space-xs;
+
+  .page {
+    a {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 36px;
+      height: 36px;
+      padding: 0 $space-sm;
+      border-radius: $radius-md;
+      font-size: $font-size-sm;
+      font-weight: 500;
+      color: $dash-text-dark;
+      background: #ffffff;
+      border: 1px solid $dash-base-border;
+      transition: all 0.15s ease;
+
+      &:hover {
+        background: $dash-bg;
+        border-color: darken($dash-base-border, 5%);
+      }
+    }
+
+    &.active a {
+      background: $dash-base;
+      border-color: $dash-base;
+      color: #ffffff;
+    }
+  }
+
+  .prev a,
+  .next a {
+    font-weight: 400;
+    opacity: 0.7;
+
+    &:hover {
+      opacity: 1;
+    }
+  }
+}

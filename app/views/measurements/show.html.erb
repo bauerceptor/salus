@@ -1,0 +1,74 @@
+<div class="page-measurement">
+  <header class="dash-header">
+    <div class="dash-header__left">
+      <h1 class="dash-header__title">
+        <%= t(".title", date: l(@measurement.measurement_date, format: '%H:%M, %d %B %Yr.')) %>
+      </h1>
+      <%= render "shared/breadcrumbs" %>
+    </div>
+    <div class="dash-header__right">
+      <%= link_to edit_measurement_path(id: @measurement.id, locale: I18n.locale), class: "dash-button dash-button--info" do %>
+        <i class="ri-edit-2-line dash-button__icon"></i>
+        <%= t(".button.edit") %>
+      <% end %>
+      <%= button_to measurement_path(id: @measurement.id, locale: I18n.locale), class: "dash-button dash-button--delete",
+          method: :delete, form: { data: { turbo_confirm: t(".button.delete.turbo.confirm") } } do %>
+        <i class="ri-close-line dash-button__icon"></i>
+        <%= t(".button.delete.title") %>
+      <% end %>
+      <%= link_to show_by_day_measurements_path(day: @measurement.measurement_date, locale: I18n.locale), class: "dash-button dash-button--back" do %>
+        <i class="ri-arrow-left-line dash-button__icon"></i>
+      <% end %>
+    </div>
+  </header>
+  <div class="dash-flash-messages">
+    <%= turbo_frame_tag "flash" do %>
+      <%= render "shared/dash_flash" %>
+    <% end %>
+  </div>
+  <div class="page-measurement__content">
+    <div class="dash-group dash-group--border">
+      <header class="dash-group__header">
+        <h2 class="dash-group__title"><%= t(".about") %></h2>
+        <div class="dash-group__actions"></div>
+      </header>
+      <div class="dash-group__content">
+        <div class="dash-info">
+          <div class="dash-info__group">
+            <div class="dash-info__group__left">
+              <div class="dash-info__group__label"><%= t(".info.title") %></div>
+              <div class="dash-info__group__desc"><%= t(".info.description") %></div>
+            </div>
+            <div class="dash-info__group__right">
+              <div class="dash-info__group__value">
+                <%= I18n.t("activerecord.attributes.measurement_types.#{@measurement.measurement_type.name}") %>
+              </div>
+            </div>
+          </div>
+          <div class="dash-info__group">
+            <div class="dash-info__group__left">
+              <div class="dash-info__group__label"><%= t(".value.title") %></div>
+              <div class="dash-info__group__desc"><%= t(".value.description") %></div>
+            </div>
+            <div class="dash-info__group__right">
+              <div class="dash-info__group__value">
+                <%= @measurement.value %> <span class="dash-info__group__symbol"><%= @measurement.measurement_type.unit.symbol %></span>
+              </div>
+            </div>
+          </div>
+          <div class="dash-info__group">
+            <div class="dash-info__group__left">
+              <div class="dash-info__group__label"><%= t(".measurement_date.title") %></div>
+              <div class="dash-info__group__desc"><%= t(".measurement_date.description") %></div>
+            </div>
+            <div class="dash-info__group__right">
+              <div class="dash-info__group__value">
+                <%= l(@measurement.measurement_date, format: '%H:%M - %d %B %Yr.') %>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

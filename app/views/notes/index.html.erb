@@ -1,0 +1,143 @@
+<div class="salus-page-container">
+  <header class="salus-page-header">
+    <div class="salus-page-header__left">
+      <h1 class="salus-page-header__title">
+        <i class="ri-sticky-note-line salus-page-header__icon"></i>
+        <%= t(".title") %>
+      </h1>
+      <%= render "shared/breadcrumbs" %>
+    </div>
+    <div class="salus-page-header__actions">
+      <%= link_to authenticated_root_path, class: "salus-btn salus-btn--secondary" do %>
+        <i class="ri-arrow-left-line salus-btn__icon"></i>
+      <% end %>
+    </div>
+  </header>
+
+  <%= turbo_frame_tag "flash" do %>
+    <%= render "shared/dash_flash" %>
+  <% end %>
+
+  <div class="salus-notes-layout">
+
+    <div class="salus-notes-main">
+      <section class="salus-card">
+        <div class="salus-card__header">
+          <h2 class="salus-card__title">
+            <i class="ri-pushpin-line" style="color: var(--color-primary)"></i>
+            <%= t(".pinned_notes") %>
+          </h2>
+          <span style="font-size: var(--text-xs); color: var(--color-text-light);">
+            <%== pagy_info(@pagy_pinned) %>
+          </span>
+        </div>
+        <% if @notes_pinned.to_a.any? %>
+          <div class="salus-notes-grid">
+            <% @notes_pinned.each do |note| %>
+              <div class="salus-note-card salus-note-card--pinned">
+                <%= link_to edit_note_path(id: note.id, locale: I18n.locale), class: "salus-note-card__title" do %>
+                  <%= note.title %>
+                <% end %>
+                <div class="salus-note-card__footer">
+                  <span class="salus-note-card__time">
+                    <%= time_ago_in_words(note.updated_at) %> ago
+                  </span>
+                  <%= button_to unpin_note_path(id: note.id), method: :patch,
+                      class: "salus-note-card__action" do %>
+                    <i class="ri-unpin-line"></i>
+                  <% end %>
+                </div>
+              </div>
+            <% end %>
+          </div>
+        <% else %>
+          <p style="font-size: var(--text-sm); color: var(--color-text-light);"><%= t(".empty_pinned_notes") %></p>
+        <% end %>
+        <%== pagy_nav(@pagy_pinned) if @pagy_pinned.pages > 1 %>
+      </section>
+
+      <section class="salus-card" style="margin-top: var(--space-lg);">
+        <div class="salus-card__header">
+          <h2 class="salus-card__title">
+            <i class="ri-sticky-note-2-line" style="color: var(--color-primary)"></i>
+            <%= t(".all_notes") %>
+          </h2>
+          <span style="font-size: var(--text-xs); color: var(--color-text-light);">
+            <%== pagy_info(@pagy_all) %>
+          </span>
+        </div>
+        <div class="salus-notes-grid">
+          <%= link_to new_note_path, class: "salus-note-card salus-note-card--new" do %>
+            <div class="salus-note-card__new-content">
+              <i class="ri-add-line"></i>
+              <span>Add Note</span>
+            </div>
+          <% end %>
+
+          <% @notes.each do |note| %>
+            <div class="salus-note-card">
+              <%= link_to edit_note_path(id: note.id, locale: I18n.locale), class: "salus-note-card__title" do %>
+                <%= note.title %>
+              <% end %>
+              <div class="salus-note-card__footer">
+                <span class="salus-note-card__time">
+                  <%= time_ago_in_words(note.updated_at) %> ago
+                </span>
+                <%= button_to pin_note_path(id: note.id), method: :patch,
+                    class: "salus-note-card__action" do %>
+                  <i class="ri-pushpin-line"></i>
+                <% end %>
+              </div>
+            </div>
+          <% end %>
+        </div>
+        <%== pagy_nav(@pagy_all) if @pagy_all.pages > 1 %>
+      </section>
+    </div>
+
+    <aside class="salus-notes-sidebar">
+      <div class="salus-card salus-card--sticky">
+        <div class="salus-card__header">
+          <h2 class="salus-card__title">
+            <i class="ri-hashtag" style="color: var(--color-primary)"></i>
+            <%= t(".tags.title") %>
+          </h2>
+        </div>
+        <div class="salus-tags-actions">
+          <% if params[:tag_id].present? %>
+            <%= link_to notes_path, class: "salus-btn salus-btn--secondary salus-btn--sm" do %>
+              <i class="ri-close-line salus-btn__icon"></i>
+              <%= t(".tags.clear") %>
+            <% end %>
+          <% end %>
+          <%= link_to new_note_tag_path, class: "salus-btn salus-btn--primary salus-btn--sm" do %>
+            <i class="ri-add-line salus-btn__icon"></i>
+            <%= t(".tags.new") %>
+          <% end %>
+        </div>
+        <% if @tags.to_a.any? %>
+          <ul class="salus-tags-list">
+            <% @tags.to_a.each do |tag| %>
+              <li>
+                <%= link_to notes_path(tag_id: tag),
+                    class: "salus-tag-item #{params[:tag_id] == tag.id.to_s ? 'salus-tag-item--active' : ''}" do %>
+                  <span class="salus-tag-item__name">
+                    <i class="ri-hashtag"></i>
+                    <%= tag.name %>
+                  </span>
+                  <%= link_to edit_note_tag_path(id: tag.id, locale: I18n.locale),
+                      class: "salus-tag-item__edit" do %>
+                    <i class="ri-pencil-line"></i>
+                  <% end %>
+                <% end %>
+              </li>
+            <% end %>
+          </ul>
+        <% else %>
+          <p style="font-size: var(--text-sm); color: var(--color-text-light);"><%= t(".tags.no_results") %></p>
+        <% end %>
+      </div>
+    </aside>
+
+  </div>
+</div>

@@ -1,0 +1,74 @@
+<div class="page-disease">
+  <header class="dash-header page-disease__header">
+    <div class="dash-header__left">
+      <h1 class="dash-header__title">
+        <i class="ri-dossier-line dash-header__title__icon"></i>
+        <span class="dash-header__title__text"><%= @disease.predefined_disease.name %></span>
+      </h1>
+      <%= render "shared/breadcrumbs" %>
+    </div>
+    <div class="dash-header__right">
+      <%= link_to diseases_path, class: "dash-button dash-button--back" do %>
+        <i class="ri-arrow-left-line dash-button__icon"></i>
+      <% end %>
+    </div>
+  </header>
+  <div class="dash-flash-messages">
+    <%= turbo_frame_tag "flash" do %>
+      <%= render "shared/dash_flash" %>
+    <% end %>
+  </div>
+  <div class="page-disease__content">
+    <div class="disease">
+      <nav class="navigation">
+        <%= link_to disease_statuses_path(disease_id: @disease.id, locale: I18n.locale), class: "navigation__item" do %>
+          <i class="ri-hearts-line navigation__item__icon"></i>
+          <div>
+            <p class="navigation__item__text"><%= t(".statuses") %></p>
+            <p class="navigation__item__link"><%= t(".show_more") %></p>
+          </div>
+        <% end %>
+        <%= link_to disease_symptoms_path(disease_id: @disease.id, locale: I18n.locale), class: "navigation__item" do %>
+          <i class="ri-thermometer-line navigation__item__icon"></i>
+          <div>
+            <p class="navigation__item__text"><%= t(".symptoms") %></p>
+            <p class="navigation__item__link"><%= t(".show_more") %></p>
+          </div>
+        <% end %>
+        <%= link_to disease_risk_factors_path(disease_id: @disease.id, locale: I18n.locale), class: "navigation__item" do %>
+          <i class="ri-fire-line navigation__item__icon"></i>
+          <div>
+            <p class="navigation__item__text"><%= t(".risk_factors") %></p>
+            <p class="navigation__item__link"><%= t(".show_more") %></p>
+          </div>
+        <% end %>
+        <%= link_to disease_treatments_path(disease_id: @disease.id, locale: I18n.locale), class: "navigation__item" do %>
+          <i class="ri-hospital-line navigation__item__icon"></i>
+          <div>
+            <p class="navigation__item__text"><%= t(".treatments") %></p>
+            <p class="navigation__item__link"><%= t(".show_more") %></p>
+          </div>
+        <% end %>
+        <%= link_to disease_photos_path(disease_id: @disease.id, locale: I18n.locale), class: "navigation__item" do %>
+          <i class="ri-camera-3-line navigation__item__icon"></i>
+          <div>
+            <p class="navigation__item__text"><%= t(".photos") %></p>
+            <p class="navigation__item__link"><%= t(".show_more") %></p>
+          </div>
+        <% end %>
+        <%= link_to edit_disease_path(id: @disease.id, locale: I18n.locale), class: "navigation__item navigation__item--edit" do %>
+          <i class="ri-edit-box-line navigation__item__icon"></i>
+          <div>
+            <p class="navigation__item__text"><%= t(".edit") %></p>
+          </div>
+        <% end %>
+      </nav>
+      <div class="feed">
+        <% nudge = DiseaseOnboardingService.new(@disease, current_account).eligible_nudge %>
+        <% if nudge %>
+          <%= render "disease_statuses/join_group_nudge", nudge: nudge %>
+        <% end %>
+      </div>
+    </div>
+  </div>
+</div>

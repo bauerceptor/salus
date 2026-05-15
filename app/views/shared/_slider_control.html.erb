@@ -1,0 +1,29 @@
+<!-- Segmented Slider Control Component -->
+<!-- Usage: Render this partial with local variables for options and legend -->
+<% options = local_assigns[:options] || [
+  { id: 'option1', label: 'Option 1', checked: true },
+  { id: 'option2', label: 'Option 2', checked: false },
+  { id: 'option3', label: 'Option 3', checked: false }
+] %>
+<% legend = local_assigns[:legend] || 'Select an Option' %>
+<% group_id = local_assigns[:group_id] || 'sliderGroup' %>
+
+<div class="slider-control">
+	<fieldset class="slider-control__group">
+		<legend class="slider-control__legend"><%= legend %></legend>
+		<div class="slider-control__options" id="<%= group_id %>">
+			<% options.each_with_index do |option, index| %>
+				<span class="slider-control__option">
+					<input
+						type="radio"
+						name="<%= group_id %>"
+						id="<%= option[:id] %>"
+						<%= 'checked' if option[:checked] %>
+						class="slider-control__input"
+					/>
+					<label class="slider-control__label" for="<%= option[:id] %>"><%= option[:label] %></label>
+				</span>
+			<% end %>
+		</div>
+	</fieldset>
+</div>

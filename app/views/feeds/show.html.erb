@@ -1,0 +1,35 @@
+<div class="page-feed">
+  <div class="page-feed__container">
+    <div class="dash-flash-messages">
+      <%= turbo_frame_tag "flash" %>
+    </div>
+
+    <header class="page-feed__header">
+      <h1 class="page-feed__title"><%= t(".title") %></h1>
+    </header>
+
+    <% if @feed_items.any? %>
+      <div class="feed-items">
+        <% @feed_items.each do |feed_item| %>
+          <% if feed_item.type == :post %>
+            <%= render "posts/post", post: feed_item.item %>
+          <% else %>
+            <%= render "disease_statuses/disease_status", disease: feed_item.item.disease, disease_status: feed_item.item, liked_statuses: [] %>
+          <% end %>
+        <% end %>
+      </div>
+
+      <% if @pagy.pages > 1 %>
+        <div class="pagination">
+          <%== pagy_nav(@pagy) %>
+        </div>
+      <% end %>
+    <% else %>
+      <div class="empty-state">
+        <p class="empty-state__text"><%= t(".empty.title") %></p>
+        <p class="empty-state__hint"><%= t(".empty.hint") %></p>
+        <%= link_to t(".empty.cta"), groups_path, class: "btn btn-primary" %>
+      </div>
+    <% end %>
+  </div>
+</div>

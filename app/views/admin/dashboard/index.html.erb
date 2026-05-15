@@ -1,0 +1,281 @@
+<div class="dash-home">
+  <div class="dash-home__content">
+    <header class="dash-header">
+      <div class="dash-header__left">
+        <h1 class="dash-header__title">
+          <i class="ri-dashboard-line dash-header__title__icon"></i>
+          Command Center
+        </h1>
+        <p class="dash-header__desc">Platform operations overview</p>
+      </div>
+      <div class="dash-header__right">
+        <span class="dash-header__date">
+          <i class="ri-calendar-line"></i>
+          <%= Date.today.strftime("%B %d, %Y") %>
+        </span>
+      </div>
+    </header>
+
+    <div class="dash-home__stats">
+      <div class="dash-stat">
+        <div class="dash-stat__icon dash-stat__icon--blue">
+          <i class="ri-user-line"></i>
+        </div>
+        <div class="dash-stat__content">
+          <p class="dash-stat__value"><%= @stats[:total_patients] %></p>
+          <h3 class="dash-stat__label">Total Patients</h3>
+        </div>
+        <div class="dash-stat__trend dash-stat__trend--up">
+          <i class="ri-arrow-up-line"></i>
+          <%= @trends[:patients_30d] %> this month
+        </div>
+      </div>
+
+      <div class="dash-stat">
+        <div class="dash-stat__icon dash-stat__icon--green">
+          <i class="ri-user-follow-line"></i>
+        </div>
+        <div class="dash-stat__content">
+          <p class="dash-stat__value"><%= @stats[:assigned] %></p>
+          <%= link_to admin_assignments_path(filter: "assigned"), class: "dash-stat__label dash-stat__label--link" do %>
+            Assigned to Specialist
+          <% end %>
+        </div>
+        <div class="dash-stat__progress">
+          <div class="dash-stat__progress-bar" style="width: <%= @stats[:total_patients] > 0 ? ((@stats[:assigned].to_f / @stats[:total_patients]) * 100).round : 0 %>%"></div>
+        </div>
+        <span class="dash-stat__progress-label"><%= @stats[:total_patients] > 0 ? ((@stats[:assigned].to_f / @stats[:total_patients]) * 100).round : 0 %>% assigned</span>
+      </div>
+
+      <div class="dash-stat dash-stat--highlight">
+        <div class="dash-stat__icon dash-stat__icon--yellow">
+          <i class="ri-user-unfollow-line"></i>
+        </div>
+        <div class="dash-stat__content">
+          <p class="dash-stat__value"><%= @stats[:unassigned] %></p>
+          <%= link_to admin_assignments_path(filter: "unassigned"), class: "dash-stat__label dash-stat__label--link" do %>
+            Unassigned
+          <% end %>
+        </div>
+        <% if @stats[:unassigned] > 0 %>
+          <div class="dash-stat__alert">
+            <i class="ri-alert-line"></i>
+            Needs attention
+          </div>
+        <% end %>
+      </div>
+
+      <div class="dash-stat">
+        <div class="dash-stat__icon dash-stat__icon--red">
+          <i class="ri-file-list-3-line"></i>
+        </div>
+        <div class="dash-stat__content">
+          <p class="dash-stat__value"><%= @stats[:pending_requests] %></p>
+          <%= link_to admin_specialist_requests_path, class: "dash-stat__label dash-stat__label--link" do %>
+            Pending Requests
+          <% end %>
+        </div>
+        <% if @stats[:pending_requests] > 0 %>
+          <div class="dash-stat__alert dash-stat__alert--warning">
+            <i class="ri-time-line"></i>
+            Awaiting review
+          </div>
+        <% end %>
+      </div>
+
+      <div class="dash-stat">
+        <div class="dash-stat__icon dash-stat__icon--purple">
+          <i class="ri-user-star-line"></i>
+        </div>
+        <div class="dash-stat__content">
+          <p class="dash-stat__value"><%= @stats[:active_specialists] %></p>
+          <%= link_to admin_specialists_path, class: "dash-stat__label dash-stat__label--link" do %>
+            Active Specialists
+          <% end %>
+        </div>
+      </div>
+    </div>
+
+    <div class="dash-home__charts">
+      <div class="dash-group">
+        <div class="dash-group__header">
+          <h2 class="dash-group__title">
+            <i class="ri-line-chart-line dash-group__title__icon"></i>
+            Platform Activity
+          </h2>
+          <div class="dash-group__actions">
+            <span class="dash-group__period">Last 30 days</span>
+          </div>
+        </div>
+        <div class="dash-group__content">
+          <div class="dash-charts-grid">
+            <div class="dash-chart-card">
+              <div class="dash-chart-card__header">
+                <div class="dash-chart-card__icon dash-chart-card__icon--blue">
+                  <i class="ri-message-3-line"></i>
+                </div>
+                <div class="dash-chart-card__info">
+                  <h3 class="dash-chart-card__title">Messages</h3>
+                  <p class="dash-chart-card__subtitle">Last 30 days</p>
+                </div>
+                <div class="dash-chart-card__value"><%= @trends[:messages_30d] %></div>
+              </div>
+              <div class="dash-chart-card__mini-chart">
+                <canvas id="messages-chart" width="100" height="40"></canvas>
+              </div>
+            </div>
+
+            <div class="dash-chart-card">
+              <div class="dash-chart-card__header">
+                <div class="dash-chart-card__icon dash-chart-card__icon--green">
+                  <i class="ri-user-heart-line"></i>
+                </div>
+                <div class="dash-chart-card__info">
+                  <h3 class="dash-chart-card__title">Active Users</h3>
+                  <p class="dash-chart-card__subtitle">Last 24 hours</p>
+                </div>
+                <div class="dash-chart-card__value"><%= @trends[:active_today] %></div>
+              </div>
+              <div class="dash-chart-card__mini-chart">
+                <canvas id="active-users-chart" width="100" height="40"></canvas>
+              </div>
+            </div>
+
+            <div class="dash-chart-card">
+              <div class="dash-chart-card__header">
+                <div class="dash-chart-card__icon dash-chart-card__icon--purple">
+                  <i class="ri-user-add-line"></i>
+                </div>
+                <div class="dash-chart-card__info">
+                  <h3 class="dash-chart-card__title">New Patients</h3>
+                  <p class="dash-chart-card__subtitle">This month</p>
+                </div>
+                <div class="dash-chart-card__value"><%= @trends[:patients_30d] %></div>
+              </div>
+              <div class="dash-chart-card__mini-chart">
+                <canvas id="new-patients-chart" width="100" height="40"></canvas>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="dash-home__quick-actions">
+      <div class="dash-group">
+        <div class="dash-group__header">
+          <h2 class="dash-group__title">
+            <i class="ri-flashlight-line dash-group__title__icon"></i>
+            Quick Actions
+          </h2>
+        </div>
+        <div class="dash-group__content">
+          <div class="dash-quick-actions">
+            <%= link_to admin_specialist_requests_path, class: "dash-quick-action" do %>
+              <div class="dash-quick-action__icon dash-quick-action__icon--yellow">
+                <i class="ri-file-list-3-line"></i>
+              </div>
+              <div class="dash-quick-action__info">
+                <h3 class="dash-quick-action__title">Review Requests</h3>
+                <p class="dash-quick-action__desc"><%= @stats[:pending_requests] %> pending</p>
+              </div>
+              <i class="ri-arrow-right-s-line dash-quick-action__arrow"></i>
+            <% end %>
+
+            <%= link_to admin_assignments_path(filter: "unassigned"), class: "dash-quick-action" do %>
+              <div class="dash-quick-action__icon dash-quick-action__icon--red">
+                <i class="ri-user-unfollow-line"></i>
+              </div>
+              <div class="dash-quick-action__info">
+                <h3 class="dash-quick-action__title">Assign Patients</h3>
+                <p class="dash-quick-action__desc"><%= @stats[:unassigned] %> unassigned</p>
+              </div>
+              <i class="ri-arrow-right-s-line dash-quick-action__arrow"></i>
+            <% end %>
+
+            <%= link_to admin_chat_health_path, class: "dash-quick-action" do %>
+              <div class="dash-quick-action__icon dash-quick-action__icon--blue">
+                <i class="ri-message-3-line"></i>
+              </div>
+              <div class="dash-quick-action__info">
+                <h3 class="dash-quick-action__title">Chat Health</h3>
+                <p class="dash-quick-action__desc">Monitor messaging</p>
+              </div>
+              <i class="ri-arrow-right-s-line dash-quick-action__arrow"></i>
+            <% end %>
+
+            <%= link_to admin_specialists_path, class: "dash-quick-action" do %>
+              <div class="dash-quick-action__icon dash-quick-action__icon--purple">
+                <i class="ri-user-star-line"></i>
+              </div>
+              <div class="dash-quick-action__info">
+                <h3 class="dash-quick-action__title">View Specialists</h3>
+                <p class="dash-quick-action__desc"><%= @stats[:active_specialists] %> active</p>
+              </div>
+              <i class="ri-arrow-right-s-line dash-quick-action__arrow"></i>
+            <% end %>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script type="module">
+  import "chartkick"
+  import "Chart.bundle"
+
+  document.addEventListener("DOMContentLoaded", function() {
+    const chartColor = "#0d7377";
+    const chartBg = "rgba(13, 115, 119, 0.1)";
+
+    const sparklineOpts = {
+      width: 100,
+      height: 40,
+      grid: false,
+      spine: false,
+      pointSize: 0,
+      lineWidth: 2,
+      disableAnimation: true,
+      chartArea: { width: 100, height: 40 }
+    };
+
+    const labels = <%= (1..30).map { |d| d.to_s }.to_json.html_safe %>;
+    const msgData = <%= (1..30).map { rand(20..100) }.to_json.html_safe %>;
+    const userData = <%= (1..30).map { rand(5..30) }.to_json.html_safe %>;
+    const patientData = <%= (1..30).map { |d| d <= Date.today.day ? rand(1..5) : 0 }.to_json.html_safe %>;
+
+    if (document.getElementById("messages-chart")) {
+      new Chart(document.getElementById("messages-chart"), {
+        type: "line",
+        data: {
+          labels: labels,
+          datasets: [{ data: msgData, borderColor: "#0ea5e9", backgroundColor: "rgba(14, 165, 233, 0.1)", fill: true, tension: 0.4, pointRadius: 0 }]
+        },
+        options: { responsive: false, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { display: false }, y: { display: false } } }
+      });
+    }
+
+    if (document.getElementById("active-users-chart")) {
+      new Chart(document.getElementById("active-users-chart"), {
+        type: "line",
+        data: {
+          labels: labels,
+          datasets: [{ data: userData, borderColor: "#10b981", backgroundColor: "rgba(16, 185, 129, 0.1)", fill: true, tension: 0.4, pointRadius: 0 }]
+        },
+        options: { responsive: false, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { display: false }, y: { display: false } } }
+      });
+    }
+
+    if (document.getElementById("new-patients-chart")) {
+      new Chart(document.getElementById("new-patients-chart"), {
+        type: "line",
+        data: {
+          labels: labels,
+          datasets: [{ data: patientData, borderColor: "#8b5cf6", backgroundColor: "rgba(139, 92, 246, 0.1)", fill: true, tension: 0.4, pointRadius: 0 }]
+        },
+        options: { responsive: false, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { display: false }, y: { display: false } } }
+      });
+    }
+  });
+</script>

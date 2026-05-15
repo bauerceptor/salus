@@ -1,0 +1,194 @@
+<div class="page-posts-new">
+  <header class="dash-header">
+    <div class="dash-header__left">
+      <h1 class="dash-header__title">
+        <i class="ri-edit-line dash-header__title__icon"></i>
+        <%= t(".title") %>
+      </h1>
+      <%= render "shared/breadcrumbs" %>
+    </div>
+    <div class="dash-header__right">
+      <%= link_to account_posts_path(account_id: current_account.id, locale: I18n.locale), class: "dash-button dash-button--back" do %>
+        <i class="ri-arrow-left-line dash-button__icon"></i>
+      <% end %>
+    </div>
+  </header>
+
+  <div class="dash-flash-messages">
+    <%= turbo_frame_tag "flash" do %>
+      <%= render "shared/dash_flash" %>
+    <% end %>
+  </div>
+
+  <div class="page-posts-new__content">
+    <div class="add-post">
+      <%= form_with(model: @post, url: account_posts_path(account_id: current_account.id, locale: I18n.locale),
+          html: { class: "add-post-form", id: "post-form" },
+          data: { controller: "reset-form", action: "turbo:submit-end->reset-form#clear" }) do |f| %>
+
+        <div class="add-post-form__field">
+          <%= f.label :disease_id, class: "add-post-form__label" do %>
+            <i class="ri-stethoscope-line"></i>
+            <%= t(".select_disease") %>
+          <% end %>
+          <%= f.select :disease_id,
+              options_from_collection_for_select(@diseases, :id, :name, @post.disease_id),
+              { prompt: t(".select_disease_prompt") },
+              class: "add-post-form__select" %>
+        </div>
+
+        <div class="add-post-form__field">
+          <%= f.label :status, class: "add-post-form__label" do %>
+            <i class="ri-bar-chart-box-line"></i>
+            How are you feeling?
+          <% end %>
+          <%= f.select :status,
+              options_for_select(@status_options, @post.status.presence || "diagnosed"),
+              {},
+              class: "add-post-form__select" %>
+        </div>
+
+        <%= f.text_area :content, id: "post-content",
+            data: { controller: "textarea-autogrow" },
+            class: "add-post-form__body",
+            placeholder: t(".placeholder") %>
+
+        <footer class="add-post-form__footer">
+          <div class="add-post-form__actions">
+            <button type="button" class="add-post-form__action" id="emoji-btn">
+              <i class="ri-emoji-sticker-line"></i>
+            </button>
+
+            <div class="emoji-menu" id="emoji-menu" style="display: none;">
+              <div class="emoji-grid">
+                <% ["😀", "😃", "😄", "😁", "😆", "😅", "🤣", "😂", "🙂", "🙃", "😉", "😊", "😇", "🥰", "😍", "🤩", "😘", "😗", "😋", "😛", "😜", "🤪", "🤤", "😴", "😷", "🤒", "👍", "👏", "🙏", "💪", "❤️", "🧡", "💛", "💚", "💙", "💜", "🖤", "💯", "🔥", "⭐", "✨", "⚡"].each do |emoji| %>
+                  <button type="button" class="emoji-item" data-emoji="<%= emoji %>"><%= emoji %></button>
+              <% end %>
+              </div>
+            </div>
+
+            <button type="button" class="add-post-form__action" id="gif-btn">
+              <i class="ri-file-gif-line"></i>
+            </button>
+
+            <div class="gif-input" id="gif-input" style="display: none;">
+              <input type="url" placeholder="Paste GIF URL and press Enter" id="gif-url">
+            </div>
+
+            <button type="button" class="add-post-form__action" id="image-btn">
+              <i class="ri-image-add-line"></i>
+            </button>
+            <input type="file" accept="image/*" id="image-file" style="display: none;">
+          </div>
+          <%= button_tag type: :submit, class: "add-post-form__submit" do %>
+            <i class="ri-send-plane-2-fill"></i>
+          <% end %>
+        </footer>
+      <% end %>
+    </div>
+  </div>
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+  const emojiBtn = document.getElementById("emoji-btn");
+  const emojiMenu = document.getElementById("emoji-menu");
+  const gifBtn = document.getElementById("gif-btn");
+  const gifInput = document.getElementById("gif-input");
+  const gifUrl = document.getElementById("gif-url");
+  const imageBtn = document.getElementById("image-btn");
+  const imageFile = document.getElementById("image-file");
+  const textarea = document.getElementById("post-content");
+
+  if (!emojiBtn || !textarea) {
+    console.log("Elements not found, skipping emoji picker init");
+    return;
+  }
+
+  console.log("Emoji picker initializing...");
+
+  // Emoji button toggle
+  emojiBtn.addEventListener("click", function(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    console.log("Emoji button clicked");
+    const isHidden = emojiMenu.style.display === "none";
+    emojiMenu.style.display = isHidden ? "block" : "none";
+    gifInput.style.display = "none";
+  });
+
+  // Insert emoji
+  document.querySelectorAll(".emoji-item").forEach(function(item) {
+    item.addEventListener("click", function(e) {
+      e.preventDefault();
+      const emoji = this.dataset.emoji;
+      console.log("Inserting emoji:", emoji);
+      const start = textarea.selectionStart;
+      const end = textarea.selectionEnd;
+      const text = textarea.value;
+      textarea.value = text.substring(0, start) + emoji + text.substring(end);
+      textarea.selectionStart = textarea.selectionEnd = start + emoji.length;
+      textarea.focus();
+      emojiMenu.style.display = "none";
+    });
+  });
+
+  // GIF button toggle
+  gifBtn.addEventListener("click", function(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    console.log("GIF button clicked");
+    const isHidden = gifInput.style.display === "none";
+    gifInput.style.display = isHidden ? "block" : "none";
+    emojiMenu.style.display = "none";
+    if (isHidden) {
+      gifUrl.focus();
+    }
+  });
+
+  // GIF URL submit
+  gifUrl.addEventListener("keydown", function(e) {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      console.log("GIF URL submitted:", this.value);
+      const url = this.value.trim();
+      if (url) {
+        textarea.value += (textarea.value ? "\n" : "") + "[GIF](" + url + ")";
+        textarea.focus();
+      }
+      this.value = "";
+      gifInput.style.display = "none";
+    }
+  });
+
+  // Image button
+  imageBtn.addEventListener("click", function(e) {
+    e.preventDefault();
+    console.log("Image button clicked");
+    imageFile.click();
+  });
+
+  // Image file selected
+  imageFile.addEventListener("change", function(e) {
+    const file = e.target.files[0];
+    if (file) {
+      console.log("Image selected:", file.name);
+      textarea.value += (textarea.value ? "\n" : "") + "[📷 " + file.name + "]";
+      textarea.focus();
+    }
+    this.value = "";
+  });
+
+  // Close dropdowns when clicking outside
+  document.addEventListener("click", function(e) {
+    if (!emojiBtn.contains(e.target) && !emojiMenu.contains(e.target)) {
+      emojiMenu.style.display = "none";
+    }
+    if (!gifBtn.contains(e.target) && !gifInput.contains(e.target)) {
+      gifInput.style.display = "none";
+    }
+  });
+
+  console.log("Emoji picker initialized successfully");
+});
+</script>

@@ -1,0 +1,45 @@
+<div class="page-account">
+  <div class="page-account__container">
+    <div class="dash-flash-messages">
+      <%= turbo_frame_tag "flash" do %>
+        <%= render "shared/dash_flash" %>
+      <% end %>
+    </div>
+    <%= render "accounts/card" %>
+    <div class="card-group">
+      <header class="card-group__header">
+        <div class="card-group__header__left">
+          <h2 class="card-group__header__title"><%= t(".title") %></h2>
+        </div>
+        <div class="card-group__header__right">
+        </div>
+      </header>
+      <div class="card-group__content">
+        <% if policy(@account).show? %>
+          <div class="posts-list">
+            <%= turbo_frame_tag "posts_#{@pagy.page}" do %>
+              <% unless @posts.to_a.any? %>
+                <p class="no-results"><%= t(".no_posts") %></p>
+              <% else %>
+                <div class="dash-posts-container">
+                  <% @posts.each do |post| %>
+                    <%= render partial: "disease_status", locals: { disease: post.disease, disease_status: post,
+                      liked_statuses: @liked_statuses } %>
+                  <% end %>
+                </div>
+              <% end %>
+              <% unless @pagy.page == @pagy.pages %>
+                <%= turbo_frame_tag "posts_#{@pagy.next}", src: account_posts_path(account_id: @account.id, page: @pagy.next),
+                  loading: "lazy" do %>
+                  <div><%= t(".turbo.fetching") %></div>
+                <% end %>
+              <% end %>
+            <% end %>
+          </div>
+        <% else %>
+          <p class="dash-text"><%= t("accounts.unauthorized") %></p>
+        <% end %>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,87 @@
+@import url("https://fonts.googleapis.com/css?family=Overpass:300,400&display=swap");
+
+$bg: #fff;
+$text: #2e2e2e;
+$blue: #2c2fe8;
+$darkblue: darken($blue, 10%);
+
+* {
+  box-sizing: border-box;
+  &::before,
+  &::after {
+    box-sizing: border-box;
+  }
+}
+
+body {
+  font-family: "Overpass", sans-serif;
+  font-size: 1em;
+  font-weight: 300;
+  line-height: 1.5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0;
+  min-height: 100vh;
+  color: $text;
+  background: $bg;
+  @media (min-width: 48rem) {
+    font-size: 1.25em;
+  }
+}
+
+#container {
+  margin: auto;
+  padding: 0 1rem;
+  max-width: 48rem;
+  width: 100%;
+}
+
+a {
+  text-decoration: none;
+  color: black;
+  cursor: pointer;
+}
+
+.link {
+  position: relative;
+  transition: clip-path 275ms ease;
+  &:hover span::before,
+  &:focus span::before {
+    clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
+  }
+  span {
+    position: relative;
+    display: inline-block;
+    color: $blue;
+    &::before {
+      position: absolute;
+      content: attr(data-content);
+      color: $darkblue;
+      text-decoration: underline;
+      text-decoration-color: $darkblue;
+      clip-path: polygon(0 0, 0 0, 0% 100%, 0 100%);
+      transition: clip-path 275ms ease;
+    }
+  }
+}
+
+span.dotted::before {
+  text-decoration-style: dotted;
+}
+
+span.dashed::before {
+  text-decoration-style: dashed;
+}
+
+span.double::before {
+  text-decoration-style: double;
+}
+
+span.wavy::before {
+  text-decoration-style: wavy;
+}
+
+span.line-through::before {
+  text-decoration-line: line-through;
+}

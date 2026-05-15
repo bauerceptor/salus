@@ -1,0 +1,88 @@
+<div class="quick-actions-toolbar" data-controller="quick-actions">
+  <div class="quick-actions-toolbar__inner">
+    <div class="quick-actions-toolbar__patient-context">
+      <% if patient %>
+        <div class="quick-actions-toolbar__patient-badge">
+          <i class="ri-user-line"></i>
+          <span><%= patient.full_name %></span>
+        </div>
+      <% else %>
+        <div class="quick-actions-toolbar__no-patient">
+          <i class="ri-user-search-line"></i>
+          <span>Select a patient</span>
+        </div>
+      <% end %>
+    </div>
+
+    <div class="quick-actions-toolbar__actions">
+      <div class="quick-actions-toolbar__group">
+        <%= link_to new_specialist_note_path(patient_id: patient&.id),
+            class: "quick-action-btn",
+            title: "Add Note" do %>
+          <i class="ri-sticky-note-add-line quick-action-btn__icon"></i>
+          <span class="quick-action-btn__label">+ Note</span>
+        <% end %>
+
+        <%= link_to new_specialist_recommendation_path(patient_id: patient&.id, type: "medication"),
+            class: "quick-action-btn",
+            title: "Send Medication Recommendation" do %>
+          <i class="ri-pill-line quick-action-btn__icon"></i>
+          <span class="quick-action-btn__label">+ Medication</span>
+        <% end %>
+
+        <%= link_to new_specialist_recommendation_path(patient_id: patient&.id, type: "treatment"),
+            class: "quick-action-btn",
+            title: "Send Treatment Recommendation" do %>
+          <i class="ri-hotel-line quick-action-btn__icon"></i>
+          <span class="quick-action-btn__label">+ Treatment</span>
+        <% end %>
+
+        <%= link_to new_specialist_schedule_path(patient_id: patient&.id),
+            class: "quick-action-btn",
+            title: "Schedule Appointment" do %>
+          <i class="ri-calendar-event-line quick-action-btn__icon"></i>
+          <span class="quick-action-btn__label">Schedule</span>
+        <% end %>
+      </div>
+
+      <div class="quick-actions-toolbar__search">
+        <button type="button",
+                class="quick-action-btn quick-action-btn--search quick-actions-toolbar__search-btn",
+                data-action="quick-actions#openSearch",
+                title="Search Patients">
+          <i class="ri-search-line quick-action-btn__icon"></i>
+          <span class="quick-action-btn__label">Search</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="quick-actions-toolbar__search-modal"
+       data-quick-actions-target="searchModal"
+       data-action="click->quick-actions#closeOnBackdrop keydown.esc->quick-actions#closeSearch">
+    <div class="quick-actions-toolbar__search-modal-content" data-quick-actions-target="searchModalContent">
+      <div class="quick-actions-toolbar__search-modal-header">
+        <h3>Search Patients</h3>
+        <button type="button"
+                class="quick-actions-toolbar__search-modal-close"
+                data-action="quick-actions#closeSearch">
+          <i class="ri-close-line"></i>
+        </button>
+      </div>
+      <div class="quick-actions-toolbar__search-modal-body">
+        <div class="quick-actions-toolbar__search-input-wrapper">
+          <i class="ri-search-line"></i>
+          <input type="text"
+                 data-quick-actions-target="searchInput"
+                 data-action="keydown->quick-actions#handleSearchInput"
+                 class="quick-actions-toolbar__search-input"
+                 placeholder="Search by name..."
+                 autocomplete="off">
+        </div>
+        <div class="quick-actions-toolbar__search-results"
+             data-quick-actions-target="searchResults">
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

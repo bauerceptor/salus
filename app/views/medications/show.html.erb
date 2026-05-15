@@ -1,0 +1,185 @@
+<div class="salus-page-container">
+  <header class="salus-page-header">
+    <div class="salus-page-header__left">
+      <h1 class="salus-page-header__title">
+        <i class="ri-medicine-bottle-line salus-page-header__icon"></i>
+        <%= @medication.name %>
+      </h1>
+      <%= render "shared/breadcrumbs" %>
+    </div>
+    <div class="salus-page-header__actions">
+      <%= link_to edit_medication_path(id: @medication.id, locale: I18n.locale),
+          class: "salus-btn salus-btn--primary" do %>
+        <i class="ri-edit-line salus-btn__icon"></i>
+        <%= t(".button.edit") %>
+      <% end %>
+      <%= link_to medications_path, class: "salus-btn salus-btn--secondary" do %>
+        <i class="ri-arrow-left-line salus-btn__icon"></i>
+      <% end %>
+    </div>
+  </header>
+
+  <%= turbo_frame_tag "flash" do %>
+    <%= render "shared/dash_flash" %>
+  <% end %>
+
+  <div class="salus-cards-grid" style="grid-template-columns: 1fr;">
+
+    <section class="salus-card">
+      <div class="salus-card__header">
+        <h2 class="salus-card__title">
+          <i class="ri-information-line" style="color: var(--color-primary)"></i>
+          <%= t(".info.title") %>
+        </h2>
+      </div>
+      <div class="salus-info-grid">
+        <div class="salus-info-item">
+          <div class="salus-info-item__label"><%= t(".info.name.title") %></div>
+          <div class="salus-info-item__value"><%= @medication.name %></div>
+        </div>
+        <div class="salus-info-item">
+          <div class="salus-info-item__label"><%= t(".info.dosage.title") %></div>
+          <div class="salus-info-item__value"><%= @medication.dosage %></div>
+        </div>
+        <div class="salus-info-item">
+          <div class="salus-info-item__label"><%= t(".info.frequency.title") %></div>
+          <div class="salus-info-item__value salus-info-item__value--muted"><%= @medication.frequency.humanize %></div>
+        </div>
+        <div class="salus-info-item">
+          <div class="salus-info-item__label"><%= t(".info.start_date.title") %></div>
+          <div class="salus-info-item__value salus-info-item__value--muted">
+            <%= @medication.start_date ? @medication.start_date.strftime("%B %d, %Y") : "-" %>
+          </div>
+        </div>
+        <div class="salus-info-item">
+          <div class="salus-info-item__label"><%= t(".info.end_date.title") %></div>
+          <div class="salus-info-item__value salus-info-item__value--muted">
+            <%= @medication.end_date ? @medication.end_date.strftime("%B %d, %Y") : "-" %>
+          </div>
+        </div>
+        <div class="salus-info-item">
+          <div class="salus-info-item__label"><%= t(".info.is_active.title") %></div>
+          <div class="salus-info-item__value">
+            <% if @medication.is_active? %>
+              <span class="salus-badge salus-badge--success">Active</span>
+            <% else %>
+              <span class="salus-badge salus-badge--danger">Inactive</span>
+            <% end %>
+          </div>
+        </div>
+        <% if @medication.instructions.present? %>
+          <div class="salus-info-item" style="grid-column: 1 / -1;">
+            <div class="salus-info-item__label"><%= t(".info.instructions.title") %></div>
+            <div class="salus-info-item__value salus-info-item__value--muted"><%= @medication.instructions %></div>
+          </div>
+        <% end %>
+      </div>
+    </section>
+
+    <section class="salus-card">
+      <div class="salus-card__header">
+        <h2 class="salus-card__title">
+          <i class="ri-calendar-check-line" style="color: var(--color-primary)"></i>
+          <%= t(".schedules.title") %>
+        </h2>
+        <%= link_to new_medication_medication_schedule_path(medication_id: @medication.id, locale: I18n.locale),
+            class: "salus-btn salus-btn--secondary salus-btn--sm" do %>
+          <i class="ri-add-line salus-btn__icon"></i>
+          <%= t(".schedules.button.new") %>
+        <% end %>
+      </div>
+      <% if @medication_schedules.to_a.any? %>
+        <table class="salus-table">
+          <thead>
+            <tr>
+              <th><i class="ri-time-line"></i> Time</th>
+              <th>Day</th>
+              <th>Time of Day</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            <% @medication_schedules.each do |schedule| %>
+              <tr>
+                <td style="font-weight: 500; color: var(--color-text-dark);">
+                  <%= schedule.scheduled_time.strftime("%H:%M") %>
+                </td>
+                <td style="color: var(--color-text-light);">
+                  <%= schedule.day_of_week ? schedule.day_of_week.humanize : "Every day" %>
+                </td>
+                <td style="color: var(--color-text-light);">
+                  <%= schedule.time_of_day ? schedule.time_of_day.humanize : "" %>
+                </td>
+                <td style="text-align: right;">
+                  <%= button_to medication_medication_schedule_path(medication_id: @medication.id, id: schedule.id, locale: I18n.locale),
+                      method: :delete,
+                      class: "salus-btn salus-btn--secondary salus-btn--sm salus-btn--danger-ghost",
+                      data: { turbo_confirm: t(".button.delete.turbo.confirm") } do %>
+                    <i class="ri-delete-bin-line"></i>
+                  <% end %>
+                </td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      <% else %>
+        <div class="salus-empty" style="padding: var(--space-xl);">
+          <p class="salus-empty__text"><%= t(".schedules.no_results") %></p>
+        </div>
+      <% end %>
+    </section>
+
+    <section class="salus-card">
+      <div class="salus-card__header">
+        <h2 class="salus-card__title">
+          <i class="ri-history-line" style="color: var(--color-primary)"></i>
+          <%= t(".logs.title") %>
+        </h2>
+      </div>
+      <% if @medication_logs.to_a.any? %>
+        <table class="salus-table">
+          <thead>
+            <tr>
+              <th>Status</th>
+              <th>Scheduled For</th>
+              <th>Taken At</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% @medication_logs.each do |log| %>
+              <tr>
+                <td>
+                  <% if log.status == "taken" %>
+                    <span class="salus-badge salus-badge--success"><%= log.status.humanize %></span>
+                  <% elsif log.status == "missed" %>
+                    <span class="salus-badge salus-badge--danger"><%= log.status.humanize %></span>
+                  <% else %>
+                    <span class="salus-badge salus-badge--warning"><%= log.status.humanize %></span>
+                  <% end %>
+                </td>
+                <td style="color: var(--color-text-dark);">
+                  <%= log.scheduled_for ? log.scheduled_for.strftime("%B %d, %Y %H:%M") : "-" %>
+                </td>
+                <td>
+                  <% if log.taken_at %>
+                    <span style="color: var(--color-success); display: flex; align-items: center; gap: var(--space-xs);">
+                      <i class="ri-check-line"></i>
+                      <%= t(".logs.taken_at", time: log.taken_at.strftime("%H:%M")) %>
+                    </span>
+                  <% else %>
+                    <span style="color: var(--color-text-light);">-</span>
+                  <% end %>
+                </td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      <% else %>
+        <div class="salus-empty" style="padding: var(--space-xl);">
+          <p class="salus-empty__text"><%= t(".logs.no_results") %></p>
+        </div>
+      <% end %>
+    </section>
+
+  </div>
+</div>

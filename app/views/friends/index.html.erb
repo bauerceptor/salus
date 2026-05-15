@@ -1,0 +1,69 @@
+<div class="page-account">
+  <div class="page-account__container">
+    <div class="dash-flash-messages">
+      <%= turbo_frame_tag "flash" %>
+    </div>
+    <%= render "accounts/card" %>
+    <div class="card-group">
+      <header class="card-group__header">
+        <div class="card-group__header__left">
+          <h2 class="card-group__header__title">
+            <%= t(".title") %>
+          </h2>
+        </div>
+        <div class="card-group__header__right">
+          <% if policy(@account).show? %>
+            <%= link_to friend_requests_path, class: "dash-button dash-button--blue dash-button--small" do %>
+              <i class="ri-user-add-line dash-button__icon"></i>
+              <%= t(".button.show") %>
+            <% end %>
+          <% end %>
+        </div>
+      </header>
+      <div class="card-group__content">
+        <% if policy(@account).show? %>
+          <% if @friends.to_a.any? %>
+            <ul class="friends-list">
+              <% @friends.each do |friend| %>
+                <li class="friend">
+                  <div class="friend__left">
+                    <div class="friend__avatar">
+                      <%= render "shared/avatar", account: friend, css_class: "friend__image", alt: friend.full_name %>
+                    </div>
+                    <%= link_to account_path(id: friend.id, locale: I18n.locale), class: "friend__info" do %>
+                      <p class="friend__name"><%= friend.full_name %></p>
+                      <p class="friend__username">@<%= friend.username %></p>
+                    <% end %>
+                  </div>
+                  <div class="friend__right">
+                    <%= link_to chatrooms_path(user_id: friend.id, locale: I18n.locale),
+                        class: "friend__button friend__button--message" do %>
+                      <i class="ri-chat-3-line friend__icon"></i>
+                    <% end %>
+                    <%= button_to account_path(id: friend.id, locale: I18n.locale), class: "friend__button" do %>
+                      <i class="ri-arrow-right-line friend__icon friend__icon--show"></i>
+                    <% end %>
+                  </div>
+                </li>
+              <% end %>
+            </ul>
+          <% else %>
+            <p class="dash-group__text"><%= t(".no_results") %></p>
+          <% end %>
+          <div class="dash-pagination friends-pagination">
+            <div class="dash-pagination__controls">
+              <%== pagy_nav(@pagy) if @pagy.pages > 1 %>
+            </div>
+            <div class="dash-pagination__info">
+              <%== pagy_info(@pagy) %>
+            </div>
+          </div>
+        <% else %>
+          <p class="dash-text">
+            <%= t("accounts.unauthorized") %>
+          </p>
+        <% end %>
+      </div>
+    </div>
+  </div>
+</div>

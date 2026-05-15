@@ -1,0 +1,177 @@
+<div class="dash-home">
+  <div class="dash-home__content">
+    <header class="dash-home__header">
+      <div class="dash-home__header__left">
+        <h1 class="dash-home__header__title">
+          <i class="ri-user-settings-line dash-home__header__title__icon"></i>
+          <%= t(".title") %>
+        </h1>
+        <p class="dash-home__header__text"><%= t(".subtitle") %></p>
+      </div>
+      <div class="dash-home__header__right">
+        <%= link_to specialist_edit_profile_path,
+            class: "dash-button dash-button--new" do %>
+          <i class="ri-edit-line dash-button__icon"></i>
+          <%= t(".edit_button") %>
+        <% end %>
+      </div>
+    </header>
+
+    <div class="profile-grid">
+      <div class="profile-card">
+        <div class="profile-card__header">
+          <div class="profile-card__avatar">
+            <%= image_tag "avatar-placeholder.png", alt: "" %>
+          </div>
+          <div class="profile-card__info">
+            <h2 class="profile-card__name"><%= @account.full_name %></h2>
+            <p class="profile-card__email"><%= current_user.email %></p>
+            <span class="mark-specialist">
+              <i class="ri-check-line"></i>
+              <%= t(".verified") %>
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <div class="dash-group">
+        <header class="dash-group__header">
+          <h2 class="dash-group__title">
+            <i class="ri-user-line dash-group__title__icon"></i>
+            <%= t(".personal_info") %>
+          </h2>
+        </header>
+        <div class="dash-group__content">
+          <div class="dash-info">
+            <div class="dash-info__group">
+              <p class="dash-info__group__label"><%= t(".full_name") %></p>
+              <p class="dash-info__group__value"><%= @account.full_name %></p>
+            </div>
+            <div class="dash-info__group">
+              <p class="dash-info__group__label"><%= t(".email") %></p>
+              <p class="dash-info__group__value"><%= current_user.email %></p>
+            </div>
+            <div class="dash-info__group">
+              <p class="dash-info__group__label"><%= t(".phone") %></p>
+              <p class="dash-info__group__value"><%= @account.phone_number || "-" %></p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="dash-group">
+        <header class="dash-group__header">
+          <h2 class="dash-group__title">
+            <i class="ri-nurse-line dash-group__title__icon"></i>
+            <%= t(".professional_info") %>
+          </h2>
+        </header>
+        <div class="dash-group__content">
+          <div class="dash-info">
+            <div class="dash-info__group">
+              <p class="dash-info__group__label"><%= t(".specialization") %></p>
+              <p class="dash-info__group__value"><%= @specialist.specialization %></p>
+            </div>
+            <div class="dash-info__group">
+              <p class="dash-info__group__label"><%= t(".field_of_expertise") %></p>
+              <p class="dash-info__group__value"><%= @specialist.field_of_expertise %></p>
+            </div>
+            <div class="dash-info__group">
+              <p class="dash-info__group__label"><%= t(".description") %></p>
+              <p class="dash-info__group__value"><%= @specialist.specialization_description %></p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="dash-group">
+        <header class="dash-group__header">
+          <h2 class="dash-group__title">
+            <i class="ri-calendar-check-line dash-group__title__icon"></i>
+            <%= t(".statistics") %>
+          </h2>
+        </header>
+        <div class="dash-group__content">
+          <div class="dash-home__stats">
+            <div class="dash-stat">
+              <div class="dash-stat__icon">
+                <i class="ri-user-line"></i>
+              </div>
+              <div class="dash-stat__content">
+                <p class="dash-stat__text"><%= current_user.specialist_patients.active.count %></p>
+                <h3 class="dash-stat__title"><%= t(".total_patients") %></h3>
+              </div>
+            </div>
+            <div class="dash-stat">
+              <div class="dash-stat__icon dash-stat__icon--green">
+                <i class="ri-file-list-3-line"></i>
+              </div>
+              <div class="dash-stat__content">
+                <p class="dash-stat__text"><%= current_user.specialist_recommendations.count %></p>
+                <h3 class="dash-stat__title"><%= t(".recommendations") %></h3>
+              </div>
+            </div>
+            <div class="dash-stat">
+              <div class="dash-stat__icon dash-stat__icon--blue">
+                <i class="ri-message-3-line"></i>
+              </div>
+              <div class="dash-stat__content">
+                <p class="dash-stat__text"><%= current_user.specialist_messages.count %></p>
+                <h3 class="dash-stat__title"><%= t(".messages") %></h3>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  .profile-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 30px;
+  }
+
+  .profile-card {
+    grid-column: 1 / -1;
+    background: #ffffff;
+    border: 1px solid #e7e1d8;
+    border-radius: 3px;
+    padding: 30px;
+  }
+
+  .profile-card__header {
+    display: flex;
+    align-items: center;
+    gap: 30px;
+  }
+
+  .profile-card__avatar {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    overflow: hidden;
+    border: 4px solid #cae6ff;
+  }
+
+  .profile-card__avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .profile-card__name {
+    font-size: var(--24px);
+    font-weight: 600;
+    color: #232b39;
+    margin-bottom: 5px;
+  }
+
+  .profile-card__email {
+    font-size: var(--14px);
+    color: #727d92;
+    margin-bottom: 10px;
+  }
+</style>

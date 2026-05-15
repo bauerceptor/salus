@@ -1,0 +1,181 @@
+<div class="page-measurements__content">
+  <header class="page-measurements__header">
+    <h1 class="page-measurements__title">
+      <i class="ri-heart-pulse-line"></i>
+      <%= t(".title") %>
+    </h1>
+    <div class="page-measurements__actions">
+      <%= link_to measurement_raports_path, class: "dash-button dash-button--show" do %>
+        <i class="ri-file-chart-line"></i>
+        <%= t(".button.raports") %>
+      <% end %>
+      <%= link_to authenticated_root_path, class: "dash-button dash-button--back" do %>
+        <i class="ri-arrow-left-line"></i>
+      <% end %>
+    </div>
+  </header>
+
+  <%= turbo_frame_tag "flash" do %>
+    <%= render "shared/dash_flash" %>
+  <% end %>
+
+  <div class="measurements-latest">
+    <% Measurement::TYPES.each do |measurement_type| %>
+      <% latest = @latest[measurement_type] %>
+      <% risk_level = latest&.health_risk_level || :none %>
+      <div class="measurement-container">
+        <div class="measurement-card <%= 'measurement-card--dangerous' if risk_level == :critical || risk_level == :abnormal %> <%= 'measurement-card--warning' if risk_level == :warning %>">
+          <div class="measurement-card__header">
+            <span class="measurement-card__title measurement-card__title--<%= measurement_type %>">
+              <%= measurement_type.to_sym == :spo2 ? "Blood Oxygen" : I18n.t("activerecord.attributes.measurement_types.#{measurement_type}") %>
+            </span>
+            <% if risk_level == :critical %>
+              <span class="measurement-card__warning measurement-card__warning--critical" title="Critical value!">
+                <i class="ri-alert-fill"></i>
+              </span>
+            <% elsif risk_level == :abnormal %>
+              <span class="measurement-card__warning" title="Abnormal value">!</span>
+            <% elsif risk_level == :warning %>
+              <span class="measurement-card__warning measurement-card__warning--low" title="Value near limits">~</span>
+            <% end %>
+          </div>
+          <div class="measurement-card__body">
+            <span class="measurement-card__value">
+              <%= latest ? latest.value : '-' %>
+            </span>
+            <span class="measurement-card__symbol">
+              <%= latest ? latest.measurement_type.unit.symbol : '-' %>
+            </span>
+          </div>
+          <div class="measurement-card__footer">
+            <% if latest %>
+              <%= link_to show_by_day_measurements_path(day: latest.measurement_date.to_date),
+                  class: "measurement-card__date" do %>
+                <i class="ri-calendar-line"></i>
+                <%= l(latest.measurement_date, format: '%d %b') %>
+              <% end %>
+            <% else %>
+              <p class="measurement-card__date" style="justify-content: center;">
+                <%= t(".no_measurement") %>
+              </p>
+            <% end %>
+          </div>
+        </div>
+        <%= link_to new_measurements_path(measurement_type: measurement_type),
+            class: "add-measurement-btn add-measurement-btn--#{measurement_type}" do %>
+          <i class="ri-add-line"></i>
+          <%= t(".add_new") %>
+        <% end %>
+      </div>
+    <% end %>
+  </div>
+
+  <div class="measurements-calendar">
+    <div class="measurements-calendar__header">
+      <h2 class="measurements-calendar__title">
+        <i class="ri-calendar-line"></i>
+        <%= t(".calendar.title") %>
+      </h2>
+    </div>
+    <div class="overflow-x-auto">
+      <%= month_calendar do |date| %>
+        <div data-controller="popover" data-popover-url-value="<%= details_measurements_path(day: date) %>">
+          <span class="date-day"><%= date.strftime("%d") %></span>
+          <% measurements_count = @measurements[date] || 0 %>
+          <% if measurements_count > 0 %>
+            <div class="measurements-indicator">
+              <%= link_to show_by_day_measurements_path(day: date),
+                  class: "measurement-dot",
+                  data: { action: "mouseenter->popover#show mouseleave->popover#hide" } do %>
+              <% end %>
+            </div>
+          <% end %>
+        </div>
+      <% end %>
+    </div>
+  </div>
+
+  <div class="measurements-list">
+    <div class="measurements-list__header">
+      <h2 class="measurements-list__title">
+        <i class="ri-list-check"></i>
+        <%= t(".list.title") %>
+      </h2>
+    </div>
+
+    <% if @pagy.count > 0 %>
+      <div class="measurements-table-wrapper">
+        <table class="measurements-table">
+          <thead>
+            <tr>
+              <th><%= t(".list.date") %></th>
+              <th><%= t(".list.type") %></th>
+              <th><%= t(".list.value") %></th>
+              <th><%= t(".list.risk") %></th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            <% @measurements_list.each do |measurement| %>
+              <% risk_class = case measurement.health_risk_level
+                             when :critical then 'risk-critical'
+                             when :abnormal then 'risk-abnormal'
+                             when :warning then 'risk-warning'
+                             else 'risk-normal'
+                             end %>
+              <tr class="measurement-row <%= risk_class %>">
+                <td class="measurement-row__date">
+                  <%= l(measurement.measurement_date, format: '%d %b %Y') %>
+                </td>
+                <td class="measurement-row__type">
+                  <%= measurement.measurement_type.name %>
+                </td>
+                <td class="measurement-row__value">
+                  <%= measurement.value %> <%= measurement.measurement_type.unit.symbol %>
+                </td>
+                <td class="measurement-row__risk">
+                  <% if measurement.health_risk_level == :critical %>
+                    <span class="risk-badge risk-badge--critical">
+                      <i class="ri-alert-fill"></i> Critical
+                    </span>
+                  <% elsif measurement.health_risk_level == :abnormal %>
+                    <span class="risk-badge risk-badge--abnormal">
+                      <i class="ri-alert-line"></i> Abnormal
+                    </span>
+                  <% elsif measurement.health_risk_level == :warning %>
+                    <span class="risk-badge risk-badge--warning">
+                      <i class="ri-warning-line"></i> Warning
+                    </span>
+                  <% else %>
+                    <span class="risk-badge risk-badge--normal">
+                      <i class="ri-checkbox-circle-line"></i> Normal
+                    </span>
+                  <% end %>
+                </td>
+                <td class="measurement-row__actions">
+                  <%= link_to measurement_path(id: measurement.id, locale: I18n.locale), class: "dash-button dash-button--small" do %>
+                    <i class="ri-eye-line"></i>
+                  <% end %>
+                </td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="pagination-container">
+        <div class="dash-pagination__info">
+          <%== pagy_info(@pagy) if @pagy.pages > 1 %>
+        </div>
+        <div class="dash-pagination__nav">
+          <%== pagy_nav(@pagy) if @pagy.pages > 1 %>
+        </div>
+      </div>
+    <% else %>
+      <div class="empty-state">
+        <i class="ri-heart-pulse-line empty-state__icon"></i>
+        <p class="empty-state__text"><%= t(".list.empty") %></p>
+      </div>
+    <% end %>
+  </div>
+</div>

@@ -1,0 +1,65 @@
+<% content_for :body_attributes do %> data-gallery="true" <% end %>
+
+<div class="page-group">
+  <div class="dash-flash-messages">
+    <%= turbo_frame_tag "flash" do %>
+      <%= render "shared/dash_flash" %>
+    <% end %>
+  </div>
+  <div class="page-group__content">
+    <div class="group">
+      <%= render "groups/header" %>
+      <%= render "groups/nav" %>
+      <div class="group__content">
+        <div class="group-symptoms">
+          <div class="dash-group">
+            <header class="dash-group__header">
+              <h2 class="dash-group__title">
+                <i class="ri-camera-line dash-group__title__icon"></i>
+                <%= t(".title") %>
+              </h2>
+              <div class="dash-group__actions"></div>
+            </header>
+            <div class="dash-group__content">
+              <div class="group-photos">
+                <p class="group-photos__text"><%= t(".description") %></p>
+                <% if @photos.to_a.any? %>
+                  <div class="group-photos__list">
+                    <% @photos.each do |photo| %>
+                      <div class="photo">
+                        <%= link_to photo.image_url, class: "photo", data: { fslightbox: true, turbo: false } do %>
+                          <%= image_tag photo.image_url, class: "photo__image" %>
+                        <% end %>
+                        <div class="photo__bottom">
+                          <p class="photo__user">
+                            @<%= photo.disease.account.username %>
+                          </p>
+                          <p class="photo__date">
+                            <i class="ri-calendar-line"></i>
+                            <%= photo.created_at.strftime("%d.%m.%Y") %>r.
+                          </p>
+                        </div>
+                      </div>
+                    <% end %>
+                  </div>
+                <% else %>
+                  <p class="no-results">
+                    <%= t(".no_results") %>
+                  </p>
+                <% end %>
+              </div>
+            </div>
+            <div class="dash-pagination">
+              <div class="dash-pagination__controls">
+                <%== pagy_nav(@pagy) if @pagy.pages > 1 %>
+              </div>
+              <div class="dash-pagination__info">
+                <%== pagy_info(@pagy) %>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

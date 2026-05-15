@@ -1,0 +1,24 @@
+<!-- Autocomplete Form Field Component -->
+<!-- Usage: Render this partial with a select element and options -->
+<!-- The JS will transform the select into an autocomplete input -->
+<% field_id = local_assigns[:field_id] || 'autocomplete-field' %>
+<% label = local_assigns[:label] || 'Agent name:' %>
+<% options = local_assigns[:options] || [
+  { value: '1', text: 'Wendi Alfonso' },
+  { value: '2', text: 'Fletcher Birdsell' },
+  { value: '3', text: 'Kyra Bohm' }
+] %>
+<% shortcut_indices = local_assigns[:shortcuts] || nil %>
+<% shortcut_label = local_assigns[:shortcut_label] || 'Frequently used:' %>
+
+<div class="autocomplete-field">
+	<label for="<%= field_id %>">
+		<span class="autocomplete-field__label"><%= label %></span>
+	</label>
+	<select name="<%= field_id %>" id="<%= field_id %>" class="autocomplete-field__select">
+		<option value="">Select</option>
+		<% options.each do |option| %>
+			<option value="<%= option[:value] %>"><%= option[:text] %></option>
+		<% end %>
+	</select>
+</div>

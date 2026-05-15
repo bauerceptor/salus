@@ -1,0 +1,941 @@
+// ═══════════════════════════════════════════════════════════════════════════
+// SALUS UI — Unified component system
+// Light mode, warm, breathable, clinical-calm aesthetic
+// ═══════════════════════════════════════════════════════════════════════════
+
+// ─── Buttons ──────────────────────────────────────────────────────────────
+
+.salus-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-sm);
+  height: 2.5rem;
+  padding: 0 var(--space-lg);
+  font-size: var(--text-sm);
+  font-weight: 500;
+  font-family: inherit;
+  line-height: 1;
+  border-radius: var(--radius-md);
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: background-color 0.15s ease, transform 0.1s ease, box-shadow 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+  white-space: nowrap;
+  text-decoration: none;
+
+  &:focus-visible {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 2px;
+  }
+
+  &:active {
+    transform: scale(0.98);
+  }
+
+  // Primary
+  &--primary {
+    background: var(--color-primary);
+    color: #ffffff;
+    border-color: var(--color-primary);
+
+    &:hover {
+      background: var(--color-primary-hover);
+      border-color: var(--color-primary-hover);
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(13, 115, 119, 0.25);
+    }
+
+    &:active {
+      background: var(--color-primary-dark);
+      transform: scale(0.98) translateY(0);
+    }
+  }
+
+  // Secondary
+  &--secondary {
+    background: var(--color-surface);
+    color: var(--color-text-dark);
+    border-color: var(--color-border);
+
+    &:hover {
+      background: var(--color-bg);
+      border-color: var(--color-primary);
+      color: var(--color-primary);
+    }
+  }
+
+  // Danger
+  &--danger {
+    background: var(--color-danger);
+    color: #ffffff;
+    border-color: var(--color-danger);
+
+    &:hover {
+      background: #dc2626;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(239, 68, 68, 0.25);
+    }
+  }
+
+  // Success
+  &--success {
+    background: var(--color-success);
+    color: #ffffff;
+    border-color: var(--color-success);
+
+    &:hover {
+      background: #059669;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(16, 185, 129, 0.25);
+    }
+  }
+
+  // Ghost (text-like)
+  &--ghost {
+    background: transparent;
+    color: var(--color-primary);
+    border-color: transparent;
+
+    &:hover {
+      background: var(--color-primary-light);
+      color: var(--color-primary-dark);
+    }
+  }
+
+  // Danger ghost
+  &--danger-ghost {
+    background: transparent;
+    color: var(--color-danger);
+    border-color: transparent;
+
+    &:hover {
+      background: var(--color-danger-light);
+      color: var(--color-danger-dark);
+    }
+  }
+
+  // Sizes
+  &--sm {
+    height: 2rem;
+    padding: 0 var(--space-md);
+    font-size: var(--text-xs);
+    border-radius: var(--radius-sm);
+  }
+
+  &--lg {
+    height: 3rem;
+    padding: 0 var(--space-xl);
+    font-size: var(--text-base);
+  }
+
+  &--icon {
+    width: 2.5rem;
+    padding: 0;
+
+    &.salus-btn--sm {
+      width: 2rem;
+    }
+
+    &.salus-btn--lg {
+      width: 3rem;
+    }
+  }
+
+  // Loading state
+  &--loading {
+    opacity: 0.75;
+    cursor: not-allowed;
+    pointer-events: none;
+  }
+
+  &__icon {
+    font-size: 1rem;
+    opacity: 0.9;
+  }
+}
+
+// ─── Cards ─────────────────────────────────────────────────────────────────
+
+.salus-card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-lg);
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
+
+  &--hoverable {
+    cursor: pointer;
+
+    &:hover {
+      box-shadow: var(--shadow-md);
+      transform: translateY(-2px);
+    }
+  }
+
+  &__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-md);
+    padding-bottom: var(--space-md);
+    margin-bottom: var(--space-md);
+    border-bottom: 1px solid var(--color-border-light);
+  }
+
+  &__title {
+    font-size: var(--text-lg);
+    font-weight: 600;
+    color: var(--color-text-dark);
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+  }
+
+  &__subtitle {
+    font-size: var(--text-sm);
+    color: var(--color-text-light);
+    margin-top: var(--space-xs);
+  }
+
+  &__body {
+    font-size: var(--text-sm);
+    color: var(--color-text-light);
+    line-height: var(--line-height-relaxed);
+  }
+
+  &__footer {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    padding-top: var(--space-md);
+    margin-top: var(--space-md);
+    border-top: 1px solid var(--color-border-light);
+  }
+}
+
+// ─── Badges ───────────────────────────────────────────────────────────────
+
+.salus-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-xs);
+  padding: 0.2rem 0.6rem;
+  font-size: var(--text-xs);
+  font-weight: 500;
+  border-radius: var(--radius-full);
+  line-height: 1.4;
+
+  &--success {
+    background: var(--color-success-light);
+    color: var(--color-success-dark);
+  }
+
+  &--danger {
+    background: var(--color-danger-light);
+    color: var(--color-danger-dark);
+  }
+
+  &--warning {
+    background: var(--color-warning-light);
+    color: var(--color-warning-dark);
+  }
+
+  &--info {
+    background: var(--color-info-light);
+    color: var(--color-info-dark);
+  }
+
+  &--neutral {
+    background: var(--color-bg);
+    color: var(--color-text-light);
+    border: 1px solid var(--color-border);
+  }
+
+  &--primary {
+    background: var(--color-primary-light);
+    color: var(--color-primary-dark);
+  }
+
+  &__dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: currentColor;
+  }
+}
+
+// ─── Tables ───────────────────────────────────────────────────────────────
+
+.salus-table {
+  width: 100%;
+  border-collapse: collapse;
+
+  th {
+    font-size: var(--text-xs);
+    font-weight: 600;
+    color: var(--color-text-light);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    padding: var(--space-sm) var(--space-md);
+    text-align: left;
+    border-bottom: 2px solid var(--color-border);
+    background: var(--color-bg);
+  }
+
+  td {
+    font-size: var(--text-sm);
+    color: var(--color-text-dark);
+    padding: var(--space-md);
+    border-bottom: 1px solid var(--color-border-light);
+    vertical-align: middle;
+  }
+
+  tr:last-child td {
+    border-bottom: none;
+  }
+
+  tbody tr {
+    transition: background-color 0.1s ease;
+
+    &:hover {
+      background: var(--color-bg);
+    }
+  }
+
+  &--clickable tbody tr {
+    cursor: pointer;
+
+    &:hover {
+      background: var(--color-primary-tint);
+    }
+  }
+}
+
+// ─── Form Groups ───────────────────────────────────────────────────────────
+
+.salus-form-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+  margin-bottom: var(--space-lg);
+}
+
+.salus-label {
+  font-size: var(--text-sm);
+  font-weight: 500;
+  color: var(--color-text-dark);
+}
+
+.salus-hint {
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
+}
+
+.salus-error {
+  font-size: var(--text-xs);
+  color: var(--color-danger);
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+}
+
+// ─── Alerts ───────────────────────────────────────────────────────────────
+
+.salus-alert {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-md);
+  padding: var(--space-md) var(--space-lg);
+  border-radius: var(--radius-md);
+  font-size: var(--text-sm);
+
+  &__icon {
+    font-size: 1.25rem;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+
+  &__content {
+    flex: 1;
+    min-width: 0;
+  }
+
+  &__title {
+    font-weight: 600;
+    margin-bottom: var(--space-xs);
+  }
+
+  &--info {
+    background: var(--color-info-light);
+    color: var(--color-info-dark);
+  }
+
+  &--success {
+    background: var(--color-success-light);
+    color: var(--color-success-dark);
+  }
+
+  &--warning {
+    background: var(--color-warning-light);
+    color: var(--color-warning-dark);
+  }
+
+  &--danger {
+    background: var(--color-danger-light);
+    color: var(--color-danger-dark);
+  }
+}
+
+// ─── Empty State ───────────────────────────────────────────────────────────
+
+.salus-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-3xl) var(--space-lg);
+  text-align: center;
+
+  &__icon {
+    font-size: 3rem;
+    color: var(--color-text-muted);
+    margin-bottom: var(--space-lg);
+    opacity: 0.5;
+  }
+
+  &__title {
+    font-size: var(--text-lg);
+    font-weight: 600;
+    color: var(--color-text-dark);
+    margin-bottom: var(--space-sm);
+  }
+
+  &__text {
+    font-size: var(--text-sm);
+    color: var(--color-text-light);
+    max-width: 36ch;
+    line-height: var(--line-height-relaxed);
+  }
+
+  &__action {
+    margin-top: var(--space-lg);
+  }
+}
+
+// ─── Page Header ──────────────────────────────────────────────────────────
+
+.salus-page-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-xl);
+  padding-bottom: var(--space-xl);
+  margin-bottom: var(--space-xl);
+  border-bottom: 1px solid var(--color-border);
+  flex-wrap: wrap;
+
+  &__left {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xs);
+  }
+
+  &__title {
+    font-size: var(--text-2xl);
+    font-weight: 700;
+    color: var(--color-text-dark);
+    display: flex;
+    align-items: center;
+    gap: var(--space-md);
+  }
+
+  &__desc {
+    font-size: var(--text-sm);
+    color: var(--color-text-light);
+  }
+
+  &__actions {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    flex-shrink: 0;
+  }
+
+  &__icon {
+    color: var(--color-primary);
+  }
+}
+
+// ─── Page Container ────────────────────────────────────────────────────────
+
+.salus-page-container {
+  padding: var(--space-lg);
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+// ─── Cards Grid ───────────────────────────────────────────────────────────
+
+.salus-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: var(--space-lg);
+}
+
+// ─── Treatment Card ───────────────────────────────────────────────────────
+
+.salus-treatment-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-md);
+}
+
+.salus-treatment-emoji {
+  font-size: 2rem;
+}
+
+.salus-treatment-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: var(--space-md);
+  margin-top: var(--space-md);
+  border-top: 1px solid var(--color-border-light);
+
+  &__item {
+    display: flex;
+    align-items: center;
+    gap: var(--space-xs);
+    font-size: var(--text-xs);
+    color: var(--color-text-light);
+
+    i {
+      font-size: var(--text-sm);
+    }
+  }
+}
+
+// ─── Pagination ───────────────────────────────────────────────────────────
+
+.salus-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: var(--space-xl);
+  margin-top: var(--space-xl);
+  border-top: 1px solid var(--color-border-light);
+
+  &__info {
+    font-size: var(--text-sm);
+    color: var(--color-text-light);
+  }
+
+  &__nav {
+    display: flex;
+    align-items: center;
+    gap: var(--space-xs);
+  }
+
+  &__btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 2rem;
+    height: 2rem;
+    padding: 0 var(--space-sm);
+    font-size: var(--text-sm);
+    color: var(--color-text-dark);
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    transition: background-color 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+
+    &:hover:not(.salus-pagination__btn--active):not(:disabled) {
+      background: var(--color-bg);
+      border-color: var(--color-primary);
+      color: var(--color-primary);
+    }
+
+    &--active {
+      background: var(--color-primary);
+      color: #ffffff;
+      border-color: var(--color-primary);
+      font-weight: 500;
+    }
+
+    &:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+
+    &--dots {
+      background: transparent;
+      border-color: transparent;
+      color: var(--color-text-muted);
+    }
+  }
+}
+
+// ─── Info Grid ────────────────────────────────────────────────────────────
+
+.salus-info-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--space-lg);
+
+  @media (max-width: 640px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.salus-info-item {
+  &__label {
+    font-size: var(--text-xs);
+    color: var(--color-text-light);
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    margin-bottom: var(--space-xs);
+  }
+
+  &__value {
+    font-size: var(--text-base);
+    font-weight: 500;
+    color: var(--color-text-dark);
+  }
+
+  &__value--muted {
+    color: var(--color-text-light);
+    font-weight: 400;
+  }
+}
+
+// ─── Divider ──────────────────────────────────────────────────────────────
+
+.salus-divider {
+  border: none;
+  border-top: 1px solid var(--color-border);
+  margin: var(--space-xl) 0;
+}
+
+.salus-stat-card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-lg);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
+
+  &:hover {
+    box-shadow: var(--shadow-md);
+  }
+
+  &__label {
+    font-size: var(--text-xs);
+    font-weight: 600;
+    color: var(--color-text-light);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+  }
+
+  &__value {
+    font-size: var(--text-3xl);
+    font-weight: 700;
+    color: var(--color-text-dark);
+    line-height: 1;
+  }
+
+  &__desc {
+    font-size: var(--text-xs);
+    color: var(--color-text-muted);
+  }
+
+  &__icon {
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: var(--radius-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.25rem;
+
+    &--primary {
+      background: var(--color-primary-light);
+      color: var(--color-primary);
+    }
+
+    &--success {
+      background: var(--color-success-light);
+      color: var(--color-success);
+    }
+
+    &--danger {
+      background: var(--color-danger-light);
+      color: var(--color-danger);
+    }
+
+    &--warning {
+      background: var(--color-warning-light);
+      color: var(--color-warning);
+    }
+
+    &--info {
+      background: var(--color-info-light);
+      color: var(--color-info);
+    }
+  }
+}
+
+// ─── Notes Layout ─────────────────────────────────────────────────────────
+
+.salus-notes-layout {
+  display: grid;
+  grid-template-columns: 1fr 280px;
+  gap: var(--space-xl);
+  align-items: start;
+
+  @media (max-width: 1024px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.salus-notes-main {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
+}
+
+.salus-notes-sidebar {
+  @media (max-width: 1024px) {
+    order: -1;
+  }
+}
+
+.salus-card--sticky {
+  position: sticky;
+  top: var(--space-lg);
+}
+
+.salus-notes-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: var(--space-md);
+}
+
+.salus-note-card {
+  display: flex;
+  flex-direction: column;
+  padding: var(--space-md);
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  min-height: 100px;
+  transition: box-shadow 0.15s ease, transform 0.15s ease;
+
+  &:hover {
+    box-shadow: var(--shadow-sm);
+    transform: translateY(-1px);
+  }
+
+  &--pinned {
+    background: var(--color-primary-tint);
+    border-color: var(--color-border);
+  }
+
+  &--new {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px dashed var(--color-border);
+    background: transparent;
+    cursor: pointer;
+
+    &:hover {
+      border-color: var(--color-primary);
+      background: var(--color-primary-tint);
+    }
+  }
+
+  &__title {
+    font-size: var(--text-sm);
+    font-weight: 500;
+    color: var(--color-text-dark);
+    text-decoration: none;
+    flex: 1;
+    margin-bottom: var(--space-sm);
+
+    &:hover {
+      text-decoration: underline;
+      color: var(--color-primary);
+    }
+  }
+
+  &__footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: auto;
+  }
+
+  &__time {
+    font-size: var(--text-xs);
+    color: var(--color-text-light);
+  }
+
+  &__action {
+    width: 1.5rem;
+    height: 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--radius-sm);
+    background: transparent;
+    border: none;
+    color: var(--color-text-light);
+    cursor: pointer;
+    transition: background-color 0.15s ease, color 0.15s ease;
+
+    &:hover {
+      background: var(--color-primary-light);
+      color: var(--color-primary);
+    }
+  }
+
+  &__new-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-xs);
+    color: var(--color-text-light);
+    font-size: var(--text-sm);
+
+    i {
+      font-size: 1.5rem;
+    }
+  }
+}
+
+.salus-tags-actions {
+  display: flex;
+  gap: var(--space-sm);
+  margin-bottom: var(--space-md);
+}
+
+.salus-tags-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+}
+
+.salus-tag-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-sm);
+  border-radius: var(--radius-md);
+  color: var(--color-text-light);
+  font-size: var(--text-sm);
+  text-decoration: none;
+  transition: background-color 0.15s ease, color 0.15s ease;
+
+  &:hover {
+    background: var(--color-bg);
+    color: var(--color-text-dark);
+  }
+
+  &--active {
+    background: var(--color-primary-tint);
+    color: var(--color-primary-dark);
+  }
+
+  &__name {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+  }
+
+  &__edit {
+    width: 1.5rem;
+    height: 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--radius-sm);
+    opacity: 0.6;
+    font-size: var(--text-xs);
+    transition: opacity 0.15s ease;
+
+    &:hover {
+      opacity: 1;
+    }
+  }
+}
+
+// ─── FHIR Grid ────────────────────────────────────────────────────────────
+
+.salus-fhir-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--space-md);
+
+  @media (max-width: 640px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.salus-fhir-resource {
+  padding: var(--space-md);
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+
+  &__name {
+    font-size: var(--text-sm);
+    font-weight: 500;
+    color: var(--color-text-dark);
+    margin-bottom: var(--space-xs);
+  }
+
+  &__desc {
+    font-size: var(--text-xs);
+    color: var(--color-text-light);
+  }
+}
+
+// ─── Measurement Table ───────────────────────────────────────────────────
+
+.salus-measurement-link {
+  font-weight: 500;
+  color: var(--color-text-dark);
+  text-decoration: none;
+
+  &:hover {
+    text-decoration: underline;
+    color: var(--color-primary);
+  }
+}
+
+.salus-measurement-value {
+  font-weight: 700;
+  color: var(--color-text-dark);
+}
+
+.salus-measurement-unit {
+  font-size: var(--text-sm);
+  color: var(--color-text-light);
+  margin-left: var(--space-xs);
+}
+
+.salus-measurement-time {
+  color: var(--color-text-light);
+}
+
+.salus-measurement-row--alert {
+  background: var(--color-danger-light);
+}

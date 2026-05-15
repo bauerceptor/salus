@@ -1,0 +1,68 @@
+<%= form_with(model: [@treatment, @treatment_update], html: { class: "dash-form" }) do |form| %>
+  <div class="dash-form__container">
+    <div class="dash-form__group">
+      <div class="dash-form__group__container">
+        <div class="dash-form__group__left">
+          <div class="dash-form__group__title"><%= t(".name.title") %></div>
+          <p class="dash-form__group__description"><%= t(".name.description") %></p>
+        </div>
+        <div class="dash-form__group__right">
+          <%= form.text_field :name, class: "dash-form__input",
+              placeholder: t(".name.placeholder") %>
+        </div>
+      </div>
+      <%= render DashFormErrorComponent.new(model: @treatment_update, field: :name) %>
+    </div>
+  </div>
+
+  <div class="dash-form__container">
+    <div class="dash-form__group">
+      <div class="dash-form__group__container">
+        <div class="dash-form__group__left">
+          <div class="dash-form__group__title"><%= t(".description.title") %></div>
+          <p class="dash-form__group__description"><%= t(".description.description") %></p>
+        </div>
+        <div class="dash-form__group__right">
+          <%= form.text_area :description, class: "dash-form__input dash-form__textarea",
+              placeholder: t(".description.placeholder") %>
+        </div>
+      </div>
+      <%= render DashFormErrorComponent.new(model: @treatment_update, field: :description) %>
+    </div>
+  </div>
+
+  <div class="dash-form__container">
+    <div class="dash-form__group">
+      <div class="dash-form__group__container">
+        <div class="dash-form__group__left">
+          <div class="dash-form__group__title"><%= t(".status.title") %></div>
+          <p class="dash-form__group__description"><%= t(".status.description") %></p>
+        </div>
+        <div class="dash-form__group__right">
+          <%= form.select :status, options_for_select(@treatment_status_options, @treatment_update.status),
+            { include_blank: false }, class: "dash-form__input dash-form__select" %>
+        </div>
+      </div>
+      <%= render DashFormErrorComponent.new(model: @treatment_update, field: :status) %>
+    </div>
+  </div>
+
+  <div class="dash-form__container">
+    <div class="dash-form__group">
+      <div class="dash-form__group__container">
+        <div class="dash-form__group__left">
+          <div class="dash-form__group__title"><%= t(".update_date.title") %></div>
+          <p class="dash-form__group__description"><%= t(".update_date.description") %></p>
+        </div>
+        <div class="dash-form__group__right">
+          <%= form.datetime_field :update_date, class: "dash-form__input" %>
+        </div>
+      </div>
+      <%= render DashFormErrorComponent.new(model: @treatment_update, field: :update_date) %>
+    </div>
+  </div>
+
+  <div class="dash-form__group">
+    <%= form.submit t("dash_form.submit"), class: "dash-form__submit dash-button dash-button--new" %>
+  </div>
+<% end %>

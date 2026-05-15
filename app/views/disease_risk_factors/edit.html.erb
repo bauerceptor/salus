@@ -1,0 +1,21 @@
+<div class="new-disease-symptom">
+  <header class="dash-header">
+    <div class="dash-header__left">
+      <h1 class="dash-header__title"><%= t(".title") %></h1>
+      <%= render "shared/breadcrumbs" %>
+    </div>
+    <div class="dash-header__right">
+      <%= link_to disease_risk_factor_path(disease_id: @disease.id, id: @disease_risk_factor.id, locale: I18n.locale), class: "dash-button dash-button--back" do %>
+        <i class="ri-arrow-left-line dash-button__icon"></i>
+      <% end %>
+    </div>
+  </header>
+  <div class="dash-flash-messages">
+    <%= turbo_frame_tag "flash" do %>
+      <%= render "shared/dash_flash" %>
+    <% end %>
+  </div>
+  <div>
+    <%= render "form", url: disease_risk_factor_path(disease_id: @disease.id, id: @disease_risk_factor.id, locale: I18n.locale) %>
+  </div>
+</div>

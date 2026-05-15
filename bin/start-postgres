@@ -1,0 +1,69 @@
+#!/bin/bash
+# Start PostgreSQL container for Salus project using Podman
+# Usage: ./bin/start-postgres
+
+set -e
+
+CONTAINER_NAME="salus-postgres"
+POSTGRES_USER="postgres"
+POSTGRES_PASSWORD="postgres"
+POSTGRES_DB="salus_development"
+PORT=5432
+IMAGE="docker.io/library/postgres:15-alpine"
+
+# Check if podman is available
+if ! command -v podman &> /dev/null; then
+    echo "Error: podman is not installed"
+    exit 1
+fi
+
+# Check if container already exists and is running
+if podman ps -q --filter "name=${CONTAINER_NAME}" 2>/dev/null | grep -q .; then
+    echo "PostgreSQL container '${CONTAINER_NAME}' is already running"
+    exit 0
+fi
+
+# Check if container exists but is stopped
+EXISTING=$(podman ps -aq --filter "name=${CONTAINER_NAME}" 2>/dev/null)
+if [ -n "$EXISTING" ]; then
+    echo "Starting existing container '${CONTAINER_NAME}'..."
+    podman start "${CONTAINER_NAME}"
+    exit $?
+fi
+
+# Try to pull the image if not available
+echo "Pulling PostgreSQL image..."
+if ! podman pull "${IMAGE}" 2>&1; then
+    echo "Warning: Could not pull image, trying to use cached version if available..."
+fi
+
+# Create and start new container
+echo "Creating and starting PostgreSQL container '${CONTAINER_NAME}'..."
+podman run -d \
+    --name "${CONTAINER_NAME}" \
+    -e POSTGRES_USER="${POSTGRES_USER}" \
+    -e POSTGRES_PASSWORD="${POSTGRES_PASSWORD}" \
+    -e POSTGRES_DB="${POSTGRES_DB}" \
+    -p "${PORT}:5432" \
+    -v salus-postgres-data:/var/lib/postgresql/data \
+    "${IMAGE}" 2>&1
+
+if [ $? -eq 0 ]; then
+    echo "PostgreSQL container started successfully!"
+    echo ""
+    echo "Connection details:"
+    echo "  Host: localhost"
+    echo "  Port: ${PORT}"
+    echo "  Database: ${POSTGRES_DB}"
+    echo "  Username: ${POSTGRES_USER}"
+    echo "  Password: ${POSTGRES_PASSWORD}"
+    echo ""
+    echo "Add to your shell profile for convenience:"
+    echo "  export POSTGRES_HOST=localhost"
+    echo "  export POSTGRES_PORT=${PORT}"
+    echo "  export POSTGRES_USERNAME=${POSTGRES_USER}"
+    echo "  export POSTGRES_PASSWORD=${POSTGRES_PASSWORD}"
+else
+    echo "Failed to start PostgreSQL container"
+    exit 1
+fi

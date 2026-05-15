@@ -1,0 +1,4 @@
+#!/bin/sh
+
+# Ensure persistent storage directories exist
+ssh deploy@$KAMAL_HOST "sudo mkdir -p /var/lib/salus/postgresql && sudo chown -R 999:999 /var/lib/salus/postgresql"

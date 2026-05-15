@@ -1,0 +1,50 @@
+.icon-hand {
+  width: 100%;
+  max-width: 15em;
+  margin: 0 auto;
+
+  svg {
+    overflow: visible;
+    width: 100%;
+    height: 100%;
+  }
+
+  &:hover {
+    #star-1 {
+      transform-origin: 24px 22px;
+      transform: translateY(30px) rotate(-140deg) scale(0);
+      opacity: 0;
+      animation: sparkle 1s cubic-bezier(0.13, 0.32, 0.12, 1) forwards 0s;
+    }
+
+    #star-2 {
+      transform-origin: 58px 35px;
+      transform: translateY(20px) rotate(80deg) scale(0);
+      opacity: 0;
+      animation: sparkle 1s cubic-bezier(0.13, 0.32, 0.12, 1) forwards 0.2s;
+    }
+
+    #star-4 {
+      transform-origin: 49px 11.5px;
+      transform: translateY(30px) rotate(-40deg) scale(0);
+      opacity: 0;
+      animation: sparkle 1.2s cubic-bezier(0.13, 0.32, 0.12, 1) forwards 0.2s;
+    }
+
+    #star-3 {
+      transform-origin: 32.5px 45.5px;
+      transform: translateY(15px) rotate(30deg) scale(0);
+      opacity: 0;
+      animation: sparkle 1.2s cubic-bezier(0.13, 0.32, 0.12, 1) forwards 0.15s;
+    }
+  }
+}
+
+@keyframes sparkle {
+  0% {}
+  50% { opacity: 1; }
+  100% {
+    transform: translateY(0) rotate(0deg) scale(1);
+    opacity: 1;
+  }
+}

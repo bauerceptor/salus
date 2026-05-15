@@ -1,0 +1,124 @@
+<div class="dash-home">
+  <div class="dash-home__content">
+    <header class="dash-header">
+      <div class="dash-header__left">
+        <h1 class="dash-header__title">
+          <i class="ri-user-add-line dash-header__title__icon"></i>
+          Add New Specialist
+        </h1>
+        <p class="dash-header__desc">Create a new specialist account</p>
+      </div>
+      <div class="dash-header__right">
+        <%= link_to admin_specialists_path, class: "dash-button dash-button--back" do %>
+          <i class="ri-arrow-left-line dash-button__icon"></i>
+          Back to List
+        <% end %>
+      </div>
+    </header>
+
+    <%= form_with(model: @specialist, url: admin_specialists_path, local: true, html: { class: "dash-form" }) do |f| %>
+      <% if @specialist.errors.any? %>
+        <div class="dash-alert dash-alert--error">
+          <i class="ri-error-warning-line"></i>
+          <%= pluralize(@specialist.errors.count, "error") %> prohibited this specialist from being saved:
+          <ul>
+            <% @specialist.errors.each do |error| %>
+              <li><%= error.full_message %></li>
+            <% end %>
+          </ul>
+        </div>
+      <% end %>
+
+      <div class="dash-group">
+        <div class="dash-group__header">
+          <h2 class="dash-group__title">
+            <i class="ri-user-3-line dash-group__title__icon"></i>
+            Account Information
+          </h2>
+        </div>
+        <div class="dash-group__content">
+          <div class="dash-form-grid">
+            <div class="dash-form-field">
+              <%= f.label :email, "Email *", class: "dash-form-label" %>
+              <%= f.email_field :email, class: "dash-form-input", placeholder: "doctor.name@hospital.gov", required: true %>
+            </div>
+          </div>
+
+          <%= f.fields_for :account do |account_f| %>
+            <div class="dash-form-grid">
+              <div class="dash-form-field">
+                <%= account_f.label :first_name, "First Name *", class: "dash-form-label" %>
+                <%= account_f.text_field :first_name, class: "dash-form-input", placeholder: "John", required: true %>
+              </div>
+              <div class="dash-form-field">
+                <%= account_f.label :last_name, "Last Name *", class: "dash-form-label" %>
+                <%= account_f.text_field :last_name, class: "dash-form-input", placeholder: "Smith", required: true %>
+              </div>
+              <div class="dash-form-field">
+                <%= account_f.label :username, "Username", class: "dash-form-label" %>
+                <%= account_f.text_field :username, class: "dash-form-input", placeholder: "john.smith" %>
+              </div>
+            </div>
+          <% end %>
+
+          <div class="dash-form-grid">
+            <div class="dash-form-field">
+              <%= f.label :password, "Password *", class: "dash-form-label" %>
+              <%= f.password_field :password, class: "dash-form-input", placeholder: "Leave blank for auto-generated", required: false %>
+              <span class="dash-form-hint">Leave blank to auto-generate a secure password</span>
+            </div>
+            <div class="dash-form-field">
+              <%= f.label :password_confirmation, "Confirm Password *", class: "dash-form-label" %>
+              <%= f.password_field :password_confirmation, class: "dash-form-input", placeholder: "Confirm password", required: false %>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="dash-group">
+        <div class="dash-group__header">
+          <h2 class="dash-group__title">
+            <i class="ri-stethoscope-line dash-group__title__icon"></i>
+            Professional Information
+          </h2>
+        </div>
+        <div class="dash-group__content">
+          <%= f.fields_for :specialist do |specialist_f| %>
+            <div class="dash-form-grid">
+              <div class="dash-form-field">
+                <%= specialist_f.label :field_of_expertise, "Field of Expertise *", class: "dash-form-label" %>
+                <%= specialist_f.select :field_of_expertise,
+                    options_for_select(Admin::SpecialistsController::FIELDS_OF_EXPERTISE.map { |f| [f, f] }),
+                    { include_blank: "Select field of expertise" },
+                    class: "dash-form-input",
+                    required: true %>
+              </div>
+              <div class="dash-form-field">
+                <%= specialist_f.label :specialization, "Specialization *", class: "dash-form-label" %>
+                <%= specialist_f.text_field :specialization, class: "dash-form-input", placeholder: "e.g., Hepatologist", required: true %>
+              </div>
+            </div>
+            <div class="dash-form-field dash-form-field--full">
+              <%= specialist_f.label :specialization_description, "Description", class: "dash-form-label" %>
+              <%= specialist_f.text_area :specialization_description,
+                  class: "dash-form-input dash-form-textarea",
+                  placeholder: "Brief description of the specialist's expertise and focus areas...",
+                  rows: 4 %>
+            </div>
+          <% end %>
+        </div>
+      </div>
+
+      <div class="dash-form-actions">
+        <%= link_to admin_specialists_path, class: "dash-button dash-button--gray" do %>
+          <i class="ri-close-line dash-button__icon"></i>
+          Cancel
+        <% end %>
+        <%= f.button "Create Specialist", type: :submit, class: "dash-button dash-button--new" do %>
+          <i class="ri-user-add-line dash-button__icon"></i>
+          Create Specialist
+        <% end %>
+      </div>
+    <% end %>
+  </div>
+</div>

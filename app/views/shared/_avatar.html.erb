@@ -1,0 +1,5 @@
+<% if account_has_image?(account) && account.image %>
+  <%= image_tag(account.image.url, alt: alt || account.full_name, class: css_class) %>
+<% else %>
+  <%= tag.span(account_initials(account), class: css_class, title: alt || account.full_name) %>
+<% end %>

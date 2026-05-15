@@ -1,0 +1,23 @@
+<% if outgoing.to_a.any? %>
+  <div class="space-y-3">
+    <% outgoing.each do |req| %>
+      <div class="flex items-center justify-between p-3 rounded" style="background: #f5faff; border: 1px solid #cae6ff;" id="request-<%= req.id %>">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-full flex items-center justify-center text-sm" style="background: #dbeafe; color: #1a5b90; border: 1px solid #a1c8dd;">
+            <i class="ri-user-line"></i>
+          </div>
+          <%= link_to account_path(id: req.friend.id, locale: I18n.locale), class: "hover:underline", style: "color: #232b39;" do %>
+            <p class="font-medium text-sm"><%= req.friend.full_name %></p>
+            <p class="text-xs" style="color: #727d92;">@<%= req.friend.username %></p>
+          <% end %>
+        </div>
+        <%= button_to friend_request_path(id: req.id, locale: I18n.locale), method: :delete,
+            class: "w-8 h-8 rounded-full flex items-center justify-center transition-all hover:opacity-80", style: "background: #fee2e2; color: #991b1b; border: 1px solid #e2baba;" do %>
+          <i class="ri-close-line text-sm"></i>
+        <% end %>
+      </div>
+    <% end %>
+  </div>
+<% else %>
+  <p class="text-sm text-center py-4" style="color: #727d92;"><%= t(".no_outgoing_requests") %></p>
+<% end %>

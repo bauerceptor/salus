@@ -1,0 +1,17 @@
+{
+  "name": "app",
+  "private": "true",
+  "dependencies": {
+    "@playwright/mcp": "^0.0.70",
+    "autoprefixer": "^10.4.14",
+    "chart.js": "^4.5.1",
+    "daisyui": "^5.5.19",
+    "postcss": "^8.4.26",
+    "sass": "^1.63.6",
+    "tailwindcss": "^3.3.3"
+  },
+  "scripts": {
+    "build:tailwind": "tailwindcss -i ./app/assets/stylesheets/application.tailwind.css -o ./app/assets/builds/tailwind.css --minify",
+    "build:css": "sass ./app/assets/stylesheets/application.scss:./app/assets/builds/application.css --no-source-map --load-path=node_modules"
+  }
+}

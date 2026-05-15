@@ -1,0 +1,64 @@
+<div class="page-treatment-request">
+  <header class="page-header">
+    <div class="page-header__left">
+      <h1 class="page-header__title">
+        <i class="ri-hospital-line"></i>
+        <%= @treatment_request.title %>
+      </h1>
+      <%= render "shared/breadcrumbs" %>
+    </div>
+    <div class="page-header__right">
+      <%= link_to patient_treatment_requests_path, class: "dash-button dash-button--back" do %>
+        <i class="ri-arrow-left-line"></i>
+      <% end %>
+    </div>
+  </header>
+
+  <div class="treatment-request-detail">
+    <div class="treatment-request-detail__status treatment-request-detail__status--<%= @treatment_request.status %>">
+      <%= @treatment_request.status.humanize %>
+    </div>
+
+    <div class="treatment-request-detail__info">
+      <div class="info-row">
+        <span class="info-label"><%= t(".description") %></span>
+        <span class="info-value"><%= @treatment_request.description %></span>
+      </div>
+      <div class="info-row">
+        <span class="info-label"><%= t(".start_date") %></span>
+        <span class="info-value"><%= @treatment_request.start_date.strftime("%B %d, %Y") %></span>
+      </div>
+      <div class="info-row">
+        <span class="info-label"><%= t(".requested_at") %></span>
+        <span class="info-value"><%= l(@treatment_request.requested_at, format: :long) %></span>
+      </div>
+      <% if @treatment_request.approved? && @treatment_request.specialist %>
+        <div class="info-row">
+          <span class="info-label"><%= t(".approved_by") %></span>
+          <span class="info-value">Dr. <%= @treatment_request.specialist.full_name %></span>
+        </div>
+      <% elsif @treatment_request.rejected? && @treatment_request.rejection_reason.present? %>
+        <div class="info-row">
+          <span class="info-label"><%= t(".rejection_reason") %></span>
+          <span class="info-value text-danger"><%= @treatment_request.rejection_reason %></span>
+        </div>
+      <% end %>
+    </div>
+
+    <% if @treatment_request.approved? %>
+      <div class="treatment-request-detail__actions">
+        <p class="text-sm text-[var(--color-text-light)] mb-3">
+          <i class="ri-information-line"></i> <%= t(".approved_info") %>
+        </p>
+      </div>
+    <% elsif @treatment_request.pending? %>
+      <div class="treatment-request-detail__actions">
+        <%= button_to patient_treatment_request_path(@treatment_request), method: :delete,
+            class: "dash-button dash-button--delete",
+            data: { turbo_confirm: t(".confirm.cancel") } do %>
+          <i class="ri-close-line"></i> <%= t(".button.cancel_request") %>
+        <% end %>
+      </div>
+    <% end %>
+  </div>
+</div>

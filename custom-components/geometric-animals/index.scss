@@ -1,0 +1,357 @@
+@mixin base {
+  font-size: 2vmax; // Change value to scale
+  display: grid;
+  max-width: -moz-max-content;
+  max-width: -webkit-max-content;
+}
+
+@mixin eye {
+  height: 0.7em;
+  width: 0.7em;
+  border-radius: 50%;
+  background-color: #1f190b;
+}
+
+.puppy {
+  @include base;
+  grid-template-columns: 2.5em;
+  grid-template-rows: auto 3.125em 0.938em;
+}
+
+.puppy__head {
+  grid-column: 1 / 2;
+  grid-row: 2 / 4;
+  position: relative;
+  height: 4.063em;
+  width: 8.125em;
+  border-radius: 0 0 4.063em 4.063em;
+  background-color: #f9d9b2;
+  overflow: hidden;
+
+  &::before {
+    content: "";
+    position: absolute;
+    width: 1.75em;
+    height: 1.75em;
+    border-radius: 0 0 1.75em 0;
+    background-color: #59402f;
+  }
+}
+
+.puppy__eyes {
+  grid-column: 2 / 3;
+  grid-row: 2 / 4;
+  justify-self: end;
+  height: 2.625em;
+  width: 5.25em;
+  border-radius: 0 0 2.625em 2.625em;
+  background-color: #59402f;
+  position: relative;
+  right: 0;
+  top: 0;
+  display: flex;
+
+  &::after {
+    @include eye;
+    content: "";
+    position: absolute;
+    top: 20%;
+    left: 30%;
+  }
+}
+
+.puppy__ear {
+  grid-column: 3 / 2;
+  grid-row: 1 / 2;
+  justify-self: end;
+  height: 5.25em;
+  width: 2.625em;
+  border-radius: 5.25em 0 0 5.25em;
+  background-color: #59402f;
+}
+
+.puppy__tongue {
+  grid-column: 1 / 2;
+  grid-row: 3 / 5;
+  align-self: start;
+  width: 1.375em;
+  height: 1.375em;
+  border-radius: 0 0 0 1.375em;
+  background-color: #ea6400;
+}
+
+.puppy__body {
+  grid-column: 2 / 3;
+  grid-row: 4 / 5;
+  justify-self: end;
+  position: relative;
+  width: 5.625em;
+  height: 5.625em;
+  background-color: #59402f;
+  border-radius: 5.625em 0 0 0;
+  overflow: hidden;
+
+  &::after {
+    content: "";
+    height: 2.813em;
+    width: 100%;
+    border-radius: 2.813em 2.813em 0 0;
+    background-color: inherit;
+    box-shadow: 0.5em 0 1em #422e21;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+  }
+}
+
+.puppy__tail {
+  grid-column: 1 / 2;
+  grid-row: 4 / 5;
+  justify-self: end;
+  align-self: end;
+  height: 4.375em;
+  width: 2.188em;
+  border-radius: 4.375em 0 0 4.375em;
+  background-color: #f9d9b2;
+}
+
+.puppy__foot {
+  grid-column: 4 / 5;
+  grid-row: 4 / 5;
+  align-self: end;
+  width: 2em;
+  height: 1em;
+  background-color: #f9d9b2;
+  border-radius: 1em 1em 0 0;
+}
+
+.rooster {
+  @include base;
+  grid-template-columns: auto 3.25em 0.438em;
+  grid-template-rows: 3.125em 3.625em;
+}
+
+.rooster__head {
+  grid-column: 4 / 5;
+  grid-row: 2 / 3;
+  justify-self: end;
+  width: 3.625em;
+  height: 3.625em;
+  border-radius: 3.625em 0 0 0;
+  background-color: #f3d1a9;
+  position: relative;
+
+  // eye
+  &::after {
+    @include eye;
+    content: "";
+    box-shadow: 0.5em 1em 1em rgba(#e96400, 0.5);
+    position: absolute;
+    top: 0%;
+    right: 30%;
+  }
+}
+
+.rooster__beak {
+  grid-column: 5;
+  grid-row: 2;
+  align-self: start;
+  width: 1.125em;
+  height: 1.125em;
+  background-color: #e96400;
+  border-radius: 0 0 1.125em 0;
+}
+
+.rooster__body {
+  grid-column: 2 / 5;
+  grid-row: 3 / 4;
+  position: relative;
+  width: 7.5em;
+  height: 3.75em;
+  border-radius: 0 0 3.75em 3.75em;
+  background-color: #59402f;
+  overflow: hidden;
+
+  &::after {
+    content: "";
+    position: absolute;
+    width: 5em;
+    height: 2.5em;
+    border-radius: inherit;
+    background-color: inherit;
+    box-shadow: 1em 0.5em 1em #422e21;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+}
+
+.rooster__tail {
+  grid-column: 1 / 2;
+  grid-row: 1 / 3;
+  align-self: end;
+  justify-self: end;
+  width: 5.625em;
+  height: 5.625em;
+  border-radius: 5.625em 0 0 0;
+  background-color: #f3d1a9;
+}
+
+.rooster__leg {
+  grid-column: 4 / 5;
+  grid-row: 4 / 5;
+  width: 2em;
+  height: 2em;
+  background-color: #f3d1a9;
+  border-radius: 0 0 2em 0;
+}
+
+.rooster__foot {
+  grid-column: 4 / 5;
+  grid-row: 5 / 6;
+  height: 1.375em;
+  width: 1.375em;
+  border-radius: 0 1.375em 0 0;
+  background-color: #e96400;
+}
+
+.rooster__sun {
+  grid-column: 3 / 5;
+  grid-row: 1 / 2;
+  width: 4.25em;
+  height: 2.125em;
+  border-radius: 0 0 2.125em 2.125em;
+  background-color: #e96400;
+}
+
+.rooster__orangeStuff {
+  grid-column: 1 / 2;
+  grid-row: 3 / 6;
+  align-self: end;
+  justify-self: end;
+  height: 4em;
+  width: 4em;
+  border-radius: 50%;
+  background-color: #e96400;
+  position: relative;
+
+  &::after {
+    content: "";
+    height: 2em;
+    width: 2em;
+    border-radius: 50%;
+    background: linear-gradient(45deg, transparent 50%, #59402f 50%);
+    position: absolute;
+    top: -1.7em;
+    left: 10%;
+    z-index: -1;
+  }
+}
+
+.squirrel {
+  @include base;
+  grid-template-columns: auto 1.75em;
+  grid-template-rows: 3.25em;
+}
+
+.squirrel__head {
+  grid-column: 1 / 2;
+  grid-row: 3 / 4;
+  width: 2.875em;
+  height: 2.875em;
+  border-radius: 0 0 0 2.875em;
+  background-color: #dd5b00;
+  position: relative;
+
+  &::after {
+    @include eye;
+    content: "";
+    position: absolute;
+    top: 10%;
+    right: 30%;
+  }
+}
+
+.squirrel__ear {
+  grid-column: 2 / 3;
+  grid-row: 2 / 3;
+  height: 1.25em;
+  width: 1.25em;
+  border-radius: 0 0 1.25em 0;
+  background-color: #f9d9b2;
+}
+
+.squirrel__body {
+  grid-column: 2 / 4;
+  grid-row: 4 / 5;
+  height: 5.625em;
+  width: 5.625em;
+  border-radius: 0 5.625em 0 0;
+  background-color: #dd5b00;
+  position: relative;
+  overflow: hidden;
+
+  &::after {
+    content: "";
+    width: 5.625em;
+    height: 2.813em;
+    border-radius: 2.813em 2.813em 0 0;
+    box-shadow: 0.5em -0.5em 1em #d34300;
+    background-color: inherit;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+  }
+}
+
+.squirrel__foot {
+  grid-column: 1 / 2;
+  grid-row: 4 / 5;
+  justify-self: end;
+  align-self: end;
+  height: 1em;
+  width: 2em;
+  border-radius: 1em 1em 0 0;
+  background-color: #59402f;
+}
+
+.squirrel__tailStart {
+  grid-column: 4 / 5;
+  grid-row: 4 / 5;
+  align-self: end;
+  width: 2.625em;
+  height: 5.25em;
+  background-color: #f9d9b2;
+  border-radius: 0 5.25em 5.25em 0;
+}
+
+.squirrel__tailEnd {
+  grid-column: 3 / 4;
+  grid-row: 1 / 5;
+  height: 7.75em;
+  width: 3.875em;
+  background-color: #ea6400;
+  border-radius: 7.75em 0 0 7.75em;
+}
+
+// Styles below for demonstration purposes only
+body {
+  font-family: "Roboto Mono", monospace;
+  background-color: #f9f9f9;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+
+  .u-text {
+    font-size: 13px;
+    position: fixed;
+    bottom: 0;
+    right: 1em;
+    padding: 0.1em 0.3em;
+    background-color: #fff;
+    color: #333;
+  }
+
+  & > div {
+    margin: 100px 1em;
+  }
+}

@@ -1,0 +1,109 @@
+<div class="page-disease-symptoms">
+  <header class="dash-header page-disease-symptoms__header">
+    <div class="dash-header__left">
+      <h1 class="dash-header__title">
+        <i class="ri-thermometer-line dash-header__title__icon"></i>
+        <%= t(".title") %>
+      </h1>
+      <%= render "shared/breadcrumbs" %>
+    </div>
+    <div class="dash-header__right">
+      <%= link_to new_disease_symptom_path, class: "dash-button dash-button--new" do %>
+        <i class="ri-add-line dash-button__icon"></i>
+        <%= t(".button.new") %>
+      <% end %>
+      <%= link_to disease_path(id: @disease.id, locale: I18n.locale), class: "dash-button dash-button--back" do %>
+        <i class="ri-arrow-left-line dash-button__icon"></i>
+      <% end %>
+    </div>
+  </header>
+  <div class="dash-flash-messages">
+    <%= turbo_frame_tag "flash" do %>
+      <%= render "shared/dash_flash" %>
+    <% end %>
+  </div>
+  <div class="page-disease-symptoms__content">
+    <div class="dash-group">
+      <header class="dash-group__header">
+        <h2 class="dash-group__title"><%= t(".predefined_symptoms") %></h2>
+        <div class="dash-group__actions"></div>
+      </header>
+      <div class="dash-group__content">
+        <% if @predefined_symptoms.to_a.any? %>
+          <div class="symptoms-list">
+            <% @predefined_symptoms.each do |disease_symptom| %>
+              <%= link_to disease_symptom_path(disease_id: @disease.id, id: disease_symptom.id, locale: I18n.locale),
+                  class: "symptom symptom--predefined" do %>
+                <div class="symptom__group">
+                  <i class="ri-sparkling-fill symptom__icon"></i>
+                  <div>
+                    <span class="symptom__name">
+                      <%= disease_symptom.predefined_symptom.name %>
+                    </span>
+                    <span class="symptom__link">
+                      Symptom Details
+                    </span>
+                  </div>
+                </div>
+                <i class="ri-arrow-right-s-line symptom__icon"></i>
+              <% end %>
+            <% end %>
+          </div>
+        <% else %>
+          <p class="no-results">
+            <%= t(".no_results") %>
+          </p>
+        <% end %>
+      </div>
+      <div class="dash-pagination">
+        <div class="dash-pagination__controls">
+          <%== pagy_nav(@pagy_predefined) if @pagy_predefined.pages > 1 %>
+        </div>
+        <div class="dash-pagination__info">
+          <%== pagy_info(@pagy_predefined) %>
+        </div>
+      </div>
+    </div>
+    <div class="dash-group">
+      <header class="dash-group__header">
+        <h2 class="dash-group__title"><%= t(".custom_symptoms") %></h2>
+        <div class="dash-group__actions"></div>
+      </header>
+      <div class="dash-group__content">
+        <% if @custom_symptoms.to_a.any? %>
+          <div class="symptoms-list">
+            <% @custom_symptoms.each do |disease_symptom| %>
+              <%= link_to disease_symptom_path(disease_id: @disease.id, id: disease_symptom.id, locale: I18n.locale),
+                  class: "symptom symptom--predefined" do %>
+                <div class="symptom__group">
+                  <i class="ri-sparkling-line symptom__icon"></i>
+                  <div>
+                    <span class="symptom__name">
+                      <%= disease_symptom.name %>
+                    </span>
+                    <span class="symptom__link">
+                      <%= t(".symptom.details") %>
+                    </span>
+                  </div>
+                </div>
+                <i class="ri-arrow-right-s-line symptom__icon"></i>
+              <% end %>
+            <% end %>
+          </div>
+        <% else %>
+          <p class="no-results">
+            <%= t(".no_results") %>
+          </p>
+        <% end %>
+      </div>
+      <div class="dash-pagination">
+        <div class="dash-pagination__controls">
+          <%== pagy_nav(@pagy_custom) if @pagy_custom.pages > 1 %>
+        </div>
+        <div class="dash-pagination__info">
+          <%== pagy_info(@pagy_custom) %>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

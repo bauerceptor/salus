@@ -1,0 +1,464 @@
+<div class="patient-detail-wrapper">
+  <%= render "specialist/shared/quick_actions_toolbar", patient: @patient, current_page: "patient_detail" %>
+
+  <header class="patient-header">
+    <div class="patient-header__left">
+      <div class="patient-header__avatar">
+        <i class="ri-user-line"></i>
+      </div>
+      <div class="patient-header__info">
+        <h1 class="patient-header__name">
+          <%= @patient.full_name %>
+          <span class="risk-badge risk-badge--<%= @patient.risk_level.downcase %>">
+            <i class="ri-<%= @patient.risk_level == 'HIGH' ? 'error-warning' : @patient.risk_level == 'MODERATE' ? 'alert' : 'shield-check' %>-line"></i>
+            <%= @patient.risk_level %>
+          </span>
+        </h1>
+        <p class="patient-header__meta">
+          <i class="ri-time-line"></i>
+          Last updated <%= time_ago_in_words(@patient.updated_at) %> ago
+        </p>
+      </div>
+    </div>
+    <div class="patient-header__right">
+      <div class="dropdown dropdown--end">
+        <button tabindex="0" class="dash-button dash-button--gray" type="button">
+          <i class="ri-database-2-line dash-button__icon"></i>
+          <span class="dash-button__text">Data</span>
+          <i class="ri-arrow-down-s-line dash-button__icon"></i>
+        </button>
+        <ul tabindex="0" class="dropdown-content menu p-2 shadow-sm bg-white rounded-box w-52 z-10">
+          <li>
+            <%= link_to export_fhir_specialist_patient_path(id: @patient.id, locale: I18n.locale) do %>
+              <i class="ri-download-line"></i> Export FHIR
+            <% end %>
+          </li>
+          <li>
+            <label for="import_fhir_file_<%= @patient.id %>" class="cursor-pointer">
+              <i class="ri-upload-line"></i> Import FHIR
+            </label>
+          </li>
+          <li>
+            <label for="import_pdf_file_<%= @patient.id %>" class="cursor-pointer">
+              <i class="ri-file-pdf-line"></i> Import PDF
+            </label>
+          </li>
+          <li>
+            <%= link_to clinical_documents_path(patient_id: @patient.id, locale: I18n.locale) do %>
+              <i class="ri-file-text-line"></i> View Documents
+            <% end %>
+          </li>
+        </ul>
+      </div>
+      <%= form_tag import_fhir_specialist_patient_path(id: @patient.id, locale: I18n.locale), method: :post, enctype: "multipart/form-data" do %>
+        <input type="file" id="import_fhir_file_<%= @patient.id %>" name="file" accept="application/json" class="hidden" onchange="this.form.submit();">
+      <% end %>
+      <%= form_tag import_document_specialist_patient_path(id: @patient.id, locale: I18n.locale), method: :post, enctype: "multipart/form-data", id: "import_pdf_form_#{@patient.id}" do %>
+        <input type="file" id="import_pdf_file_<%= @patient.id %>" name="file" accept="application/pdf" class="hidden" onchange="showDocumentTypeModal('<%= @patient.id %>');">
+      <% end %>
+      <dialog id="import_pdf_modal_<%= @patient.id %>" class="modal">
+        <div class="modal-box">
+          <h3 class="font-bold text-lg">Import PDF Document</h3>
+          <div class="py-4">
+            <label class="form-label">Document Type</label>
+            <select id="import_pdf_type_<%= @patient.id %>" class="form-select" name="document_type">
+              <option value="lab_result">Lab Result</option>
+              <option value="imaging_report">Imaging Report</option>
+              <option value="clinical_note">Clinical Note</option>
+              <option value="discharge_summary">Discharge Summary</option>
+              <option value="other">Other</option>
+            </select>
+          </div>
+          <div class="modal-action">
+            <button type="button" class="btn" onclick="document.getElementById('import_pdf_modal_<%= @patient.id %>').close();">Cancel</button>
+            <button type="button" class="btn btn-primary" onclick="submitPdfImport('<%= @patient.id %>');">Import</button>
+          </div>
+        </div>
+        <form method="dialog" class="modal-backdrop"></form>
+      </dialog>
+      <script>
+        function showDocumentTypeModal(patientId) {
+          document.getElementById('import_pdf_modal_' + patientId).showModal();
+        }
+        function submitPdfImport(patientId) {
+          var form = document.getElementById('import_pdf_form_' + patientId);
+          var select = document.getElementById('import_pdf_type_' + patientId);
+          var docType = document.createElement('input');
+          docType.type = 'hidden';
+          docType.name = 'document_type';
+          docType.value = select.value;
+          form.appendChild(docType);
+          form.submit();
+        }
+      </script>
+      <%= link_to report_specialist_patient_path(id: @patient.id, locale: I18n.locale),
+          class: "dash-button dash-button--gray" do %>
+        <i class="ri-file-pdf-line dash-button__icon"></i>
+        <span class="dash-button__text">Report</span>
+      <% end %>
+      <%= link_to new_specialist_message_path(recipient_id: @patient.id),
+          class: "dash-button dash-button--blue" do %>
+        <i class="ri-message-3-line dash-button__icon"></i>
+        <span class="dash-button__text"><%= t(".button.message") %></span>
+      <% end %>
+      <%= link_to specialist_patients_path, class: "dash-button dash-button--back" do %>
+        <i class="ri-arrow-left-line dash-button__icon"></i>
+      <% end %>
+    </div>
+  </header>
+
+  <div class="dash-flash-messages">
+    <%= turbo_frame_tag "flash" do %>
+      <%= render "shared/dash_flash" %>
+    <% end %>
+  </div>
+
+  <div class="patient-overview">
+    <div class="patient-stat-cards">
+      <div class="patient-stat-card patient-stat-card--primary">
+        <div class="patient-stat-card__icon">
+          <i class="ri-bar-chart-box-line"></i>
+        </div>
+        <div class="patient-stat-card__content">
+          <p class="patient-stat-card__value"><%= @stats[:adherence] %>%</p>
+          <h3 class="patient-stat-card__label"><%= t(".stats.adherence") %></h3>
+        </div>
+      </div>
+      <div class="patient-stat-card patient-stat-card--danger">
+        <div class="patient-stat-card__icon">
+          <i class="ri-error-warning-line"></i>
+        </div>
+        <div class="patient-stat-card__content">
+          <p class="patient-stat-card__value <%= @stats[:risk_score] >= 50 ? 'text-red' : '' %>"><%= @stats[:risk_score] %></p>
+          <h3 class="patient-stat-card__label"><%= t(".stats.risk_score") %></h3>
+        </div>
+      </div>
+      <div class="patient-stat-card patient-stat-card--warning">
+        <div class="patient-stat-card__icon">
+          <i class="ri-stethoscope-line"></i>
+        </div>
+        <div class="patient-stat-card__content">
+          <p class="patient-stat-card__value"><%= @stats[:diseases_count] %></p>
+          <h3 class="patient-stat-card__label"><%= t(".stats.diseases") %></h3>
+        </div>
+      </div>
+      <div class="patient-stat-card patient-stat-card--success">
+        <div class="patient-stat-card__icon">
+          <i class="ri-pill-line"></i>
+        </div>
+        <div class="patient-stat-card__content">
+          <p class="patient-stat-card__value"><%= @stats[:medications_count] %></p>
+          <h3 class="patient-stat-card__label"><%= t(".stats.medications") %></h3>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="patient-detail__charts">
+    <%= render "specialist/patients/measurement_charts" %>
+  </div>
+
+  <% if @adherence_prediction.is_a?(Hash) && @adherence_prediction[:risk_level] %>
+    <div class="patient-ai-insight">
+      <div class="patient-ai-insight__header">
+        <i class="ri-robot-line"></i>
+        <h3>AI Risk Assessment</h3>
+        <span class="ai-badge ai-badge--<%= @adherence_prediction[:risk_level].downcase %>">
+          <%= @adherence_prediction[:risk_level] %> Risk
+        </span>
+      </div>
+      <div class="patient-ai-insight__body">
+        <% if @adherence_prediction[:risk_factors].any? %>
+          <div class="patient-ai-insight__factors">
+            <h4>Risk Factors:</h4>
+            <ul>
+              <% @adherence_prediction[:risk_factors].each do |factor| %>
+                <li><%= factor %></li>
+              <% end %>
+            </ul>
+          </div>
+        <% end %>
+        <div class="patient-ai-insight__prediction">
+          <span class="prediction-label">Predicted adherence:</span>
+          <span class="prediction-value"><%= @adherence_prediction[:predicted_adherence_rate] < 100 ? "#{@adherence_prediction[:predicted_adherence_rate]}%" : "100%" %></span>
+        </div>
+        <% if @adherence_prediction[:recommendation].present? %>
+          <div class="patient-ai-insight__recommendation">
+            <i class="ri-lightbulb-line"></i>
+            <p><%= @adherence_prediction[:recommendation] %></p>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  <% elsif @adherence_prediction == "Insufficient data for prediction." %>
+    <div class="patient-ai-insight patient-ai-insight--neutral">
+      <div class="patient-ai-insight__header">
+        <i class="ri-robot-line"></i>
+        <h3>AI Risk Assessment</h3>
+      </div>
+      <div class="patient-ai-insight__body">
+        <div class="patient-empty">
+          <i class="ri-information-line"></i>
+          <p>Not enough data for AI prediction. At least 10 medication logs needed.</p>
+        </div>
+      </div>
+    </div>
+  <% end %>
+
+  <div class="patient-content">
+    <div class="patient-content__main">
+      <div class="dash-group dash-group--enhanced">
+        <header class="dash-group__header dash-group__header--gradient">
+          <h2 class="dash-group__title">
+            <i class="ri-heart-pulse-line dash-group__title__icon"></i>
+            <%= t(".diseases.title") %>
+          </h2>
+          <span class="section-count"><%= @patient.diseases.size %></span>
+        </header>
+        <div class="dash-group__content">
+          <% if @patient.diseases.any? %>
+            <div class="disease-cards">
+              <% @patient.diseases.each do |disease| %>
+                <div class="disease-card">
+                  <div class="disease-card__icon">
+                    <i class="ri-checkbox-circle-line"></i>
+                  </div>
+                  <div class="disease-card__info">
+                    <p class="disease-card__name">
+                      <%= disease.predefined_disease&.name || disease.name %>
+                    </p>
+                    <p class="disease-card__meta">
+                      <i class="ri-calendar-line"></i>
+                      Diagnosed <%= disease.created_at.strftime("%b %d, %Y") %>
+                    </p>
+                  </div>
+                  <% if disease.severity.present? %>
+                    <span class="severity-badge severity-badge--<%= disease.severity %>">
+                      <%= disease.severity == 0 ? 'Mild' : disease.severity == 1 ? 'Moderate' : 'Severe' %>
+                    </span>
+                  <% end %>
+                </div>
+              <% end %>
+            </div>
+          <% else %>
+            <div class="patient-empty">
+              <i class="ri-empathize-line"></i>
+              <p><%= t(".diseases.empty") %></p>
+            </div>
+          <% end %>
+        </div>
+      </div>
+
+      <div class="dash-group dash-group--enhanced">
+        <header class="dash-group__header dash-group__header--gradient">
+          <h2 class="dash-group__title">
+            <i class="ri-medicine-bottle-line dash-group__title__icon"></i>
+            <%= t(".medications.title") %>
+          </h2>
+          <div class="dash-group__actions">
+            <%= link_to new_specialist_recommendation_path(patient_id: @patient.id, type: "medication"),
+                class: "dash-button dash-button--small dash-button--blue" do %>
+              <i class="ri-add-line dash-button__icon"></i>
+              <%= t(".button.suggest") %>
+            <% end %>
+          </div>
+        </header>
+        <div class="dash-group__content">
+          <% if @patient.medications.any? %>
+            <div class="medication-cards">
+              <% @patient.medications.each do |med| %>
+                <div class="medication-card">
+                  <div class="medication-card__icon">
+                    <i class="ri-capsule-line"></i>
+                  </div>
+                  <div class="medication-card__info">
+                    <p class="medication-card__name"><%= med.name %></p>
+                    <div class="medication-card__details">
+                      <% if med.dosage.present? %>
+                        <span class="medication-detail"><i class="ri-file-list-line"></i><%= med.dosage %></span>
+                      <% end %>
+                      <% if med.frequency.present? %>
+                        <span class="medication-detail"><i class="ri-time-line"></i><%= med.frequency %></span>
+                      <% end %>
+                    </div>
+                  </div>
+                </div>
+              <% end %>
+            </div>
+          <% else %>
+            <div class="patient-empty">
+              <i class="ri-bubble-chart-line"></i>
+              <p><%= t(".medications.empty") %></p>
+            </div>
+          <% end %>
+        </div>
+      </div>
+
+      <div class="dash-group dash-group--enhanced">
+        <header class="dash-group__header dash-group__header--gradient">
+          <h2 class="dash-group__title">
+            <i class="ri-hospital-line dash-group__title__icon"></i>
+            <%= t(".treatments.title") %>
+          </h2>
+          <div class="dash-group__actions">
+            <%= link_to new_specialist_recommendation_path(patient_id: @patient.id, type: "treatment"),
+                class: "dash-button dash-button--small dash-button--blue" do %>
+              <i class="ri-add-line dash-button__icon"></i>
+              <%= t(".button.suggest") %>
+            <% end %>
+          </div>
+        </header>
+        <div class="dash-group__content">
+          <% if @patient.treatments.any? %>
+            <div class="treatment-cards">
+              <% @patient.treatments.each do |treatment| %>
+                <div class="treatment-card">
+                  <div class="treatment-card__status treatment-card__status--<%= treatment.is_finished? ? 'completed' : 'active' %>">
+                    <i class="ri-<%= treatment.is_finished? ? 'checkbox-circle' : 'time' %>-line"></i>
+                  </div>
+                  <div class="treatment-card__info">
+                    <p class="treatment-card__name"><%= treatment.name || treatment.title %></p>
+                    <% if treatment.description.present? %>
+                      <p class="treatment-card__desc"><%= treatment.description %></p>
+                    <% end %>
+                  </div>
+                  <% if treatment.effectiveness.present? %>
+                    <div class="treatment-card__effectiveness">
+                      <span class="effectiveness-label">Effectiveness</span>
+                      <div class="effectiveness-bar">
+                        <div class="effectiveness-bar__fill" style="width: <%= (treatment.effectiveness.to_f / 3 * 100).round %>%"></div>
+                      </div>
+                    </div>
+                  <% end %>
+                </div>
+              <% end %>
+            </div>
+          <% else %>
+            <div class="patient-empty">
+              <i class="ri-file-list-line"></i>
+              <p><%= t(".treatments.empty") %></p>
+            </div>
+          <% end %>
+        </div>
+      </div>
+
+      <%= render "specialist/patients/pending_treatment_requests", pending_treatment_requests: @pending_treatment_requests %>
+
+      <div class="dash-group dash-group--enhanced">
+        <header class="dash-group__header dash-group__header--gradient">
+          <h2 class="dash-group__title">
+            <i class="ri-file-list-3-line dash-group__title__icon"></i>
+            <%= t(".recommendations.title") %>
+          </h2>
+          <span class="section-count"><%= @recommendations.size %></span>
+        </header>
+        <div class="dash-group__content">
+          <% if @recommendations.any? %>
+            <div class="recommendation-cards">
+              <% @recommendations.each do |rec| %>
+                <div class="recommendation-card recommendation-card--<%= rec.status %>">
+                  <div class="recommendation-card__header">
+                    <span class="recommendation-card__name"><%= rec.name %></span>
+                    <span class="rec-badge rec-badge--<%= rec.status %>"><%= rec.status.humanize %></span>
+                  </div>
+                  <% if rec.dosage.present? %>
+                    <p class="recommendation-card__dosage"><i class="ri-file-list-line"></i><%= rec.dosage %></p>
+                  <% end %>
+                  <% if rec.notes.present? %>
+                    <p class="recommendation-card__notes"><i class="ri-sticky-note-line"></i><%= rec.notes %></p>
+                  <% end %>
+                  <p class="recommendation-card__date">
+                    <i class="ri-time-line"></i>
+                    Sent <%= rec.created_at.strftime("%b %d, %Y") %>
+                  </p>
+                </div>
+              <% end %>
+            </div>
+          <% else %>
+            <div class="patient-empty">
+              <i class="ri-lightbulb-line"></i>
+              <p><%= t(".recommendations.empty") %></p>
+            </div>
+          <% end %>
+        </div>
+      </div>
+    </div>
+
+    <div class="patient-content__sidebar">
+      <div class="dash-group dash-group--enhanced">
+        <header class="dash-group__header">
+          <h2 class="dash-group__title">
+            <i class="ri-sticky-note-line dash-group__title__icon"></i>
+            <%= t(".notes.title") %>
+          </h2>
+          <div class="dash-group__actions">
+            <%= link_to new_specialist_note_path(patient_id: @patient.id),
+                class: "dash-button dash-button--small dash-button--gray" do %>
+              <i class="ri-add-line dash-button__icon"></i>
+            <% end %>
+          </div>
+        </header>
+        <div class="dash-group__content">
+          <% if @notes.any? %>
+            <div class="note-cards">
+              <% @notes.each do |note| %>
+                <div class="note-card note-card--<%= note.note_type %>">
+                  <div class="note-card__header">
+                    <span class="note-type-badge note-type-badge--<%= note.note_type %>"><%= note.note_type.humanize %></span>
+                    <span class="note-card__date"><%= note.created_at.strftime("%b %d") %></span>
+                  </div>
+                  <p class="note-card__content"><%= note.content %></p>
+                </div>
+              <% end %>
+            </div>
+          <% else %>
+            <div class="patient-empty">
+              <i class="ri-file-edit-line"></i>
+              <p><%= t(".notes.empty") %></p>
+            </div>
+          <% end %>
+        </div>
+      </div>
+
+      <div class="dash-group dash-group--enhanced">
+        <header class="dash-group__header">
+          <h2 class="dash-group__title">
+            <i class="ri-message-3-line dash-group__title__icon"></i>
+            <%= t(".messages.title") %>
+          </h2>
+          <div class="dash-group__actions">
+            <%= link_to specialist_messages_path(patient_id: @patient.id),
+                class: "dash-link" do %>
+              <%= t(".button.view_all") %>
+            <% end %>
+          </div>
+        </header>
+        <div class="dash-group__content">
+          <% if @messages.any? %>
+            <div class="message-cards">
+              <% @messages.each do |msg| %>
+                <div class="message-card message-card--<%= msg.sender_type %>">
+                  <div class="message-card__icon">
+                    <i class="ri-<%= msg.sender_type == 'Specialist' ? 'user-heart-line' : 'user-line' %>-line"></i>
+                  </div>
+                  <div class="message-card__info">
+                    <p class="message-card__subject"><%= msg.subject %></p>
+                    <p class="message-card__preview"><%= msg.body.truncate(60) %></p>
+                    <p class="message-card__time"><i class="ri-time-line"></i><%= time_ago_in_words(msg.created_at) %> ago</p>
+                  </div>
+                </div>
+              <% end %>
+            </div>
+          <% else %>
+            <div class="patient-empty">
+              <i class="ri-chat-3-line"></i>
+              <p><%= t(".messages.empty") %></p>
+            </div>
+          <% end %>
+        </div>
+      </div>
+
+      <%= render "specialist/patients/care_stream", patient: @patient, care_history: @care_history, care_history_scope: @care_history_scope %>
+    </div>
+  </div>
+</div>

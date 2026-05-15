@@ -1,0 +1,81 @@
+<div class="page-treatment-request-show">
+  <header class="page-header">
+    <div class="page-header__left">
+      <h1 class="page-header__title">
+        <i class="ri-file-list-3-line"></i>
+        <%= t(".title") %>
+      </h1>
+      <%= render "shared/breadcrumbs" %>
+    </div>
+    <div class="page-header__right">
+      <%= link_to specialist_treatment_requests_path, class: "dash-button dash-button--back" do %>
+        <i class="ri-arrow-left-line"></i>
+      <% end %>
+    </div>
+  </header>
+
+  <div class="treatment-request-detail">
+    <div class="treatment-request-detail__header">
+      <div class="treatment-request-detail__patient">
+        <div class="treatment-request-detail__avatar">
+          <%= render "shared/avatar", account: @treatment_request.account, css_class: "", alt: "" %>
+        </div>
+        <div class="treatment-request-detail__patient-info">
+          <p class="treatment-request-detail__name"><%= @treatment_request.account.full_name %></p>
+          <p class="treatment-request-detail__date">Requested <%= time_ago_in_words(@treatment_request.requested_at) %> ago</p>
+        </div>
+      </div>
+      <span class="badge badge--<%= @treatment_request.status %>"><%= @treatment_request.status.humanize %></span>
+    </div>
+
+    <div class="treatment-request-detail__body">
+      <h3 class="treatment-request-detail__title"><%= @treatment_request.title %></h3>
+      <p class="treatment-request-detail__description"><%= @treatment_request.description %></p>
+
+      <div class="treatment-request-detail__meta">
+        <span><i class="ri-calendar-line"></i> <%= t(".start_date") %>: <%= @treatment_request.start_date.strftime("%b %d, %Y") if @treatment_request.start_date %></span>
+      </div>
+    </div>
+
+    <% if @treatment_request.status == "pending" %>
+      <div class="treatment-request-detail__actions">
+        <%= button_to specialist_treatment_request_path(id: @treatment_request, status: "approved"),
+            method: :patch,
+            class: "dash-button dash-button--new" do %>
+          <i class="ri-check-line"></i> <%= t(".button.approve") %>
+        <% end %>
+        <button type="button" class="dash-button dash-button--delete" onclick="openRejectModal()">
+          <i class="ri-close-line"></i> <%= t(".button.reject") %>
+        </button>
+      </div>
+    <% end %>
+  </div>
+</div>
+
+<div id="rejectModal" class="modal" style="display: none;">
+  <div class="modal-backdrop" onclick="closeRejectModal()"></div>
+  <div class="modal-content">
+    <h3 class="modal-title"><%= t(".reject_modal.title") %></h3>
+    <%= form_with url: specialist_treatment_request_path(id: @treatment_request, status: "rejected"),
+        method: :patch, html: { id: "rejectForm" } do %>
+      <div class="form-group">
+        <label><%= t(".reject_modal.reason_label") %></label>
+        <textarea name="reason" class="dash-form__input" rows="3" placeholder="<%= t(".reject_modal.reason_placeholder") %>"></textarea>
+      </div>
+      <div class="modal-actions">
+        <button type="button" class="dash-button" onclick="closeRejectModal()"><%= t(".button.cancel") %></button>
+        <button type="submit" class="dash-button dash-button--delete"><%= t(".button.confirm_reject") %></button>
+      </div>
+    <% end %>
+  </div>
+</div>
+
+<script>
+  function openRejectModal() {
+    document.getElementById('rejectModal').style.display = 'block';
+  }
+
+  function closeRejectModal() {
+    document.getElementById('rejectModal').style.display = 'none';
+  }
+</script>

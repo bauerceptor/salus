@@ -1,0 +1,39 @@
+<%= turbo_stream.append "messages-container" do %>
+  <div class="message message--sent <%= @message.attachments.any? ? 'message--has-attachments' : '' %>" data-message-id="<%= @message.id %>">
+    <div class="message__content">
+      <% if @message.attachments.any? %>
+        <div class="message__attachments">
+          <% @message.attachments.each do |attachment| %>
+            <% case attachment.file_type %>
+            <% when 'image' %>
+              <div class="attachment attachment--image">
+                <img src="<%== attachment.url %>" alt="<%= attachment.filename %>" loading="lazy">
+              </div>
+            <% when 'voice', 'audio' %>
+              <div class="attachment attachment--audio">
+                <audio controls><source src="<%== attachment.url %>" type="<%= attachment.content_type %>"></audio>
+              </div>
+            <% when 'video' %>
+              <div class="attachment attachment--video">
+                <video controls><source src="<%== attachment.url %>" type="<%= attachment.content_type %>"></video>
+              </div>
+            <% else %>
+              <div class="attachment attachment--document">
+                <i class="ri-file-line"></i>
+                <span class="attachment__filename"><%= attachment.filename %></span>
+                <a href="<%== attachment.url %>" download="<%= attachment.filename %>" class="attachment__download"><i class="ri-download-line"></i></a>
+              </div>
+            <% end %>
+          <% end %>
+        </div>
+      <% end %>
+      <% if @message.body.present? %>
+        <div class="message__text"><%= @message.body %></div>
+      <% end %>
+    </div>
+    <div class="message__meta">
+      <span class="message__time"><%= @message.created_at.strftime("%H:%M") %></span>
+      <span class="message__status"><i class="ri-check-line"></i></span>
+    </div>
+  </div>
+<% end %>

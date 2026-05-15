@@ -1,0 +1,81 @@
+<div class="p-6">
+  <header class="flex items-center justify-between mb-6 pb-4 border-b border-[var(--color-border)]">
+    <div>
+      <h1 class="text-2xl font-semibold flex items-center gap-2" style="color: var(--color-text-dark);">
+        <i class="ri-inbox-2-line" ></i>
+        <%= t(".title") %>
+      </h1>
+      <%= render "shared/breadcrumbs" %>
+    </div>
+    <div class="flex gap-2">
+      <%= link_to account_friends_path(account_id: current_account.id, locale: I18n.locale),
+          class: "px-4 py-2 rounded text-sm font-medium flex items-center gap-2 transition-all", style: "background: var(--color-primary-tint); color: var(--color-primary-dark); border: 1px solid var(--color-border);" do %>
+        <i class="ri-arrow-left-line"></i>
+      <% end %>
+    </div>
+  </header>
+
+  <%= turbo_frame_tag "flash" do %>
+    <%= render "shared/dash_flash" %>
+  <% end %>
+
+  <div class="grid md:grid-cols-2 gap-6">
+    <div class="bg-white rounded border border-[var(--color-border)]">
+      <div class="p-4 border-b border-[var(--color-border)]">
+        <h2 class="text-base font-semibold flex items-center gap-2" style="color: var(--color-text-dark);">
+          <i class="ri-mail-unread-line" ></i>
+          <%= t(".recieved_requests") %>
+        </h2>
+      </div>
+      <div class="p-4">
+        <% if @incoming.to_a.any? %>
+          <div class="space-y-3">
+            <% @incoming.each do |req| %>
+              <div class="flex items-center justify-between p-3 rounded" style="background: #fffcf9; border: 1px solid var(--color-border);">
+                <div class="flex items-center gap-3">
+                  <div class="w-10 h-10 rounded-full flex items-center justify-center text-sm" style="background: var(--color-primary-tint); color: var(--color-primary); border: 1px solid var(--color-border);">
+                    <i class="ri-user-line"></i>
+                  </div>
+                  <%= link_to account_path(id: req.account.id, locale: I18n.locale), class: "hover:underline", style: "color: var(--color-text-dark);" do %>
+                    <p class="font-medium text-sm"><%= req.account.full_name %></p>
+                    <p class="text-xs" style="color: var(--color-text-light);">@<%= req.account.username %></p>
+                  <% end %>
+                </div>
+                <div class="flex gap-2">
+                  <%= button_to friend_request_path(id: req.id, locale: I18n.locale), method: :patch,
+                      class: "w-8 h-8 rounded-full flex items-center justify-center transition-all hover:opacity-80", style: "background: #d1fae5; color: #065f46; border: 1px solid #b5e2ca;" do %>
+                    <i class="ri-check-line text-sm"></i>
+                  <% end %>
+                  <%= button_to friend_request_path(id: req.id, locale: I18n.locale), method: :delete,
+                      class: "w-8 h-8 rounded-full flex items-center justify-center transition-all hover:opacity-80", style: "background: #fee2e2; color: #991b1b; border: 1px solid #e2baba;" do %>
+                    <i class="ri-close-line text-sm"></i>
+                  <% end %>
+                </div>
+              </div>
+            <% end %>
+          </div>
+        <% else %>
+          <p class="text-sm text-center py-4" style="color: var(--color-text-light);"><%= t(".no_recieved_requests") %></p>
+        <% end %>
+        <%== pagy_nav(@pagy_incoming) if @pagy_incoming.pages > 1 %>
+      </div>
+    </div>
+
+    <div class="bg-white rounded border border-[var(--color-border)]">
+      <div class="p-4 border-b border-[var(--color-border)]">
+        <h2 class="text-base font-semibold flex items-center gap-2" style="color: var(--color-text-dark);">
+          <i class="ri-mail-send-line" style="color: #1a5b90;"></i>
+          <%= t(".outgoing_requests") %>
+        </h2>
+      </div>
+      <div class="p-4">
+        <div id="outgoing_requests">
+          <%= render partial: "outgoing_requests", locals: { outgoing: @outgoing } %>
+        </div>
+        <turbo-frame id="dash_pagination" data-turbo-frame="outgoing_requests">
+          <%= render partial: "shared/dash_pagination", locals: { pagy: @pagy_outgoing } %>
+        </turbo-frame>
+      </div>
+    </div>
+  </div>
+</div>

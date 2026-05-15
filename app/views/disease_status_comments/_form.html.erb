@@ -1,0 +1,11 @@
+<%= form_with(model: @comment, url:, html: { class: "comment-edit-form" }) do |form| %>
+  <div class="comment-edit-form__group">
+    <%= form.text_area :body, data: { controller: "textarea-autogrow" },
+        class: "comment-edit-form__body" %>
+  </div>
+  <div class="comment-edit-form__actions">
+    <%= link_to t(".cancel.title"), disease_status_comment_path(disease_id: @disease.id, status_id: @disease_status.id, id: @comment.id, locale: I18n.locale),
+        class: "dash-button dash-button--small dash-button--gray" %>
+    <%= form.submit t(".submit.title"), class: "dash-button dash-button--small dash-button--new" %>
+  </div>
+<% end %>

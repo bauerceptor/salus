@@ -1,0 +1,45 @@
+<div class="dash-group">
+  <header class="dash-group__header">
+    <h2 class="dash-group__title">
+      <i class="ri-file-list-3-line dash-group__title__icon"></i>
+      Pending Treatment Requests
+    </h2>
+  </header>
+  <div class="dash-group__content">
+    <% if pending_treatment_requests.any? %>
+      <div class="treatment-requests-pending">
+        <% pending_treatment_requests.each do |request| %>
+          <div class="treatment-request-pending-item">
+            <div class="treatment-request-pending-item__header">
+              <span class="treatment-request-pending-item__title"><%= request.title %></span>
+              <span class="badge badge--pending">Pending</span>
+            </div>
+            <p class="treatment-request-pending-item__description"><%= request.description %></p>
+            <% if request.start_date %>
+              <p class="treatment-request-pending-item__meta">
+                <i class="ri-calendar-line"></i> Requested start: <%= request.start_date.strftime("%b %d, %Y") %>
+              </p>
+            <% end %>
+            <p class="treatment-request-pending-item__date">
+              Requested <%= time_ago_in_words(request.requested_at) %> ago
+            </p>
+            <div class="treatment-request-pending-item__actions">
+              <%= button_to specialist_treatment_request_path(id: request.id, locale: I18n.locale, status: "approved"),
+                  method: :patch,
+                  class: "dash-button dash-button--small dash-button--new" do %>
+                <i class="ri-check-line"></i> Approve
+              <% end %>
+              <%= button_to specialist_treatment_request_path(id: request.id, locale: I18n.locale, status: "rejected"),
+                  method: :patch,
+                  class: "dash-button dash-button--small dash-button--delete" do %>
+                <i class="ri-close-line"></i> Reject
+              <% end %>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    <% else %>
+      <p class="no-results">No pending treatment requests</p>
+    <% end %>
+  </div>
+</div>

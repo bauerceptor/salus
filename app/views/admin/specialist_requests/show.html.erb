@@ -1,0 +1,91 @@
+<div class="dash-home">
+  <div class="dash-home__content">
+    <header class="dash-header">
+      <div class="dash-header__left">
+        <h1 class="dash-header__title">
+          <i class="ri-file-list-3-line dash-header__title__icon"></i>
+          Specialist Request Details
+        </h1>
+        <p class="dash-header__desc">Detailed view of specialist registration request</p>
+      </div>
+      <div class="dash-header__right">
+        <%= link_to admin_specialist_requests_path, class: "dash-button dash-button--back" do %>
+          <i class="ri-arrow-left-line dash-button__icon"></i>
+          Back to List
+        <% end %>
+      </div>
+    </header>
+
+    <div class="dash-group">
+      <div class="dash-group__header">
+        <h2 class="dash-group__title">
+          <i class="ri-user-3-line dash-group__title__icon"></i>
+          Applicant Information
+        </h2>
+        <span class="badge badge--<%= @admin_specialist_request.status %>"><%= @admin_specialist_request.status.capitalize %></span>
+      </div>
+      <div class="dash-group__content">
+        <div class="dash-info-grid">
+          <div class="dash-info-item">
+            <span class="dash-info-item__label">Full Name</span>
+            <span class="dash-info-item__value"><%= @admin_specialist_request.specialist.account.full_name %></span>
+          </div>
+          <div class="dash-info-item">
+            <span class="dash-info-item__label">Email</span>
+            <span class="dash-info-item__value"><%= @admin_specialist_request.specialist.email %></span>
+          </div>
+          <div class="dash-info-item">
+            <span class="dash-info-item__label">Specialization</span>
+            <span class="dash-info-item__value"><%= @admin_specialist_request.specialization %></span>
+          </div>
+          <div class="dash-info-item">
+            <span class="dash-info-item__label">Field of Expertise</span>
+            <span class="dash-info-item__value"><%= @admin_specialist_request.field_of_expertise %></span>
+          </div>
+          <div class="dash-info-item">
+            <span class="dash-info-item__label">Description</span>
+            <span class="dash-info-item__value"><%= @admin_specialist_request.specialization_description %></span>
+          </div>
+          <div class="dash-info-item">
+            <span class="dash-info-item__label">Submitted</span>
+            <span class="dash-info-item__value"><%= time_ago_in_words(@admin_specialist_request.created_at) %> ago</span>
+          </div>
+        </div>
+
+        <% if @admin_specialist_request.message.present? %>
+          <div class="dash-info-item dash-info-item--full">
+            <span class="dash-info-item__label">Message from Applicant</span>
+            <span class="dash-info-item__value"><%= @admin_specialist_request.message %></span>
+          </div>
+        <% end %>
+      </div>
+    </div>
+
+    <% if @admin_specialist_request.status == "pending" %>
+      <div class="dash-group">
+        <div class="dash-group__header">
+          <h2 class="dash-group__title">
+            <i class="ri-settings-3-line dash-group__title__icon"></i>
+            Actions
+          </h2>
+        </div>
+        <div class="dash-group__content">
+          <div class="dash-action-buttons">
+            <%= button_to approve_admin_specialist_request_path(id: @admin_specialist_request.id, locale: I18n.locale),
+                method: :post,
+                class: "dash-button dash-button--new" do %>
+              <i class="ri-check-line dash-button__icon"></i>
+              Approve Request
+            <% end %>
+            <%= button_to reject_admin_specialist_request_path(id: @admin_specialist_request.id, locale: I18n.locale),
+                method: :post,
+                class: "dash-button dash-button--delete" do %>
+              <i class="ri-close-line dash-button__icon"></i>
+              Reject Request
+            <% end %>
+          </div>
+        </div>
+      </div>
+    <% end %>
+  </div>
+</div>

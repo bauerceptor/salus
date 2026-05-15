@@ -1,0 +1,92 @@
+<div class="dash-post">
+  <header class="dash-post__header">
+    <div class="dash-post__header__left">
+      <%= image_tag "avatar-placeholder.png", alt: "Logo", class: "dash-post__photo" %>
+      <div class="dash-post__header__user">
+        <h3 class="dash-post__header__title">
+          <%= link_to account_path(id: disease_status.disease.account.id, locale: I18n.locale), data: { turbo_frame: "_top" } do %>
+            <%= disease_status.disease.account.full_name %>
+          <% end %>
+          <% if role_specialist? disease_status.disease.account.user %>
+            <span class="mark-specialist">
+              <i class="ri-check-line"></i>
+            </span>
+          <% end %>
+        </h3>
+        <p class="dash-post__header__disease-name">
+          <%= disease.predefined_disease.name %>
+        </p>
+      </div>
+    </div>
+    <div class="dash-post__header__right">
+      <% if disease_status.mood == 1 %>
+        <p class="dash-post__mood dash-post__mood--sad">
+          <i class="ri-emotion-unhappy-line dash-post__mood__icon"></i>
+          <%= t(".mood.unhappy") %>
+        </p>
+      <% elsif disease_status.mood == 2 %>
+        <p class="dash-post__mood dash-post__mood--normal">
+          <i class="ri-emotion-normal-line dash-post__mood__icon"></i>
+          <%= t(".mood.normal") %>
+        </p>
+      <% elsif disease_status.mood == 3 %>
+        <p class="dash-post__mood dash-post__mood--happy">
+          <i class="ri-emotion-happy-line dash-post__mood__icon"></i>
+          <%= t(".mood.happy") %>
+        </p>
+      <% else %>
+        <p class="dash-post__mood dash-post__mood--sad">
+          <i class="ri-sad-line dash-post__mood__icon"></i>
+          <%= t(".mood.unknown") %>
+        </p>
+      <% end %>
+      <div class="dash-dropdown" id="dropdown-<%= disease_status.id %>">
+        <button class="dash-dropdown__button" type="button" onclick="toggleDropdown('<%= disease_status.id %>')">
+          <i class="ri-more-fill"></i>
+        </button>
+        <div class="dash-dropdown__list hidden" id="dropdown-menu-<%= disease_status.id %>" style="position: absolute; right: 0; margin-top: 4px;">
+          <% if policy(disease_status).owner? %>
+            <%= link_to edit_disease_status_path(disease_id: disease.id, id: disease_status.id),
+              onclick: "hideDropdown('#{disease_status.id}')", class: "dash-dropdown__item" do %>
+              <i class="ri-edit-line dash-dropdown__item__icon"></i>
+              <%= t(".option.edit") %>
+            <% end %>
+            <%= button_to disease_status_path(disease_id: disease.id, id: disease_status.id), method: :delete, class: "dash-dropdown__item",
+              data: { confirm: t(".option.delete.turbo.confirm"), turbo_confirm: t(".option.delete.turbo.confirm") } do %>
+              <i class="ri-close-line dash-dropdown__item__icon dash-dropdown__item__icon--delete"></i> <%= t(".option.delete.title") %>
+            <% end %>
+          <% else %>
+            <div class="dash-dropdown__item">
+              <i class="ri-alert-line dash-dropdown__item__icon"></i>
+              <%= t(".option.report") %>
+            </div>
+          <% end %>
+        </div>
+      </div>
+    </div>
+  </header>
+  <div class="dash-post__content">
+    <p class="dash-post__text">
+      <%= disease_status.content %>
+    </p>
+  </div>
+  <div class="dash-post__interactions">
+    <%= link_to disease_status_comments_path(disease_id: disease.id, status_id: disease_status.id),
+        data: { turbo_frame: "comments_section_#{disease_status.id}" },
+        class: "dash-post__interaction dash-post__interaction--comment" do %>
+      <i class="ri-chat-3-line dash-post__interaction__icon"></i>
+      <span class="dash-post__interaction__count" id="comments_count_<%= disease_status.id %>">
+        <%= disease_status.comments.size %>
+      </span>
+    <% end %>
+    <% if liked?(liked_statuses, disease_status.id) %>
+      <%= render partial: "disease_statuses/unlike_button", locals: { disease:, disease_status: } %>
+    <% else %>
+      <%= render partial: "disease_statuses/like_button", locals: { disease:, disease_status: } %>
+    <% end %>
+    <p class="dash-post__date">
+      <%= l disease_status.created_at, format: :long %>
+    </p>
+  </div>
+  <%= turbo_frame_tag "comments_section_#{disease_status.id}" %>
+</div>

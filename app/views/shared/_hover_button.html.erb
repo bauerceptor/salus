@@ -1,0 +1,11 @@
+<!-- Hover Button Component -->
+<!-- Usage: Render this partial with locals for text customization -->
+<% text = local_assigns[:text] || "Learn More" %>
+<div class="hover-button">
+  <button class="hover-button__learn-more">
+    <span class="hover-button__circle" aria-hidden="true">
+      <span class="hover-button__icon hover-button__icon--arrow"></span>
+    </span>
+    <span class="hover-button__text"><%= text %></span>
+  </button>
+</div>

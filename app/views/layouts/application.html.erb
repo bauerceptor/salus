@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="<%= I18n.locale %>">
+  <head>
+    <title><%= yield(:title).presence || I18n.t("site.title") %></title>
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+
+    <!-- Favicon -->
+    <%= favicon_link_tag asset_path("salus-without-name.svg"), rel: "icon", type: "image/svg+xml" %>
+
+    <!-- Google Fonts - Source Sans 3 -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
+    <!-- Remixicons -->
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@3.4.0/fonts/remixicon.css" rel="stylesheet">
+
+    <%= csrf_meta_tags %>
+    <%= csp_meta_tag %>
+    <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
+    <%= javascript_importmap_tags %>
+
+    <%= yield :head %>
+  </head>
+  <body <%= yield(:body_attributes) %>>
+    <%= content_for?(:body) ? yield(:body) : yield %>
+
+    <%= yield :javascript %>
+
+    <script>
+    function toggleDropdown(id) {
+      var menu = document.getElementById('dropdown-menu-' + id);
+      if (menu) {
+        menu.classList.toggle('hidden');
+      }
+    }
+
+    function hideDropdown(id) {
+      var menu = document.getElementById('dropdown-menu-' + id);
+      if (menu) {
+        menu.classList.add('hidden');
+      }
+    }
+
+    document.addEventListener('click', function(e) {
+      document.querySelectorAll('.dash-dropdown__list').forEach(function(menu) {
+        if (!menu.classList.contains('hidden')) {
+          var dropdown = menu.closest('.dash-dropdown');
+          if (dropdown && !dropdown.contains(e.target)) {
+            menu.classList.add('hidden');
+          }
+        }
+      });
+    });
+    </script>
+  </body>
+  </html>

@@ -1,0 +1,17 @@
+<%= turbo_frame_tag :note_tag_associations do %>
+  <div class="assigned-tags">
+    <%= turbo_frame_tag :no_results_note_tag_associations do %>
+      <% if @note_tags.none? %>
+        <%= render "no_results" %>
+      <% end %>
+    <% end %>
+    <%= turbo_frame_tag :list_note_tag_associations, class: "assigned-tags__list" do %>
+      <% @note_tags.to_a.each do |tag| %>
+        <%= render partial: "note_tag_association", locals: { tag: tag } %>
+      <% end %>
+    <% end %>
+  </div>
+  <%= turbo_frame_tag :pagination_note_tag_associations do %>
+    <%= render "pagination" %>
+  <% end %>
+<% end %>

@@ -1,0 +1,76 @@
+<div class="dash-post">
+  <header class="dash-post__header">
+    <div class="dash-post__header__left">
+      <%= image_tag "avatar-placeholder.png", alt: "Logo", class: "dash-post__photo" %>
+      <div class="dash-post__header__user">
+        <h3 class="dash-post__header__title">
+          <%= post.account.full_name %>
+          <% if post.account.user&.specialist? %>
+            <span class="mark-specialist">
+              <i class="ri-check-line"></i>
+            </span>
+          <% end %>
+        </h3>
+        <p class="dash-post__header__username">
+          @<%= post.account.username %>
+        </p>
+      </div>
+    </div>
+    <div class="dash-post__header__right">
+      <% if post.pinned? %>
+        <span class="dash-post__pinned">
+          <i class="ri-pushpin-fill"></i>
+        </span>
+      <% end %>
+    </div>
+  </header>
+  <div class="dash-post__content">
+    <% if post.quote_post? %>
+      <div class="dash-post__quote">
+        <p class="dash-post__quote-text"><%= post.quoted_post.body %></p>
+        <p class="dash-post__quote-author">@<%= post.quoted_post.account.username %></p>
+      </div>
+    <% end %>
+    <p class="dash-post__text">
+      <%= post.body %>
+    </p>
+    <% if post.post_type_link? && post.link_preview %>
+      <div class="dash-post__link-preview">
+        <% if post.link_preview["image"].present? %>
+          <%= image_tag post.link_preview["image"], class: "dash-post__link-preview-image" %>
+        <% end %>
+        <% if post.link_preview["title"].present? %>
+          <h4 class="dash-post__link-preview-title"><%= post.link_preview["title"] %></h4>
+        <% end %>
+        <% if post.link_preview["description"].present? %>
+          <p class="dash-post__link-preview-desc"><%= post.link_preview["description"] %></p>
+        <% end %>
+        <% if post.link_url.present? %>
+          <p class="dash-post__link-preview-url"><%= post.link_url %></p>
+        <% end %>
+      </div>
+    <% end %>
+    <% if post.post_type_poll? && post.poll_options.any? %>
+      <div class="dash-post__poll">
+        <% post.poll_options.each do |option| %>
+          <div class="dash-post__poll-option">
+            <span class="dash-post__poll-option-text"><%= option.content %></span>
+            <span class="dash-post__poll-option-count"><%= option.votes.count %></span>
+          </div>
+        <% end %>
+      </div>
+    <% end %>
+  </div>
+  <div class="dash-post__interactions">
+    <%= link_to "#",
+         class: "dash-post__interaction dash-post__interaction--comment" do %>
+      <i class="ri-chat-3-line dash-post__interaction__icon"></i>
+      <span class="dash-post__interaction__count">
+        <%= post.comments.size %>
+      </span>
+    <% end %>
+    <p class="dash-post__date">
+      <%= l post.created_at, format: :long %>
+    </p>
+  </div>
+</div>

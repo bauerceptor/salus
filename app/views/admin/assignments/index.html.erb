@@ -1,0 +1,265 @@
+<div data-controller="admin-assignments">
+<div class="dash-home">
+  <div class="dash-home__content">
+    <header class="dash-header">
+      <div class="dash-header__left">
+        <h1 class="dash-header__title">
+          <i class="ri-user-follow-line dash-header__title__icon"></i>
+          Patient-Specialist Assignments
+        </h1>
+        <p class="dash-header__desc">Manage patient-specialist relationships and assignments</p>
+      </div>
+      <div class="dash-header__right">
+        <% if @assignments.any? || @accounts.any? %>
+          <button type="button" class="dash-button dash-button--new" data-action="admin-assignments#openBulkModal">
+            <i class="ri-git-branch-line dash-button__icon"></i>
+            Reassign Selected (<span id="selected-count"></span>)
+          </button>
+        <% end %>
+      </div>
+    </header>
+
+    <div class="dash-group">
+      <div class="dash-filter-bar">
+        <div class="dash-filter-bar__chips">
+          <%= link_to admin_assignments_path,
+              class: "filter-chip filter-chip--all #{@filter == 'all' ? 'filter-chip--active' : ''}" do %>
+            <i class="ri-stack-line"></i>
+            All
+          <% end %>
+          <%= link_to admin_assignments_path(filter: "active"),
+              class: "filter-chip #{@filter == 'active' ? 'filter-chip--active' : ''}" do %>
+            <i class="ri-checkbox-circle-line"></i>
+            Active
+          <% end %>
+          <%= link_to admin_assignments_path(filter: "pending"),
+              class: "filter-chip #{@filter == 'pending' ? 'filter-chip--active' : ''}" do %>
+            <i class="ri-time-line"></i>
+            Pending
+          <% end %>
+          <%= link_to admin_assignments_path(filter: "inactive"),
+              class: "filter-chip #{@filter == 'inactive' ? 'filter-chip--active' : ''}" do %>
+            <i class="ri-close-circle-line"></i>
+            Inactive
+          <% end %>
+          <%= link_to admin_assignments_path(filter: "unassigned"),
+              class: "filter-chip filter-chip--all #{@filter == 'unassigned' ? 'filter-chip--active' : ''}" do %>
+            <i class="ri-user-unfollow-line"></i>
+            Unassigned
+          <% end %>
+        </div>
+        <div class="dash-filter-bar__search">
+          <% if @specialist_id.blank? %>
+            <%= form_with url: admin_assignments_path, method: :get do |f| %>
+              <% if @filter != 'all' %>
+                <%= hidden_field_tag :filter, @filter %>
+              <% end %>
+              <div class="search-input-wrapper">
+                <i class="ri-search-line search-input-icon"></i>
+                <%= f.select :specialist_id,
+                    options_for_select(@specialist_options, @specialist_id&.to_s),
+                    { include_blank: "All Specialists" },
+                    class: "search-input" %>
+              </div>
+            <% end %>
+          <% else %>
+            <%= link_to admin_assignments_path(filter: @filter) do %>
+              <span class="dash-button dash-button--small dash-button--gray">
+                <i class="ri-close-line"></i>
+                Clear specialist filter
+              </span>
+            <% end %>
+          <% end %>
+        </div>
+      </div>
+
+      <div class="dash-group__content">
+        <% if @filter == "unassigned" %>
+          <% if @accounts.any? %>
+            <div class="dash-table-wrapper">
+              <table class="dash-table">
+                <thead>
+                  <tr>
+                    <th>Patient</th>
+                    <th>Email</th>
+                    <th>Registered</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <% @accounts.each do |account| %>
+                    <tr class="dash-table__row">
+                      <td>
+                        <div class="patient-list-item__info">
+                          <p class="patient-list-item__name"><%= account.full_name %></p>
+                        </div>
+                      </td>
+                      <td><%= account.user.email %></td>
+                      <td><%= account.created_at.strftime("%b %d, %Y") %></td>
+                      <td>
+                        <span class="badge badge--warning">
+                          <i class="ri-user-unfollow-line"></i>
+                          Unassigned
+                        </span>
+                      </td>
+                      <td>
+                        <button type="button" class="dash-button dash-button--small dash-button--new"
+                            data-action="admin-assignments#openReassignModal"
+                            data-account-id="<%= account.id %>"
+                            data-account-name="<%= account.full_name %>">
+                          <i class="ri-user-add-line"></i>
+                          Assign Specialist
+                        </button>
+                      </td>
+                    </tr>
+                  <% end %>
+                </tbody>
+              </table>
+            </div>
+          <% else %>
+            <div class="dash-empty-state">
+              <div class="dash-empty-state__icon-wrapper">
+                <i class="ri-user-follow-line dash-empty-state__icon"></i>
+              </div>
+              <p class="dash-empty-state__text">No unassigned patients</p>
+              <p class="dash-empty-state__desc">All patients have been assigned to a specialist.</p>
+            </div>
+          <% end %>
+        <% else %>
+          <% if @assignments.any? %>
+            <div class="dash-table-wrapper">
+              <table class="dash-table">
+                <thead>
+                  <tr>
+                    <th>
+                      <input type="checkbox" data-action="admin-assignments#toggleAll" />
+                    </th>
+                    <th>Patient</th>
+                    <th>Specialist</th>
+                    <th>Relationship</th>
+                    <th>Status</th>
+                    <th>Assigned</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <% @assignments.each do |sp| %>
+                    <tr class="dash-table__row">
+                      <td>
+                        <input type="checkbox" class="assignment-checkbox"
+                            data-action="admin-assignments#updateBulkCount"
+                            value="<%= sp.id %>" />
+                      </td>
+                      <td>
+                        <div class="patient-list-item__info">
+                          <p class="patient-list-item__name"><%= sp.account.full_name %></p>
+                        </div>
+                      </td>
+                      <td>
+                        <% if sp.specialist&.specialist %>
+                          <div class="specialist-info">
+                            <p><%= sp.specialist.email %></p>
+                            <p class="text-small text-muted"><%= sp.specialist.specialist.specialization %></p>
+                          </div>
+                        <% else %>
+                          <p class="text-muted">Unknown specialist</p>
+                        <% end %>
+                      </td>
+                      <td>
+                        <span class="badge badge--<%= sp.relationship_type.to_s.downcase %>">
+                          <%= sp.relationship_type.presence || "Primary Care" %>
+                        </span>
+                      </td>
+                      <td>
+                        <span class="badge badge--<%= sp.status.to_s.downcase %>">
+                          <i class="<%= sp.status.to_s.downcase == 'active' ? 'ri-checkbox-circle-line' : 'ri-time-line' %>"></i>
+                          <%= sp.status.capitalize if sp.status %>
+                        </span>
+                      </td>
+                      <td><%= sp.created_at.strftime("%b %d, %Y") %></td>
+                      <td>
+                        <button type="button" class="dash-button dash-button--small dash-button--gray"
+                            data-action="admin-assignments#openReassignModal"
+                            data-assignment-id="<%= sp.id %>"
+                            data-current-specialist="<%= sp.specialist_id %>">
+                          <i class="ri-git-branch-line"></i>
+                          Reassign
+                        </button>
+                      </td>
+                    </tr>
+                  <% end %>
+                </tbody>
+              </table>
+            </div>
+          <% else %>
+            <div class="dash-empty-state">
+              <div class="dash-empty-state__icon-wrapper">
+                <i class="ri-user-search-line dash-empty-state__icon"></i>
+              </div>
+              <p class="dash-empty-state__text">No assignments found</p>
+              <% if @filter != "all" || @specialist_id.present? %>
+                <div class="dash-empty-state__actions">
+                  <%= link_to admin_assignments_path, class: "dash-button dash-button--gray" do %>
+                    <i class="ri-close-line"></i>
+                    Clear filters
+                  <% end %>
+                </div>
+              <% end %>
+            </div>
+          <% end %>
+        <% end %>
+      </div>
+    </div>
+
+    <% if @pagy&.pages > 1 %>
+      <div class="dash-pagination">
+        <div class="dash-pagination__controls">
+          <%== pagy_nav(@pagy) %>
+        </div>
+      </div>
+    <% end %>
+  </div>
+</div>
+
+<div class="modal-backdrop" data-admin-assignments-target="modalBackdrop" style="display: none;">
+  <div class="modal" role="dialog" aria-modal="true">
+    <div class="modal__header">
+      <h3 class="modal__title" data-admin-assignments-target="modalTitle">
+        <i class="ri-git-branch-line"></i>
+        Reassign Specialist
+      </h3>
+      <button type="button" class="modal__close" data-action="admin-assignments#closeModal">
+        <i class="ri-close-line"></i>
+      </button>
+    </div>
+    <div class="modal__body">
+      <div data-admin-assignments-target="modalContent">
+        <div class="modal__form-group">
+          <label class="modal__label">Select a specialist to reassign:</label>
+          <select class="form-select" data-admin-assignments-target="specialistSelect">
+            <option value="">Choose specialist...</option>
+            <%= options_for_select(@specialist_options) %>
+          </select>
+        </div>
+      </div>
+    </div>
+    <div class="modal__footer">
+      <button type="button" class="dash-button dash-button--gray" data-action="admin-assignments#closeModal">
+        Cancel
+      </button>
+      <button type="button" class="dash-button dash-button--new" data-admin-assignments-target="confirmButton"
+          data-action="admin-assignments#confirmReassign">
+        <i class="ri-check-line dash-button__icon"></i>
+        Confirm Reassign
+      </button>
+    </div>
+  </div>
+</div>
+</div>
+
+<style>
+  .specialist-info p {
+    margin: 0;
+  }
+</style>

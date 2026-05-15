@@ -1,0 +1,119 @@
+<div class="page-medications">
+  <header class="dash-header">
+    <div class="dash-header__left">
+      <h1 class="dash-header__title">
+        <i class="ri-medicine-bottle-line dash-header__title__icon"></i>
+        <%= t(".title") %>
+      </h1>
+      <%= render "shared/breadcrumbs" %>
+    </div>
+    <div class="dash-header__right">
+      <%= link_to new_medication_path, class: "dash-button dash-button--new" do %>
+        <i class="ri-add-line dash-button__icon"></i>
+        <%= t(".button.new") %>
+      <% end %>
+      <%= link_to authenticated_root_path, class: "dash-button dash-button--back" do %>
+        <i class="ri-arrow-left-line dash-button__icon"></i>
+      <% end %>
+    </div>
+  </header>
+
+  <div class="dash-flash-messages">
+    <%= turbo_frame_tag "flash" do %>
+      <%= render "shared/dash_flash" %>
+    <% end %>
+  </div>
+
+  <% if @medications.to_a.any? %>
+    <div class="medications-grid">
+      <% @medications.each do |medication| %>
+        <div class="medication-card <%= medication.is_active? ? '' : 'medication-card--inactive' %>">
+          <div class="medication-card__body">
+            <div class="medication-card__icon">
+              <i class="ri-medicine-bottle-line"></i>
+            </div>
+            <div class="medication-card__info">
+              <div class="medication-card__header">
+                <h2 class="medication-card__name">
+                  <%= medication.name %>
+                </h2>
+                <% if medication.is_active? %>
+                  <span class="medication-card__status medication-card__status--active">
+                    <i class="ri-checkbox-circle-line"></i>
+                    Active
+                  </span>
+                <% else %>
+                  <span class="medication-card__status medication-card__status--inactive">
+                    <i class="ri-pause-circle-line"></i>
+                    Inactive
+                  </span>
+                <% end %>
+              </div>
+              <p class="medication-card__dosage">
+                <i class="ri-dose-line"></i>
+                <%= medication.dosage %>
+              </p>
+              <p class="medication-card__frequency">
+                <i class="ri-time-line"></i>
+                <%= medication.frequency.humanize %>
+              </p>
+            </div>
+          </div>
+          <div class="medication-card__details">
+            <div class="medication-card__detail">
+              <i class="ri-calendar-check-line"></i>
+              <span><%= medication.start_date ? medication.start_date.strftime("%b %d, %Y") : "No start date" %></span>
+            </div>
+            <div class="medication-card__detail">
+              <i class="ri-file-list-3-line"></i>
+              <span><%= medication.medication_schedules.count %> <%= medication.medication_schedules.count == 1 ? 'schedule' : 'schedules' %></span>
+            </div>
+          </div>
+          <% if medication.medication_schedules.any? %>
+            <div class="medication-card__schedules-list">
+              <% medication.medication_schedules.first(3).each do |schedule| %>
+                <% time_of_day_class = case schedule.time_of_day
+                  when 0 then 'morning'
+                  when 1 then 'afternoon'
+                  when 2 then 'evening'
+                  when 3 then 'night'
+                  else ''
+                end %>
+                <span class="medication-card__badge medication-card__badge--<%= time_of_day_class %>">
+                  <i class="ri-time-line"></i>
+                  <%= schedule.scheduled_time.strftime("%I:%M %p") %>
+                </span>
+              <% end %>
+              <% if medication.medication_schedules.count > 3 %>
+                <span class="medication-card__badge medication-card__badge--as-needed">
+                  +<%= medication.medication_schedules.count - 3 %> more
+                </span>
+              <% end %>
+            </div>
+          <% end %>
+          <div class="medication-card__footer">
+            <div class="medication-card__reminder">
+              <i class="ri-notification-3-line"></i>
+            </div>
+            <%= link_to t(".medication.details"), medication_path(id: medication.id, locale: I18n.locale),
+                class: "dash-button dash-button--small" %>
+          </div>
+        </div>
+      <% end %>
+    </div>
+  <% else %>
+    <div class="empty-state">
+      <i class="ri-information-line empty-state__icon"></i>
+      <p class="empty-state__text"><%= t(".no_results") %></p>
+    </div>
+  <% end %>
+
+  <div class="pagination-container">
+    <div class="dash-pagination__info">
+      <%== pagy_info(@pagy) if @pagy.pages > 1 %>
+    </div>
+    <div class="dash-pagination__nav">
+      <%== pagy_nav(@pagy) if @pagy.pages > 1 %>
+    </div>
+  </div>
+</div>

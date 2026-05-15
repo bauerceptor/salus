@@ -1,0 +1,82 @@
+<div class="new-treatment">
+  <header class="dash-header">
+    <div class="dash-header__left">
+      <h1 class="dash-header__title">
+        <i class="ri-hospital-line dash-header__title__icon"></i>
+        <%= t(".title") %>
+      </h1>
+      <%= render "shared/breadcrumbs" %>
+    </div>
+    <div class="dash-header__right">
+      <%= link_to patient_treatment_requests_path, class: "dash-button dash-button--back" do %>
+        <i class="ri-arrow-left-line dash-button__icon"></i>
+      <% end %>
+    </div>
+  </header>
+
+  <div class="dash-flash-messages">
+    <%= turbo_frame_tag "flash" do %>
+      <%= render "shared/dash_flash" %>
+    <% end %>
+  </div>
+
+  <div>
+    <div class="info-box info-box--warning mb-6">
+      <i class="ri-information-line info-box__icon"></i>
+      <p><%= t(".info_message") %></p>
+    </div>
+
+    <%= form_with model: @treatment_request, url: patient_treatment_requests_path,
+        html: { class: "dash-form" } do |form| %>
+      <div class="dash-form__container">
+        <div class="dash-form__group">
+          <div class="dash-form__group__container">
+            <div class="dash-form__group__left">
+              <div class="dash-form__group__title"><%= t(".title_field.title") %></div>
+              <p class="dash-form__group__description"><%= t(".title_field.description") %></p>
+            </div>
+            <div class="dash-form__group__right">
+              <%= form.text_field :title, class: "dash-form__input", placeholder: t(".title_field.placeholder") %>
+            </div>
+          </div>
+          <%= render DashFormErrorComponent.new(model: @treatment_request, field: :title) %>
+        </div>
+      </div>
+
+      <div class="dash-form__container">
+        <div class="dash-form__group">
+          <div class="dash-form__group__container">
+            <div class="dash-form__group__left">
+              <div class="dash-form__group__title"><%= t(".description.title") %></div>
+              <p class="dash-form__group__description"><%= t(".description.description") %></p>
+            </div>
+            <div class="dash-form__group__right">
+              <%= form.text_area :description, class: "dash-form__input dash-form__textarea",
+                  placeholder: t(".description.placeholder") %>
+            </div>
+          </div>
+          <%= render DashFormErrorComponent.new(model: @treatment_request, field: :description) %>
+        </div>
+      </div>
+
+      <div class="dash-form__container">
+        <div class="dash-form__group">
+          <div class="dash-form__group__container">
+            <div class="dash-form__group__left">
+              <div class="dash-form__group__title"><%= t(".start_date.title") %></div>
+              <p class="dash-form__group__description"><%= t(".start_date.description") %></p>
+            </div>
+            <div class="dash-form__group__right">
+              <%= form.date_field :start_date, class: "dash-form__input" %>
+            </div>
+          </div>
+          <%= render DashFormErrorComponent.new(model: @treatment_request, field: :start_date) %>
+        </div>
+      </div>
+
+      <div class="dash-form__group">
+        <%= form.submit t("dash_form.submit"), class: "dash-form__submit dash-button dash-button--new" %>
+      </div>
+    <% end %>
+  </div>
+</div>

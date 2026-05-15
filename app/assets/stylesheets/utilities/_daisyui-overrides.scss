@@ -1,0 +1,82 @@
+@charset 'utf-8';
+
+html {
+  color-scheme: light;
+}
+
+:root {
+  color-scheme: light;
+}
+
+[data-theme],
+body {
+  color-scheme: light;
+}
+
+input,
+textarea,
+select {
+  background-color: #ffffff !important;
+  color: #232b39 !important;
+}
+
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="number"],
+input[type="search"],
+input[type="tel"],
+input[type="url"],
+input[type="date"],
+input[type="time"],
+input[type="datetime-local"],
+textarea,
+select {
+  background-color: #ffffff !important;
+  color: #232b39 !important;
+  border-color: #e2e8f0 !important;
+
+  &::placeholder {
+    color: #64748b !important;
+  }
+
+  &:focus {
+    border-color: #0d7377 !important;
+    box-shadow: 0 0 0 3px rgba(13, 115, 119, 0.1) !important;
+    outline: none;
+  }
+
+  &:disabled {
+    background-color: #f8f9fa !important;
+    color: #64748b !important;
+    cursor: not-allowed;
+  }
+}
+
+select {
+  background-color: #ffffff !important;
+}
+
+ DaisyUI overrides
+.themesalus,
+[data-theme="salus"] {
+  --fallback-bg: #ffffff;
+  --fallback-color: #232b39;
+  background-color: #ffffff !important;
+}
+
+.dropdown-content {
+  background-color: #ffffff !important;
+}
+
+.modal-box {
+  background-color: #ffffff !important;
+}
+
+.card {
+  background-color: #ffffff !important;
+}
+
+.bordered {
+  border-color: #e2e8f0 !important;
+}

@@ -1,0 +1,1421 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Salus — Specialist Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.5.1" integrity="sha384-jb8JQMbMoBUzgWatfe6COACi2ljcDdZQ2OxczGA3bGNeWe+6DChMTBJemed7ZnvJ" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@3.0.0" integrity="sha384-cVMg8E3QFwTvGCDuK+ET4PD341jF3W8nO1auiXfuZNQkzbUUiBGLsIQUE+b1mxws" crossorigin="anonymous"></script>
+    <style>
+        :root {
+            --bg-primary: #f5f6f8;
+            --bg-card: #ffffff;
+            --bg-header: #1a1a2e;
+            --bg-sidebar: #16213e;
+            --text-primary: #1a1a2e;
+            --text-secondary: #6b7280;
+            --text-on-dark: #ffffff;
+            --color-1: #4C72B0;
+            --color-2: #DD8452;
+            --color-3: #55A868;
+            --color-4: #C44E52;
+            --color-5: #8172B3;
+            --color-critical: #dc2626;
+            --color-warning: #d97706;
+            --color-info: #2563eb;
+            --color-success: #16a34a;
+            --color-low: #16a34a;
+            --color-medium: #ca8a04;
+            --color-high: #dc2626;
+            --gap: 16px;
+            --radius: 10px;
+            --shadow: 0 1px 4px rgba(0,0,0,0.08);
+            --shadow-lg: 0 4px 16px rgba(0,0,0,0.12);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.5;
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* ─── SIDEBAR ─── */
+        .sidebar {
+            width: 220px;
+            background: var(--bg-sidebar);
+            color: var(--text-on-dark);
+            display: flex;
+            flex-direction: column;
+            flex-shrink: 0;
+            position: fixed;
+            top: 0; left: 0;
+            height: 100vh;
+            z-index: 100;
+            overflow-y: auto;
+        }
+
+        .sidebar-logo {
+            padding: 20px 20px 16px;
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .sidebar-logo-icon {
+            width: 32px; height: 32px;
+            background: linear-gradient(135deg, #4C72B0, #55A868);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+        }
+
+        .sidebar-logo-text {
+            font-size: 18px;
+            font-weight: 700;
+            letter-spacing: -0.3px;
+        }
+
+        .sidebar-nav {
+            padding: 12px 0;
+            flex: 1;
+        }
+
+        .nav-section-label {
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: rgba(255,255,255,0.35);
+            padding: 16px 20px 6px;
+            font-weight: 600;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 20px;
+            cursor: pointer;
+            font-size: 14px;
+            border-radius: 0;
+            color: rgba(255,255,255,0.6);
+            transition: all 0.15s;
+            position: relative;
+            border-left: 3px solid transparent;
+            user-select: none;
+        }
+
+        .nav-item:hover {
+            background: rgba(255,255,255,0.06);
+            color: rgba(255,255,255,0.9);
+        }
+
+        .nav-item.active {
+            background: rgba(255,255,255,0.08);
+            color: #ffffff;
+            border-left-color: #4C72B0;
+        }
+
+        .nav-item .badge {
+            margin-left: auto;
+            background: var(--color-critical);
+            color: white;
+            font-size: 11px;
+            font-weight: 700;
+            padding: 2px 7px;
+            border-radius: 10px;
+            min-width: 20px;
+            text-align: center;
+        }
+
+        .nav-item .badge.green { background: var(--color-success); }
+
+        .nav-item .nav-icon { font-size: 16px; width: 20px; text-align: center; }
+
+        .sidebar-profile {
+            padding: 16px 20px;
+            border-top: 1px solid rgba(255,255,255,0.08);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .sidebar-avatar {
+            width: 36px; height: 36px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #4C72B0, #8172B3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: 600;
+            color: white;
+            flex-shrink: 0;
+        }
+
+        .sidebar-profile-info { flex: 1; min-width: 0; }
+        .sidebar-profile-name { font-size: 13px; font-weight: 600; color: white; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .sidebar-profile-role { font-size: 11px; color: rgba(255,255,255,0.4); }
+
+        /* ─── MAIN CONTENT ─── */
+        .main {
+            margin-left: 220px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        .topbar {
+            background: var(--bg-card);
+            border-bottom: 1px solid #e5e7eb;
+            padding: 0 28px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 50;
+            box-shadow: var(--shadow);
+        }
+
+        .topbar-left { display: flex; align-items: center; gap: 16px; }
+        .topbar-title { font-size: 16px; font-weight: 600; }
+        .topbar-date { font-size: 13px; color: var(--text-secondary); }
+
+        .topbar-right { display: flex; align-items: center; gap: 12px; }
+
+        .search-bar {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--bg-primary);
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 6px 12px;
+            font-size: 13px;
+            color: var(--text-secondary);
+            cursor: text;
+        }
+
+        .search-bar input {
+            border: none;
+            background: transparent;
+            outline: none;
+            font-size: 13px;
+            color: var(--text-primary);
+            width: 200px;
+        }
+
+        .search-bar input::placeholder { color: #9ca3af; }
+
+        .icon-btn {
+            width: 36px; height: 36px;
+            border-radius: 8px;
+            border: 1px solid #e5e7eb;
+            background: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.15s;
+            color: var(--text-secondary);
+        }
+
+        .icon-btn:hover { background: var(--bg-primary); color: var(--text-primary); }
+        .icon-btn.active { background: var(--bg-header); color: white; border-color: var(--bg-header); }
+
+        /* ─── CONTENT AREA ─── */
+        .content {
+            padding: 24px 28px;
+            flex: 1;
+        }
+
+        /* ─── KPI ROW ─── */
+        .kpi-row {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: var(--gap);
+            margin-bottom: var(--gap);
+        }
+
+        .kpi-card {
+            background: var(--bg-card);
+            border-radius: var(--radius);
+            padding: 20px 24px;
+            box-shadow: var(--shadow);
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            transition: box-shadow 0.2s;
+        }
+
+        .kpi-card:hover { box-shadow: var(--shadow-lg); }
+
+        .kpi-icon {
+            width: 44px; height: 44px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            flex-shrink: 0;
+        }
+
+        .kpi-icon.blue { background: #dbeafe; color: #2563eb; }
+        .kpi-icon.red { background: #fee2e2; color: var(--color-critical); }
+        .kpi-icon.yellow { background: #fef3c7; color: var(--color-warning); }
+        .kpi-icon.green { background: #dcfce7; color: var(--color-success); }
+        .kpi-icon.purple { background: #ede9fe; color: #7c3aed; }
+
+        .kpi-content { flex: 1; }
+        .kpi-value { font-size: 26px; font-weight: 700; line-height: 1.2; }
+        .kpi-label { font-size: 13px; color: var(--text-secondary); margin-top: 2px; }
+        .kpi-sub { font-size: 12px; color: var(--text-secondary); margin-top: 4px; }
+
+        /* ─── TWO COLUMN LAYOUT ─── */
+        .two-col {
+            display: grid;
+            grid-template-columns: 1fr 380px;
+            gap: var(--gap);
+            margin-bottom: var(--gap);
+            align-items: start;
+        }
+
+        /* ─── ALERT QUEUE ─── */
+        .panel {
+            background: var(--bg-card);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            overflow: hidden;
+        }
+
+        .panel-header {
+            padding: 16px 20px;
+            border-bottom: 1px solid #f0f0f0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .panel-title {
+            font-size: 14px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .panel-title-icon { font-size: 16px; }
+
+        .panel-tabs {
+            display: flex;
+            gap: 4px;
+        }
+
+        .panel-tab {
+            padding: 5px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            border: 1px solid transparent;
+            background: transparent;
+            color: var(--text-secondary);
+            transition: all 0.15s;
+        }
+
+        .panel-tab.active {
+            background: var(--bg-header);
+            color: white;
+            border-color: var(--bg-header);
+        }
+
+        .panel-tab .count {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(0,0,0,0.15);
+            border-radius: 10px;
+            padding: 0 6px;
+            font-size: 10px;
+            margin-left: 4px;
+        }
+
+        .alert-queue {
+            max-height: 560px;
+            overflow-y: auto;
+        }
+
+        .alert-item {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 14px 20px;
+            border-bottom: 1px solid #f5f5f5;
+            cursor: pointer;
+            transition: background 0.12s;
+        }
+
+        .alert-item:last-child { border-bottom: none; }
+        .alert-item:hover { background: #f9fafb; }
+        .alert-item.acknowledged { opacity: 0.5; }
+
+        .alert-severity-bar {
+            width: 4px;
+            height: 44px;
+            border-radius: 2px;
+            flex-shrink: 0;
+        }
+
+        .alert-severity-bar.critical { background: var(--color-critical); }
+        .alert-severity-bar.warning { background: var(--color-warning); }
+        .alert-severity-bar.info { background: var(--color-info); }
+
+        .alert-body { flex: 1; min-width: 0; }
+        .alert-title { font-size: 13px; font-weight: 600; display: flex; align-items: center; gap: 6px; }
+        .alert-title .badge {
+            font-size: 10px;
+            font-weight: 700;
+            padding: 2px 7px;
+            border-radius: 4px;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+
+        .badge-critical { background: #fee2e2; color: #991b1b; }
+        .badge-warning { background: #fef3c7; color: #92400e; }
+        .badge-info { background: #dbeafe; color: #1e40af; }
+
+        .alert-context { font-size: 12px; color: var(--text-secondary); margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .alert-meta { font-size: 11px; color: #9ca3af; margin-top: 3px; display: flex; align-items: center; gap: 8px; }
+
+        .alert-avatar {
+            width: 36px; height: 36px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #4C72B0 0%, #8172B3 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 13px;
+            font-weight: 600;
+            color: white;
+            flex-shrink: 0;
+        }
+
+        .alert-actions {
+            display: flex;
+            gap: 6px;
+            opacity: 0;
+            transition: opacity 0.15s;
+        }
+
+        .alert-item:hover .alert-actions { opacity: 1; }
+
+        .alert-btn {
+            padding: 5px 10px;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 600;
+            cursor: pointer;
+            border: 1px solid;
+            transition: all 0.15s;
+            white-space: nowrap;
+        }
+
+        .alert-btn-view {
+            background: var(--bg-header);
+            color: white;
+            border-color: var(--bg-header);
+        }
+
+        .alert-btn-view:hover { background: #2a2a4e; }
+
+        .alert-btn-ack {
+            background: white;
+            color: var(--text-secondary);
+            border-color: #d1d5db;
+        }
+
+        .alert-btn-ack:hover { border-color: var(--bg-header); color: var(--bg-header); }
+
+        .alert-empty {
+            padding: 48px 24px;
+            text-align: center;
+            color: var(--text-secondary);
+        }
+
+        .alert-empty-icon { font-size: 36px; margin-bottom: 8px; opacity: 0.4; }
+        .alert-empty-title { font-size: 14px; font-weight: 600; color: #374151; }
+        .alert-empty-text { font-size: 13px; margin-top: 4px; }
+
+        /* ─── RIGHT SIDEBAR ─── */
+        .right-sidebar { display: flex; flex-direction: column; gap: var(--gap); }
+
+        /* ─── PATIENT LIST ─── */
+        .patient-list-header {
+            padding: 14px 20px;
+            border-bottom: 1px solid #f0f0f0;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .patient-list-search {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            background: var(--bg-primary);
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 7px 12px;
+        }
+
+        .patient-list-search input {
+            border: none;
+            background: transparent;
+            outline: none;
+            font-size: 13px;
+            width: 100%;
+        }
+
+        .patient-list-filters {
+            display: flex;
+            gap: 6px;
+            padding: 10px 16px;
+            border-bottom: 1px solid #f5f5f5;
+        }
+
+        .filter-chip {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+            cursor: pointer;
+            border: 1.5px solid #e5e7eb;
+            background: white;
+            color: var(--text-secondary);
+            transition: all 0.15s;
+            white-space: nowrap;
+        }
+
+        .filter-chip:hover { border-color: var(--bg-header); color: var(--bg-header); }
+        .filter-chip.active { background: var(--bg-header); color: white; border-color: var(--bg-header); }
+
+        .patient-list {
+            max-height: 360px;
+            overflow-y: auto;
+        }
+
+        .patient-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            border-bottom: 1px solid #f5f5f5;
+            cursor: pointer;
+            transition: background 0.12s;
+        }
+
+        .patient-row:hover { background: #f9fafb; }
+        .patient-row:last-child { border-bottom: none; }
+
+        .patient-row-avatar {
+            width: 34px; height: 34px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 600;
+            color: white;
+            flex-shrink: 0;
+        }
+
+        .patient-row-info { flex: 1; min-width: 0; }
+        .patient-row-name { font-size: 13px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .patient-row-meta { font-size: 11px; color: var(--text-secondary); margin-top: 1px; }
+
+        .patient-row-badge {
+            font-size: 10px;
+            font-weight: 700;
+            padding: 2px 8px;
+            border-radius: 4px;
+            flex-shrink: 0;
+        }
+
+        .patient-row-badge.high { background: #fee2e2; color: #991b1b; }
+        .patient-row-badge.medium { background: #fef3c7; color: #92400e; }
+        .patient-row-badge.low { background: #dcfce7; color: #166534; }
+
+        .patient-row-alert-count {
+            font-size: 11px;
+            font-weight: 700;
+            background: var(--color-critical);
+            color: white;
+            padding: 1px 6px;
+            border-radius: 10px;
+            flex-shrink: 0;
+        }
+
+        .patient-row-alert-count.none { background: #d1d5db; }
+
+        /* ─── PENDING REQUESTS ─── */
+        .requests-list {
+            max-height: 220px;
+            overflow-y: auto;
+        }
+
+        .request-item {
+            padding: 12px 16px;
+            border-bottom: 1px solid #f5f5f5;
+        }
+
+        .request-item:last-child { border-bottom: none; }
+
+        .request-header { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+        .request-name { font-size: 13px; font-weight: 600; }
+        .request-type { font-size: 10px; font-weight: 600; padding: 2px 7px; border-radius: 4px; text-transform: uppercase; }
+        .request-type.medication { background: #dbeafe; color: #1e40af; }
+        .request-type.treatment { background: #ede9fe; color: #5b21b6; }
+        .request-desc { font-size: 12px; color: var(--text-secondary); margin-top: 3px; }
+        .request-time { font-size: 11px; color: #9ca3af; margin-top: 4px; }
+        .request-actions { display: flex; gap: 6px; margin-top: 10px; }
+
+        .req-btn {
+            padding: 5px 12px;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 600;
+            cursor: pointer;
+            border: 1px solid;
+            transition: all 0.15s;
+        }
+
+        .req-btn-approve { background: #16a34a; color: white; border-color: #16a34a; }
+        .req-btn-approve:hover { background: #15803d; }
+        .req-btn-reject { background: white; color: var(--color-critical); border-color: var(--color-critical); }
+        .req-btn-reject:hover { background: #fee2e2; }
+
+        /* ─── CHARTS ─── */
+        .charts-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: var(--gap);
+            margin-bottom: var(--gap);
+        }
+
+        .chart-container {
+            background: var(--bg-card);
+            border-radius: var(--radius);
+            padding: 20px 24px;
+            box-shadow: var(--shadow);
+        }
+
+        .chart-title {
+            font-size: 13px;
+            font-weight: 700;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .chart-container canvas { max-height: 200px; }
+
+        /* ─── ALERT DETAIL MODAL ─── */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.45);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .modal-overlay.open { display: flex; }
+
+        .modal {
+            background: white;
+            border-radius: 14px;
+            width: 100%;
+            max-width: 480px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+            overflow: hidden;
+        }
+
+        .modal-header {
+            padding: 20px 24px;
+            border-bottom: 1px solid #f0f0f0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .modal-header-title { font-size: 15px; font-weight: 700; }
+        .modal-close {
+            width: 28px; height: 28px;
+            border-radius: 6px;
+            border: 1px solid #e5e7eb;
+            background: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        .modal-body { padding: 20px 24px; }
+
+        .modal-patient-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 16px;
+            background: var(--bg-primary);
+            border-radius: 10px;
+            padding: 14px;
+        }
+
+        .modal-patient-avatar {
+            width: 44px; height: 44px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            font-weight: 600;
+            color: white;
+        }
+
+        .modal-patient-name { font-size: 15px; font-weight: 700; }
+        .modal-patient-meta { font-size: 12px; color: var(--text-secondary); margin-top: 2px; }
+
+        .modal-section { margin-bottom: 16px; }
+        .modal-section-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; color: var(--text-secondary); margin-bottom: 8px; }
+
+        .modal-alert-info {
+            background: #fef3c7;
+            border: 1px solid #fcd34d;
+            border-radius: 8px;
+            padding: 12px;
+            font-size: 13px;
+        }
+
+        .modal-alert-info.critical { background: #fee2e2; border-color: #fca5a5; }
+
+        .modal-form-group { margin-bottom: 14px; }
+        .modal-form-label { font-size: 12px; font-weight: 600; color: #374151; margin-bottom: 5px; display: block; }
+        .modal-form-label .required { color: var(--color-critical); }
+
+        .modal-textarea {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1.5px solid #d1d5db;
+            border-radius: 8px;
+            font-size: 13px;
+            font-family: inherit;
+            resize: vertical;
+            min-height: 90px;
+            outline: none;
+            transition: border-color 0.15s;
+            box-sizing: border-box;
+        }
+
+        .modal-textarea:focus { border-color: var(--bg-header); }
+
+        .modal-defer-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 10px;
+        }
+
+        .modal-select {
+            padding: 7px 10px;
+            border: 1.5px solid #d1d5db;
+            border-radius: 8px;
+            font-size: 13px;
+            outline: none;
+            background: white;
+            cursor: pointer;
+        }
+
+        .modal-footer {
+            padding: 16px 24px;
+            border-top: 1px solid #f0f0f0;
+            display: flex;
+            gap: 8px;
+            justify-content: flex-end;
+        }
+
+        .btn {
+            padding: 9px 18px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+            transition: all 0.15s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn-primary { background: var(--bg-header); color: white; }
+        .btn-primary:hover { background: #2a2a4e; }
+        .btn-secondary { background: white; color: var(--text-secondary); border: 1px solid #d1d5db; }
+        .btn-secondary:hover { border-color: #9ca3af; color: var(--text-primary); }
+        .btn-danger { background: var(--color-critical); color: white; }
+        .btn-danger:hover { background: #b91c1c; }
+
+        /* ─── TOAST ─── */
+        .toast {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            background: var(--bg-header);
+            color: white;
+            padding: 12px 20px;
+            border-radius: 10px;
+            font-size: 13px;
+            font-weight: 600;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+            display: none;
+            align-items: center;
+            gap: 8px;
+            z-index: 2000;
+        }
+
+        .toast.show { display: flex; }
+
+        /* ─── RESPONSIVE ─── */
+        @media (max-width: 1100px) {
+            .two-col { grid-template-columns: 1fr; }
+            .right-sidebar { display: grid; grid-template-columns: 1fr 1fr; gap: var(--gap); }
+        }
+
+        @media (max-width: 768px) {
+            .sidebar { display: none; }
+            .main { margin-left: 0; }
+            .kpi-row { grid-template-columns: repeat(2, 1fr); }
+            .charts-row { grid-template-columns: 1fr; }
+            .right-sidebar { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- ─── SIDEBAR ─── -->
+<nav class="sidebar">
+    <div class="sidebar-logo">
+        <div class="sidebar-logo-icon">⚕</div>
+        <span class="sidebar-logo-text">Salus</span>
+    </div>
+    <div class="sidebar-nav">
+        <div class="nav-section-label">Workspace</div>
+        <div class="nav-item active" onclick="switchView('dashboard')">
+            <span class="nav-icon">◈</span> Dashboard
+            <span class="badge" id="sidebar-alert-badge">5</span>
+        </div>
+        <div class="nav-item" onclick="switchView('patients')">
+            <span class="nav-icon">◎</span> My Patients
+            <span class="badge green">10</span>
+        </div>
+        <div class="nav-item" onclick="switchView('messages')">
+            <span class="nav-icon">✉</span> Messages
+            <span class="badge" id="sidebar-msg-badge">2</span>
+        </div>
+        <div class="nav-item" onclick="switchView('schedules')">
+            <span class="nav-icon">◷</span> Schedules
+        </div>
+        <div class="nav-item" onclick="switchView('notifications')">
+            <span class="nav-icon">◉</span> Notifications
+        </div>
+        <div class="nav-section-label" style="margin-top:8px">Account</div>
+        <div class="nav-item" onclick="switchView('profile')">
+            <span class="nav-icon">◈</span> Profile
+        </div>
+    </div>
+    <div class="sidebar-profile">
+        <div class="sidebar-avatar">DR</div>
+        <div class="sidebar-profile-info">
+            <div class="sidebar-profile-name">Dr. Rachel Torres</div>
+            <div class="sidebar-profile-role">Endocrinologist</div>
+        </div>
+    </div>
+</nav>
+
+<!-- ─── MAIN ─── -->
+<div class="main">
+    <header class="topbar">
+        <div class="topbar-left">
+            <div class="topbar-title">Morning Triage</div>
+            <div class="topbar-date">Thursday, April 23, 2026</div>
+        </div>
+        <div class="topbar-right">
+            <div class="search-bar">
+                <span>⌕</span>
+                <input type="text" placeholder="Search patients, alerts..." id="global-search" oninput="globalSearch(this.value)">
+            </div>
+            <button class="icon-btn" onclick="showToast('Notifications cleared')" title="Notifications">◉<span style="position:absolute;top:4px;right:6px;width:8px;height:8px;background:#dc2626;border-radius:50%;border:2px solid white"></span></button>
+            <button class="icon-btn" onclick="showToast('Settings coming soon')" title="Settings">⚙</button>
+        </div>
+    </header>
+
+    <div class="content">
+
+        <!-- KPI ROW -->
+        <div class="kpi-row">
+            <div class="kpi-card">
+                <div class="kpi-icon blue">◎</div>
+                <div class="kpi-content">
+                    <div class="kpi-value">10</div>
+                    <div class="kpi-label">Active Patients</div>
+                    <div class="kpi-sub">All chronic disease</div>
+                </div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-icon red">⚠</div>
+                <div class="kpi-content">
+                    <div class="kpi-value">5</div>
+                    <div class="kpi-label">Active Alerts</div>
+                    <div class="kpi-sub">2 critical · 3 warning</div>
+                </div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-icon yellow">◑</div>
+                <div class="kpi-content">
+                    <div class="kpi-value">3</div>
+                    <div class="kpi-label">Pending Requests</div>
+                    <div class="kpi-sub">2 medications · 1 treatment</div>
+                </div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-icon green">◈</div>
+                <div class="kpi-content">
+                    <div class="kpi-value">82%</div>
+                    <div class="kpi-label">Avg. Adherence</div>
+                    <div class="kpi-sub">Last 30 days</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- MAIN 2-COLUMN -->
+        <div class="two-col">
+
+            <!-- LEFT: ALERT QUEUE -->
+            <div class="panel">
+                <div class="panel-header">
+                    <div class="panel-title">
+                        <span class="panel-title-icon">⚠</span>
+                        Alert Queue
+                    </div>
+                    <div class="panel-tabs">
+                        <button class="panel-tab active" onclick="filterAlerts('all', this)" data-filter="all">
+                            All <span class="count">5</span>
+                        </button>
+                        <button class="panel-tab" onclick="filterAlerts('critical', this)" data-filter="critical">
+                            Critical <span class="count">2</span>
+                        </button>
+                        <button class="panel-tab" onclick="filterAlerts('warning', this)" data-filter="warning">
+                            Warning <span class="count">3</span>
+                        </button>
+                    </div>
+                </div>
+                <div class="alert-queue" id="alert-queue">
+                    <!-- Populated by JS -->
+                </div>
+            </div>
+
+            <!-- RIGHT: PATIENT LIST + PENDING REQUESTS -->
+            <div class="right-sidebar">
+
+                <!-- Patient List -->
+                <div class="panel">
+                    <div class="patient-list-header">
+                        <div class="patient-list-search">
+                            <span>⌕</span>
+                            <input type="text" placeholder="Search patients..." id="patient-search" oninput="filterPatients(this.value)">
+                        </div>
+                    </div>
+                    <div class="patient-list-filters" id="patient-filters">
+                        <div class="filter-chip active" onclick="filterPatientsByRisk('all', this)">All</div>
+                        <div class="filter-chip" onclick="filterPatientsByRisk('High', this)">High Risk</div>
+                        <div class="filter-chip" onclick="filterPatientsByRisk('Medium', this)">Medium</div>
+                        <div class="filter-chip" onclick="filterPatientsByRisk('Low', this)">Low</div>
+                    </div>
+                    <div class="patient-list" id="patient-list">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+
+                <!-- Pending Requests -->
+                <div class="panel">
+                    <div class="panel-header">
+                        <div class="panel-title">
+                            <span class="panel-title-icon">◑</span>
+                            Pending Requests
+                        </div>
+                    </div>
+                    <div class="requests-list" id="requests-list">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- CHARTS ROW -->
+        <div class="charts-row">
+            <div class="chart-container">
+                <div class="chart-title">📊 Patient Risk Distribution</div>
+                <canvas id="risk-chart"></canvas>
+            </div>
+            <div class="chart-container">
+                <div class="chart-title">📈 Weekly Activity — Patient Interactions</div>
+                <canvas id="activity-chart"></canvas>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<!-- ─── ALERT MODAL ─── -->
+<div class="modal-overlay" id="alert-modal">
+    <div class="modal">
+        <div class="modal-header">
+            <div class="modal-header-title" id="modal-title">Alert Details</div>
+            <button class="modal-close" onclick="closeModal()">✕</button>
+        </div>
+        <div class="modal-body">
+            <div class="modal-patient-info" id="modal-patient-info">
+                <!-- Populated by JS -->
+            </div>
+            <div class="modal-section">
+                <div class="modal-section-label">Alert Details</div>
+                <div class="modal-alert-info" id="modal-alert-info"></div>
+            </div>
+            <div class="modal-section">
+                <div class="modal-section-label">Measurement Context</div>
+                <div id="modal-measurement" style="font-size:13px;color:#374151;background:#f9fafb;padding:10px 12px;border-radius:8px;border:1px solid #e5e7eb;"></div>
+            </div>
+            <div class="modal-section">
+                <div class="modal-section-label">Clinical Note <span class="required">*</span></div>
+                <textarea class="modal-textarea" id="modal-note" placeholder="Describe the action taken or clinical rationale. This note will be saved to the patient's care record."></textarea>
+            </div>
+            <div class="modal-defer-row">
+                <span style="font-size:12px;color:#6b7280;">Or defer:</span>
+                <select class="modal-select" id="modal-defer">
+                    <option value="">Don't defer</option>
+                    <option value="1h">In 1 hour</option>
+                    <option value="4h">In 4 hours</option>
+                    <option value="1d">In 1 day</option>
+                    <option value="3d">In 3 days</option>
+                    <option value="1w">In 1 week</option>
+                </select>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+            <button class="btn btn-danger" onclick="resolveAlert('defer')">Defer</button>
+            <button class="btn btn-primary" onclick="resolveAlert('resolve')">Resolve Alert</button>
+        </div>
+    </div>
+</div>
+
+<!-- ─── TOAST ─── -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ─────────────────────────────────────────────
+// SAMPLE DATA
+// ─────────────────────────────────────────────
+const PATIENTS = [
+    { id: 1, name: "Amara Okafor", initials: "AO", color: "#4C72B0", disease: "Type 2 Diabetes", risk: "High", riskClass: "high", alerts: 2, measurements: 3 },
+    { id: 2, name: "Lucas Ferreira", initials: "LF", color: "#55A868", disease: "Hypertension", risk: "Medium", riskClass: "medium", alerts: 1, measurements: 1 },
+    { id: 3, name: "Priya Sharma", initials: "PS", color: "#DD8452", disease: "Type 1 Diabetes", risk: "High", riskClass: "high", alerts: 1, measurements: 2 },
+    { id: 4, name: "James Whitfield", initials: "JW", color: "#C44E52", disease: "CHF", risk: "High", riskClass: "high", alerts: 2, measurements: 0 },
+    { id: 5, name: "Yuki Tanaka", initials: "YT", color: "#8172B3", disease: "COPD", risk: "Low", riskClass: "low", alerts: 0, measurements: 1 },
+    { id: 6, name: "Sofia Marchetti", initials: "SM", color: "#4C72B0", disease: "Asthma", risk: "Low", riskClass: "low", alerts: 0, measurements: 0 },
+    { id: 7, name: "Kwame Asante", initials: "KA", color: "#55A868", disease: "Type 2 Diabetes", risk: "Medium", riskClass: "medium", alerts: 0, measurements: 1 },
+    { id: 8, name: "Elena Volkov", initials: "EV", color: "#DD8452", disease: "Hypertension", risk: "Medium", riskClass: "medium", alerts: 0, measurements: 0 },
+    { id: 9, name: "Omar Al-Rashid", initials: "OR", color: "#8172B3", disease: "Chronic Kidney Disease", risk: "High", riskClass: "high", alerts: 0, measurements: 1 },
+    { id: 10, name: "Chidinma Eze", initials: "CE", color: "#4C72B0", disease: "Type 2 Diabetes", risk: "Low", riskClass: "low", alerts: 0, measurements: 1 },
+];
+
+const ALERTS = [
+    { id: 1, patientId: 1, severity: "critical", type: "sos_alert", title: "Emergency Alert", context: "Patient triggered SOS — immediate action required", patient: "Amara Okafor", initials: "AO", color: "#4C72B0", time: "2 min ago", acknowledged: false },
+    { id: 2, patientId: 4, severity: "critical", type: "abnormal_measurement", title: "Abnormal Reading", context: "Blood pressure 178/112 — flagged as hypertensive crisis", patient: "James Whitfield", initials: "JW", color: "#C44E52", time: "18 min ago", acknowledged: false },
+    { id: 3, patientId: 1, severity: "warning", type: "low_adherence", title: "Adherence Drop", context: "Adherence dropped to 58% — below your 80% threshold", patient: "Amara Okafor", initials: "AO", color: "#4C72B0", time: "3 hours ago", acknowledged: false },
+    { id: 4, patientId: 3, severity: "warning", type: "missed_medication", title: "Missed Medication", context: "Missed 3 doses of insulin this week", patient: "Priya Sharma", initials: "PS", color: "#DD8452", time: "5 hours ago", acknowledged: false },
+    { id: 5, patientId: 2, severity: "warning", type: "missed_medication", title: "Missed Medication", context: "Missed 4 doses of lisinopril this week", patient: "Lucas Ferreira", initials: "LF", color: "#55A868", time: "1 day ago", acknowledged: false },
+];
+
+const REQUESTS = [
+    { id: 1, patientId: 1, type: "medication", name: "Amara Okafor", item: "Metformin 500mg", reason: "Current dosage feels insufficient — experiencing frequent hyperglycemia", time: "2 hours ago" },
+    { id: 2, patientId: 4, type: "medication", name: "James Whitfield", item: "Furosemide 40mg", reason: "Swelling in ankles has increased over past 3 days", time: "5 hours ago" },
+    { id: 3, patientId: 7, type: "treatment", name: "Kwame Asante", item: "Insulin Pump Therapy", reason: "Interested in switching from multiple daily injections", time: "1 day ago" },
+];
+
+// ─────────────────────────────────────────────
+// STATE
+// ─────────────────────────────────────────────
+let currentAlertFilter = 'all';
+let currentPatientRiskFilter = 'all';
+let currentPatientSearch = '';
+let currentAlertSearch = '';
+let selectedAlert = null;
+
+const COLORS = ['#4C72B0', '#DD8452', '#55A868', '#C44E52', '#8172B3', '#937860'];
+
+// ─────────────────────────────────────────────
+// INIT
+// ─────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', () => {
+    renderAlertQueue();
+    renderPatientList();
+    renderRequests();
+    renderCharts();
+});
+
+function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+// ─────────────────────────────────────────────
+// ALERT QUEUE
+// ─────────────────────────────────────────────
+function renderAlertQueue(filter = 'all', search = '') {
+    const container = document.getElementById('alert-queue');
+    let filtered = ALERTS.filter(a => {
+        if (filter !== 'all' && a.severity !== filter) return false;
+        if (search && !a.patient.toLowerCase().includes(search.toLowerCase()) && !a.context.toLowerCase().includes(search.toLowerCase())) return false;
+        return true;
+    });
+
+    if (filtered.length === 0) {
+        container.innerHTML = `
+            <div class="alert-empty">
+                <div class="alert-empty-icon">✓</div>
+                <div class="alert-empty-title">All caught up</div>
+                <div class="alert-empty-text">No alerts matching your current view</div>
+            </div>`;
+        return;
+    }
+
+    container.innerHTML = filtered.map(alert => {
+        const badgeClass = alert.severity === 'critical' ? 'badge-critical' : alert.severity === 'warning' ? 'badge-warning' : 'badge-info';
+        return `
+        <div class="alert-item${alert.acknowledged ? ' acknowledged' : ''}" data-id="${alert.id}" onclick="openAlertModal(${alert.id})">
+            <div class="alert-severity-bar ${alert.severity}"></div>
+            <div class="alert-avatar" style="background:${alert.color}">${alert.initials}</div>
+            <div class="alert-body">
+                <div class="alert-title">
+                    ${alert.patient}
+                    <span class="badge ${badgeClass}">${alert.title}</span>
+                </div>
+                <div class="alert-context">${alert.context}</div>
+                <div class="alert-meta">
+                    <span>⏱ ${alert.time}</span>
+                    ${alert.acknowledged ? '<span style="color:#9ca3af">✓ Acknowledged</span>' : ''}
+                </div>
+            </div>
+            <div class="alert-actions" onclick="event.stopPropagation()">
+                <button class="alert-btn alert-btn-view" onclick="openAlertModal(${alert.id})">View Patient</button>
+                <button class="alert-btn alert-btn-ack" onclick="acknowledgeAlert(${alert.id})">${alert.acknowledged ? 'Acknowledged' : 'Acknowledge'}</button>
+            </div>
+        </div>`;
+    }).join('');
+}
+
+function filterAlerts(filter, btn) {
+    currentAlertFilter = filter;
+    document.querySelectorAll('.panel-tab').forEach(t => t.classList.remove('active'));
+    btn.classList.add('active');
+    renderAlertQueue(filter, currentAlertSearch);
+}
+
+function acknowledgeAlert(id) {
+    const alert = ALERTS.find(a => a.id === id);
+    if (alert) {
+        alert.acknowledged = true;
+        showToast(`Alert acknowledged — ${alert.patient}`);
+        renderAlertQueue(currentAlertFilter, currentAlertSearch);
+    }
+}
+
+// ─────────────────────────────────────────────
+// PATIENT LIST
+// ─────────────────────────────────────────────
+function renderPatientList(riskFilter = 'all', search = '') {
+    const container = document.getElementById('patient-list');
+    let filtered = PATIENTS.filter(p => {
+        if (riskFilter !== 'all' && p.risk !== riskFilter) return false;
+        if (search && !p.name.toLowerCase().includes(search.toLowerCase())) return false;
+        return true;
+    });
+
+    if (filtered.length === 0) {
+        container.innerHTML = `<div style="padding:24px;text-align:center;color:#9ca3af;font-size:13px;">No patients found</div>`;
+        return;
+    }
+
+    container.innerHTML = filtered.map(p => `
+        <div class="patient-row" onclick="showToast('Opening patient: ${p.name}')">
+            <div class="patient-row-avatar" style="background:${p.color}">${p.initials}</div>
+            <div class="patient-row-info">
+                <div class="patient-row-name">${p.name}</div>
+                <div class="patient-row-meta">${p.disease} · ${p.measurements} logged this week</div>
+            </div>
+            <span class="patient-row-badge ${p.riskClass}">${p.risk}</span>
+            <span class="patient-row-alert-count ${p.alerts === 0 ? 'none' : ''}">${p.alerts > 0 ? p.alerts : ''}</span>
+        </div>`).join('');
+}
+
+function filterPatientsByRisk(risk, chip) {
+    currentPatientRiskFilter = risk;
+    document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+    chip.classList.add('active');
+    renderPatientList(risk, currentPatientSearch);
+}
+
+function filterPatients(value) {
+    currentPatientSearch = value;
+    renderPatientList(currentPatientRiskFilter, value);
+}
+
+function globalSearch(value) {
+    currentAlertSearch = value;
+    renderAlertQueue(currentAlertFilter, value);
+    if (value.length > 1) {
+        renderPatientList('all', value);
+    } else {
+        renderPatientList(currentPatientRiskFilter, '');
+    }
+}
+
+// ─────────────────────────────────────────────
+// PENDING REQUESTS
+// ─────────────────────────────────────────────
+function renderRequests() {
+    const container = document.getElementById('requests-list');
+    if (REQUESTS.length === 0) {
+        container.innerHTML = `<div style="padding:24px;text-align:center;color:#9ca3af;font-size:13px;">No pending requests</div>`;
+        return;
+    }
+    container.innerHTML = REQUESTS.map(req => `
+        <div class="request-item">
+            <div class="request-header">
+                <div class="request-name">${req.name}</div>
+                <span class="request-type ${req.type}">${req.type}</span>
+            </div>
+            <div class="request-desc">${req.item}</div>
+            <div style="font-size:11px;color:#6b7280;margin-top:3px;">${req.reason}</div>
+            <div class="request-time">Requested ${req.time}</div>
+            <div class="request-actions">
+                <button class="req-btn req-btn-approve" onclick="approveRequest(${req.id})">Approve</button>
+                <button class="req-btn req-btn-reject" onclick="rejectRequest(${req.id})">Reject</button>
+            </div>
+        </div>`).join('');
+}
+
+function approveRequest(id) {
+    const idx = REQUESTS.findIndex(r => r.id === id);
+    if (idx !== -1) {
+        const req = REQUESTS[idx];
+        REQUESTS.splice(idx, 1);
+        showToast(`${req.item} approved for ${req.name}`);
+        renderRequests();
+        document.querySelector('.kpi-row .kpi-card:nth-child(3) .kpi-value').textContent = REQUESTS.length;
+    }
+}
+
+function rejectRequest(id) {
+    const idx = REQUESTS.findIndex(r => r.id === id);
+    if (idx !== -1) {
+        const req = REQUESTS[idx];
+        REQUESTS.splice(idx, 1);
+        showToast(`${req.item} rejected`);
+        renderRequests();
+        document.querySelector('.kpi-row .kpi-card:nth-child(3) .kpi-value').textContent = REQUESTS.length;
+    }
+}
+
+// ─────────────────────────────────────────────
+// MODAL
+// ─────────────────────────────────────────────
+function openAlertModal(id) {
+    selectedAlert = ALERTS.find(a => a.id === id);
+    if (!selectedAlert) return;
+
+    const alert = selectedAlert;
+    const patient = PATIENTS.find(p => p.id === alert.patientId) || {};
+
+    document.getElementById('modal-patient-info').innerHTML = `
+        <div class="modal-patient-avatar" style="background:${alert.color}">${alert.initials}</div>
+        <div>
+            <div class="modal-patient-name">${alert.patient}</div>
+            <div class="modal-patient-meta">${patient.disease || 'Chronic Disease'} · Risk: ${patient.risk || 'Unknown'}</div>
+        </div>`;
+
+    const alertInfoClass = alert.severity === 'critical' ? 'critical' : '';
+    document.getElementById('modal-alert-info').className = `modal-alert-info ${alertInfoClass}`;
+    document.getElementById('modal-alert-info').innerHTML = `<strong>${alert.title}</strong><br>${alert.context}`;
+
+    const measurementMap = {
+        1: "Blood glucose: 312 mg/dL (↑ above 180 target)<br>Time: Today 08:14 AM<br>Device: Dexcom G7",
+        2: "Blood pressure: 178/112 mmHg<br>Time: Today 07:45 AM<br>Device: Omron HEM-907",
+        3: "Weekly adherence: 58% (target: 80%)<br>Last 7 days: 4 missed doses<br>Medication: Metformin 1000mg",
+        4: "Insulin doses missed: 3 of 21 this week<br>Last injection: 2 days ago<br>Medication: Lantus 20 units",
+        5: "Lisinopril doses missed: 4 of 7 this week<br>Last taken: 3 days ago<br>Medication: Lisinopril 10mg"
+    };
+    document.getElementById('modal-measurement').innerHTML = measurementMap[id] || "No additional measurement data.";
+    document.getElementById('modal-note').value = '';
+
+    document.getElementById('alert-modal').classList.add('open');
+}
+
+function closeModal() {
+    document.getElementById('alert-modal').classList.remove('open');
+    selectedAlert = null;
+}
+
+function resolveAlert(action) {
+    if (!selectedAlert) return;
+    const note = document.getElementById('modal-note').value.trim();
+    const defer = document.getElementById('modal-defer').value;
+
+    if (action === 'resolve' && !note) {
+        document.getElementById('modal-note').style.borderColor = '#dc2626';
+        document.getElementById('modal-note').placeholder = 'A clinical note is required before resolving.';
+        return;
+    }
+
+    const alert = selectedAlert;
+    const idx = ALERTS.findIndex(a => a.id === alert.id);
+    if (idx !== -1) ALERTS.splice(idx, 1);
+
+    // Update KPI
+    const alertCount = document.querySelector('.kpi-row .kpi-card:nth-child(2) .kpi-value');
+    alertCount.textContent = ALERTS.length;
+
+    // Update sidebar badge
+    document.getElementById('sidebar-alert-badge').textContent = ALERTS.length;
+
+    closeModal();
+    renderAlertQueue(currentAlertFilter, currentAlertSearch);
+    showToast(action === 'resolve'
+        ? `Alert resolved — "${alert.patient}"`
+        : `Alert deferred — reminder set for ${defer}`);
+}
+
+// ─────────────────────────────────────────────
+// CHARTS
+// ─────────────────────────────────────────────
+function renderCharts() {
+    const riskCtx = document.getElementById('risk-chart').getContext('2d');
+    new Chart(riskCtx, {
+        type: 'doughnut',
+        data: {
+            labels: ['High Risk', 'Medium Risk', 'Low Risk'],
+            datasets: [{
+                data: [4, 3, 3],
+                backgroundColor: ['#dc262680', '#d9770680', '#16a34a80'],
+                borderColor: ['#dc2626', '#d97706', '#16a34a'],
+                borderWidth: 2,
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            cutout: '62%',
+            plugins: {
+                legend: { position: 'right', labels: { usePointStyle: true, padding: 16, font: { size: 12 } } },
+                tooltip: {
+                    callbacks: {
+                        label: ctx => {
+                            const total = ctx.dataset.data.reduce((a,b) => a+b, 0);
+                            const pct = ((ctx.parsed / total) * 100).toFixed(0);
+                            return `${ctx.label}: ${ctx.parsed} patients (${pct}%)`;
+                        }
+                    }
+                }
+            }
+        }
+    });
+
+    const activityCtx = document.getElementById('activity-chart').getContext('2d');
+    new Chart(activityCtx, {
+        type: 'bar',
+        data: {
+            labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+            datasets: [
+                {
+                    label: 'Alerts fired',
+                    data: [2, 1, 3, 2, 0, 1, 0],
+                    backgroundColor: '#dc262680',
+                    borderColor: '#dc2626',
+                    borderWidth: 1,
+                    borderRadius: 4,
+                },
+                {
+                    label: 'Messages sent',
+                    data: [4, 3, 5, 4, 2, 1, 1],
+                    backgroundColor: '#4C72B080',
+                    borderColor: '#4C72B0',
+                    borderWidth: 1,
+                    borderRadius: 4,
+                },
+                {
+                    label: 'Measurements logged',
+                    data: [18, 22, 15, 20, 12, 5, 3],
+                    backgroundColor: '#55A86880',
+                    borderColor: '#55A868',
+                    borderWidth: 1,
+                    borderRadius: 4,
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { position: 'top', labels: { usePointStyle: true, padding: 16, font: { size: 12 } } },
+                tooltip: { mode: 'index', intersect: false }
+            },
+            scales: {
+                x: { grid: { display: false } },
+                y: { beginAtZero: true, grid: { color: '#f0f0f0' } }
+            }
+        }
+    });
+}
+
+// ─────────────────────────────────────────────
+// NAV
+// ─────────────────────────────────────────────
+function switchView(view) {
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+    event.currentTarget.classList.add('active');
+    showToast(`Navigating to ${view}...`);
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,14 @@
+<div class="recovery-codes">
+  <header class="recovery-codes__header">
+    <h2 class="recovery-codes__title"><%= t(".title") %></h2>
+    <p class="recovery-codes__desc"><%= t(".desc") %></p>
+  </header>
+  <ul class="recovery-codes__list">
+    <% @recovery_codes.each do |code| %>
+      <li class="recovery-codes__list__code"><%= code %></li>
+    <% end %>
+  </ul>
+  <%= link_to settings_security_path, class: "dash-button dash-button--new" do %>
+    <i class="ri-arrow-left-line dash-button__icon"></i>
+  <% end %>
+</div>

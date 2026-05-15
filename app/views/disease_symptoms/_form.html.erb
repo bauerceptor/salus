@@ -1,0 +1,70 @@
+<%= form_with model: @disease_symptom, url:, html: { class: "dash-form" } do |f| %>
+  <div data-controller="toggle-input">
+    <div class="dash-form__container">
+      <div class="dash-form__group">
+        <div class="dash-form__group__container">
+          <div class="dash-form__group__left">
+            <div class="dash-form__group__title"><%= t(".predefined_symptom_id.title") %></div>
+            <p class="dash-form__group__description"><%= t(".predefined_symptom_id.description") %></p>
+          </div>
+          <div class="dash-form__group__right" >
+            <%= f.select :predefined_symptom_id, options_for_select(@predefined_symptoms, @disease_symptom.predefined_symptom_id),
+            { include_blank: true }, class: "dash-form__input dash-form__select", data: { toggle_input_target: "select" },
+            placeholder: "Select symptom" %>
+            <div class="dash-form__checkbox" >
+              <%= check_box_tag :custom_symptom, 0, @disease_symptom.name.present?, class: "dash-form__checkbox__input",
+                  data: { toggle_input_target: "checkbox", action: "input->toggle-input#toggle" }%>
+              <%= label_tag :custom_symptom, t(".predefined_symptom_id.label"), class: "dash-form__checkbox__label" %>
+            </div>
+          </div>
+        </div>
+        <%= render DashFormErrorComponent.new(model: @disease_symptom, field: :predefined_symptom_id) %>
+      </div>
+    </div>
+    <div class="dash-form__container dash-form__container--hidden" data-toggle-input-target="container">
+      <div class="dash-form__group">
+        <div class="dash-form__group__container">
+          <div class="dash-form__group__left">
+            <div class="dash-form__group__title"><%= t(".name.title") %></div>
+            <p class="dash-form__group__description"><%= t(".name.description") %></p>
+          </div>
+          <div class="dash-form__group__right">
+            <%= f.text_field :name, class: "dash-form__input", data: { toggle_input_target: "input" } %>
+          </div>
+        </div>
+        <%= render DashFormErrorComponent.new(model: @disease_symptom, field: :name) %>
+      </div>
+    </div>
+  </div>
+  <div class="dash-form__container">
+    <div class="dash-form__group">
+      <div class="dash-form__group__container">
+        <div class="dash-form__group__left">
+          <div class="dash-form__group__title"><%= t(".description.title") %></div>
+          <p class="dash-form__group__description"><%= t(".description.description") %></p>
+        </div>
+        <div class="dash-form__group__right">
+          <%= f.text_area :description, class: "dash-form__input dash-form__textarea" %>
+        </div>
+      </div>
+      <%= render DashFormErrorComponent.new(model: @disease_symptom, field: :description) %>
+    </div>
+  </div>
+  <div class="dash-form__container">
+    <div class="dash-form__group">
+      <div class="dash-form__group__container">
+        <div class="dash-form__group__left">
+          <div class="dash-form__group__title"><%= t(".first_noticed_at.title") %></div>
+          <p class="dash-form__group__description"><%= t(".first_noticed_at.description") %></p>
+        </div>
+        <div class="dash-form__group__right">
+          <%= f.date_field :first_noticed_at, class: "dash-form__input dash-form__input-date" %>
+        </div>
+      </div>
+      <%= render DashFormErrorComponent.new(model: @disease_symptom, field: :first_noticed_at) %>
+    </div>
+  </div>
+  <div class="dash-form__group">
+    <%= f.submit t("dash_form.submit"), class: "dash-form__submit dash-button dash-button--new" %>
+  </div>
+<% end %>

@@ -1,0 +1,10 @@
+// _admin_dashboard.scss
+// Admin module layout styles — mirrors specialist_dashboard layout structure.
+// Imports the shared dashboard layout styles then applies admin-specific overrides.
+// Admin module CSS lives here — page-specific styles go in pages/ directory.
+
+@import "./dashboard";
+
+.admin-dashboard-body {
+  background: var(--dash-bg, #f8f9fa);
+}

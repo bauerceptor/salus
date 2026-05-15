@@ -1,0 +1,4 @@
+version: '3.8'
+
+# Development uses SQLite - no Docker services needed for database
+# Production uses PostgreSQL 18 - configure via environment variables

@@ -1,0 +1,322 @@
+<div class="dash-home">
+  <div class="dash-home__content">
+    <header class="dash-home__header">
+      <div class="dash-home__header__left">
+        <h1 class="dash-home__header__title">
+          <i class="ri-sketching dash-home__header__title__icon"></i>
+          <%= t(".welcome", name: current_account.first_name) %>
+        </h1>
+        <p class="dash-home__header__text"><%= t(".welcome_back") %></p>
+      </div>
+      <div class="dash-home__header__right">
+        <p class="dash-home__header__date">
+          <i class="ri-calendar-todo-line"></i>
+          <span><%= l Time.now, format: "%d %B %Y" %></span>
+        </p>
+        <p class="dash-home__header__date">
+          <i class="ri-time-line"></i>
+          <span><%= l Time.now, format: "%H:%M" %></span>
+        </p>
+        <%= link_to patient_profile_report_path(format: :pdf), class: "dash-button dash-button--small", target: "_blank" do %>
+          <i class="ri-file-pdf-line"></i>
+          <%= t(".export_profile") %>
+        <% end %>
+      </div>
+    </header>
+
+    <div class="dash-home__flash mb-6">
+      <%= turbo_frame_tag "flash" do %>
+        <%= render "shared/dash_flash" %>
+      <% end %>
+    </div>
+
+    <div class="dash-home__group">
+      <div class="dash-home__group__left">
+        <div class="dash-group mb-6">
+          <header class="dash-group__header">
+            <h2 class="dash-group__title">
+              <i class="ri-article-line dash-group__title__icon"></i>
+              <%= t(".new_posts") %>
+            </h2>
+            <div class="dash-group__actions">
+              <%= link_to new_account_post_path(account_id: current_account.id, locale: I18n.locale),
+                  class: "dash-button dash-button--small dash-button--info" do %>
+                <i class="ri-add-line"></i>
+                <%= t(".button.add_post") %>
+              <% end %>
+            </div>
+          </header>
+          <div class="dash-group__content">
+            <div class="dash-home__posts">
+              <%= turbo_frame_tag "posts_#{@pagy.page}" do %>
+                <% unless @posts.to_a.any? %>
+                  <p class="dash-home__text"><%= t(".no_posts") %></p>
+                <% else %>
+                  <div class="dash-posts-container">
+                    <% @posts.each do |post| %>
+                      <%= render partial: post, locals: { disease: post.disease, disease_status: post,
+                      liked_statuses: @liked_statuses } %>
+                    <% end %>
+                  </div>
+                <% end %>
+                <% unless @pagy.page == @pagy.pages %>
+                  <%= turbo_frame_tag "posts_#{@pagy.next}", src: account_posts_path(account_id: current_account.id, page: @pagy.next),
+                  loading: "lazy" do %>
+                    <div style="text-align: center; padding: var(--space-lg);"><%= t(".fetching_posts") %></div>
+                  <% end %>
+                <% end %>
+              <% end %>
+            </div>
+          </div>
+        </div>
+
+        <div class="dash-group">
+          <header class="dash-group__header">
+            <h2 class="dash-group__title">
+              <i class="ri-nurse-line dash-group__title__icon"></i>
+              <%= t(".care_team.title") %>
+            </h2>
+            <div class="dash-group__actions">
+              <%= link_to specialists_path,
+                  class: "dash-button dash-button--small dash-button--info" do %>
+                <i class="ri-add-line"></i>
+                <%= t(".care_team.button.find") %>
+              <% end %>
+            </div>
+          </header>
+          <div class="dash-group__content">
+            <div class="dash-home__stats" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--space-md);">
+              <% if @care_team.any? %>
+                <% @care_team.first(3).each do |sp| %>
+                  <div class="dash-care-card">
+                    <div class="dash-care-card__avatar dash-care-card__avatar--primary">
+                      <i class="ri-user-line"></i>
+                    </div>
+                    <div class="dash-care-card__info">
+                      <p class="dash-care-card__name">Dr. <%= sp.specialist.account&.full_name || "Specialist" %></p>
+                      <p class="dash-care-card__role"><%= sp.specialist.specialist&.specialization || sp.specialist.specialist&.field_of_expertise || "Specialist" %></p>
+                    </div>
+                    <%= link_to patient_messages_path(specialist_id: sp.specialist.id),
+                        class: "dash-button dash-button--small dash-button--info dash-button--circle" do %>
+                      <i class="ri-message-3-line"></i>
+                    <% end %>
+                  </div>
+                <% end %>
+                <div class="dash-care-card dash-care-card--cta" style="grid-column: 1 / -1;">
+                  <div class="dash-care-card__avatar dash-care-card__avatar--primary">
+                    <i class="ri-user-add-line"></i>
+                  </div>
+                  <div class="dash-care-card__info">
+                    <p class="dash-care-card__name"><%= t(".care_team.find_more") || "Find More Specialists" %></p>
+                    <p class="dash-care-card__role"><%= t(".care_team.find_more_desc") || "Connect with specialists for personalized health guidance" %></p>
+                  </div>
+                  <%= link_to specialists_path,
+                      class: "dash-button dash-button--small dash-button--info" do %>
+                    <i class="ri-search-line"></i>
+                    <%= t(".care_team.button.find") %>
+                  <% end %>
+                </div>
+              <% else %>
+                <div class="dash-care-card dash-care-card--empty" style="grid-column: 1 / -1;">
+                  <div class="dash-care-card__avatar dash-care-card__avatar--primary">
+                    <i class="ri-user-add-line"></i>
+                  </div>
+                  <div class="dash-care-card__info">
+                    <p class="dash-care-card__name"><%= t(".care_team.empty.title") || "No Care Team Yet" %></p>
+                    <p class="dash-care-card__role"><%= t(".care_team.empty.description") || "Connect with specialists to get personalized health guidance" %></p>
+                  </div>
+                  <%= link_to specialists_path,
+                      class: "dash-button dash-button--small dash-button--info" do %>
+                    <i class="ri-search-line"></i>
+                    <%= t(".care_team.button.find") %>
+                  <% end %>
+                </div>
+              <% end %>
+
+              <% if @pending_recommendations.to_i > 0 %>
+                <div class="dash-care-card dash-care-card--warning">
+                  <div class="dash-care-card__avatar dash-care-card__avatar--warning">
+                    <i class="ri-heart-pulse-line"></i>
+                  </div>
+                  <div>
+                    <p class="dash-care-card__number"><%= @pending_recommendations %></p>
+                    <p class="dash-care-card__label"><%= t(".care_team.pending_recs") %></p>
+                  </div>
+                </div>
+              <% end %>
+
+              <% if @unread_specialist_messages.to_i > 0 %>
+                <div class="dash-care-card dash-care-card--info">
+                  <div class="dash-care-card__avatar dash-care-card__avatar--info">
+                    <i class="ri-message-3-line"></i>
+                  </div>
+                  <div>
+                    <p class="dash-care-card__number"><%= @unread_specialist_messages %></p>
+                    <p class="dash-care-card__label"><%= t(".care_team.unread_messages") %></p>
+                  </div>
+                </div>
+              <% end %>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="dash-home__group__right">
+        <div class="dash-care-request mb-6">
+          <div class="dash-care-request__header">
+            <i class="ri-user-star-line"></i>
+            <h2>Become a Specialist</h2>
+          </div>
+          <div class="dash-care-request__content">
+            <p>Are you a medical professional? Join our network of specialists and help patients.</p>
+            <%= link_to new_specialist_request_path,
+                class: "dash-button dash-button--block dash-button--primary" do %>
+              <i class="ri-medical-pass-line"></i>
+              Request to Become a Specialist
+            <% end %>
+          </div>
+        </div>
+
+        <div class="dash-export-panel mb-6">
+          <div class="dash-export-panel__header">
+            <h2 class="dash-export-panel__title">
+              <i class="ri-file-pdf-line"></i>
+              PDF Export
+            </h2>
+          </div>
+          <div class="dash-export-panel__content">
+            <%= link_to fhir_export_bundle_path,
+                class: "dash-button dash-button--block mb-3", target: "_blank" do %>
+              <i class="ri-file-download-line"></i>
+              Export Full Health Report (PDF)
+            <% end %>
+            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--space-sm); margin-bottom: var(--space-md);">
+              <%= link_to fhir_export_measurements_path,
+                  class: "dash-button dash-button--small dash-button--info dash-button--block", target: "_blank" do %>
+                <i class="ri-heart-pulse-line"></i>
+                Measurements
+              <% end %>
+              <%= link_to fhir_export_diseases_path,
+                  class: "dash-button dash-button--small dash-button--info dash-button--block", target: "_blank" do %>
+                <i class="ri-stethoscope-line"></i>
+                Diseases
+              <% end %>
+              <%= link_to fhir_export_medications_path,
+                  class: "dash-button dash-button--small dash-button--info dash-button--block", target: "_blank" do %>
+                <i class="ri-pill-line"></i>
+                Medications
+              <% end %>
+              <%= link_to fhir_export_treatments_path,
+                  class: "dash-button dash-button--small dash-button--info dash-button--block", target: "_blank" do %>
+                <i class="ri-hospital-line"></i>
+                Treatments
+              <% end %>
+            </div>
+            <%= link_to fhir_import_new_path,
+                class: "dash-button dash-button--small dash-button--line dash-button--block" do %>
+              <i class="ri-upload-cloud-line"></i>
+              Import FHIR Data
+            <% end %>
+          </div>
+        </div>
+
+        <% if @chart_data.present? && @chart_data.values.any? { |d| d[:labels].any? } %>
+          <div class="dash-chart-panel mb-6">
+            <div class="dash-chart-panel__header">
+              <h2 class="dash-chart-panel__title">
+                <i class="ri-line-chart"></i>
+                <%= t(".measurement_trends") || "Measurement Trends" %>
+              </h2>
+            </div>
+            <div class="dash-chart-panel__content">
+              <div class="dash-chart-panel__period-selector">
+                <a href="?period=7" class="dash-chart-panel__period-selector__link <%= params[:period] == '7' ? '' : 'active' %>">7 days</a>
+                <a href="?period=30" class="dash-chart-panel__period-selector__link <%= params[:period] == '30' || !params[:period] ? 'active' : '' %>">30 days</a>
+                <a href="?period=90" class="dash-chart-panel__period-selector__link <%= params[:period] == '90' ? 'active' : '' %>">90 days</a>
+              </div>
+              <div style="display: flex; flex-direction: column; gap: var(--space-lg);">
+                <% @chart_data.each do |type_name, data| %>
+                  <% next if data[:labels].empty? %>
+                  <div>
+                    <h3 class="dash-chart-panel__type-label"><%= type_name.humanize.gsub('_', ' ') %></h3>
+                    <div class="measurement-chart-container">
+                      <canvas id="chart-<%= type_name %>"
+                              data-labels="<%= data[:labels].to_json %>"
+                              data-values="<%= data[:values].to_json %>"
+                              data-unit="<%= data[:unit] %>">
+                      </canvas>
+                    </div>
+                  </div>
+                <% end %>
+              </div>
+            </div>
+          </div>
+        <% else %>
+          <div class="dash-chart-panel mb-6">
+            <div class="dash-chart-panel__header">
+              <h2 class="dash-chart-panel__title">
+                <i class="ri-line-chart"></i>
+                <%= t(".measurement_trends") || "Measurement Trends" %>
+              </h2>
+            </div>
+            <div class="dash-chart-panel__content">
+              <div class="dash-chart-panel__empty">
+                <i class="ri-heart-pulse-line"></i>
+                <p>No measurement data in the selected period.</p>
+                <p class="dash-chart-panel__empty__hint">Start logging your measurements to see trends here.</p>
+              </div>
+            </div>
+          </div>
+        <% end %>
+
+        <div class="dash-stats-panel">
+          <div class="dash-stats-panel__header">
+            <h2 class="dash-stats-panel__title">
+              <i class="ri-bar-chart-line"></i>
+              <%= t(".stats") %>
+            </h2>
+          </div>
+          <div class="dash-stats-panel__content">
+            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--space-md);">
+              <div class="dash-stat-card dash-stat-card--diseases">
+                <div class="dash-stat-card__icon"><i class="ri-stethoscope-line"></i></div>
+                <p class="dash-stat-card__value"><%= current_account.diseases.size %></p>
+                <p class="dash-stat-card__label"><%= t(".diseases") %></p>
+              </div>
+              <div class="dash-stat-card dash-stat-card--groups">
+                <div class="dash-stat-card__icon"><i class="ri-group-line"></i></div>
+                <p class="dash-stat-card__value"><%= current_account.groups.size %></p>
+                <p class="dash-stat-card__label"><%= t(".groups") %></p>
+              </div>
+              <div class="dash-stat-card dash-stat-card--treatments">
+                <div class="dash-stat-card__icon"><i class="ri-hospital-line"></i></div>
+                <p class="dash-stat-card__value"><%= current_account.treatments.size %></p>
+                <p class="dash-stat-card__label"><%= t(".treatments") %></p>
+              </div>
+              <div class="dash-stat-card dash-stat-card--measurements">
+                <div class="dash-stat-card__icon"><i class="ri-heart-pulse-line"></i></div>
+                <p class="dash-stat-card__value"><%= current_account.measurements.size %></p>
+                <p class="dash-stat-card__label"><%= t(".measurements") %></p>
+              </div>
+              <div class="dash-stat-card dash-stat-card--notes">
+                <div class="dash-stat-card__icon"><i class="ri-sticky-note-line"></i></div>
+                <p class="dash-stat-card__value"><%= current_account.notes.size %></p>
+                <p class="dash-stat-card__label"><%= t(".notes") %></p>
+              </div>
+              <div class="dash-stat-card dash-stat-card--medications">
+                <div class="dash-stat-card__icon"><i class="ri-pill-line"></i></div>
+                <p class="dash-stat-card__value"><%= current_account.medications.active.size %></p>
+                <p class="dash-stat-card__label"><%= t(".medications") %></p>
+              </div>
+              <div class="dash-stat-card dash-stat-card--risk" style="grid-column: 1 / -1;">
+                <div class="dash-stat-card__icon dash-stat-card__icon--danger"><i class="ri-error-warning-line"></i></div>
+                <p class="dash-stat-card__value dash-stat-card__value--danger"><%= current_account.risk_level %></p>
+                <p class="dash-stat-card__label"><%= t(".risk_level") %></p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

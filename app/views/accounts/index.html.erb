@@ -1,0 +1,93 @@
+<div class="page-accounts">
+  <header class="dash-header">
+    <div class="dash-header__left">
+      <h1 class="dash-header__title">
+        <i class="ri-group-2-line dash-header__title__icon"></i>
+        <%= t(".title") %>
+      </h1>
+      <%= render "shared/breadcrumbs" %>
+    </div>
+    <div class="dash-header__right">
+      <%= form_with url: accounts_path, method: :get, class: "accounts-search", local: true do %>
+        <div class="accounts-search__input-wrapper">
+          <i class="ri-search-line accounts-search__icon"></i>
+          <%= text_field_tag :search, params[:search], class: "accounts-search__input", placeholder: "Search people..." %>
+          <% if params[:search].present? %>
+            <%= link_to accounts_path, class: "accounts-search__clear" do %>
+              <i class="ri-close-line"></i>
+            <% end %>
+          <% end %>
+        </div>
+      <% end %>
+      <%= link_to measurements_path, class: "dash-button dash-button--back" do %>
+        <i class="ri-arrow-left-line dash-button__icon"></i>
+      <% end %>
+    </div>
+  </header>
+  <div class="dash-flash-messages">
+    <%= turbo_frame_tag "flash" do %>
+      <%= render "shared/dash_flash" %>
+    <% end %>
+  </div>
+  <div class="page-accounts__content">
+    <div class="accounts-list">
+      <% @accounts.each do |account| %>
+        <div class="account <%= "account--specialist" if role_specialist? account.user %>">
+          <%= link_to account_path(id: account.id, locale: I18n.locale), class: "account__info" do %>
+            <%= render "shared/avatar", account: account, css_class: "account__avatar", alt: account.full_name %>
+            <h3 class="account__name">
+              <%= account.full_name %>
+              <% if role_specialist? account.user %>
+                <span class="mark-specialist">
+                  <i class="ri-check-line"></i>
+                </span>
+              <% end %>
+            </h3>
+            <p class="account__username">@<%= account.username %></p>
+          <% end %>
+          <div class="account__actions">
+            <% if current_account?(account) %>
+              <%= link_to account_path(id: account.id, locale: I18n.locale), class: "account__button account__button--you" do %>
+                <i class="ri-user-line"></i>
+                <%= t(".your_profile") %>
+              <% end %>
+            <% elsif friend?(@friends, account) %>
+              <%= link_to account_path(id: account.id, locale: I18n.locale), class: "account__button account__button--friend" do %>
+                <i class="ri-user-shared-line"></i>
+                <%= t(".friend") %>
+              <% end %>
+              <%= link_to account_path(id: account.id, locale: I18n.locale), class: "account__button account__button--msg" do %>
+                <i class="ri-chat-4-line"></i>
+                <%= t(".message") %>
+              <% end %>
+            <% elsif friend?(@received_friend_requests, account) %>
+              <%= link_to account_path(id: account.id, locale: I18n.locale), class: "account__button account__button--accept" do %>
+                <i class="ri-mail-send-line"></i>
+                <%= t(".accept_request") %>
+              <% end %>
+            <% elsif friend?(@sent_friend_requests, account) %>
+              <div class="account__button account__button account__button--send">
+                <i class="ri-mail-send-line"></i>
+                <%= t(".request_sent") %>
+              </div>
+            <% else %>
+              <%= button_to friend_requests_path(account_id: account), method: :post,
+                    class: "account__button account__button--add", form_class: "w-full" do %>
+                <i class="ri-user-add-line"></i>
+                <%= t(".add_friend") %>
+              <% end %>
+            <% end %>
+          </div>
+        </div>
+      <% end %>
+    </div>
+  </div>
+  <div class="dash-pagination">
+    <div class="dash-pagination__controls">
+      <%== pagy_nav(@pagy) if @pagy.pages > 1 %>
+    </div>
+    <div class="dash-pagination__info">
+      <%== pagy_info(@pagy) %>
+    </div>
+  </div>
+</div>

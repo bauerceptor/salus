@@ -1,0 +1,284 @@
+<div class="page-notifications">
+  <header class="dash-header">
+    <div class="dash-header__left">
+      <h1 class="dash-header__title">
+        <i class="ri-notification-3-line dash-header__title__icon"></i>
+        <%= t(".title") %>
+      </h1>
+      <%= render "shared/breadcrumbs" %>
+    </div>
+    <div class="dash-header__right">
+      <span class="badge badge--red"><%= @total_unacknowledged %> <%= t(".pending") %></span>
+    </div>
+  </header>
+
+  <div class="dash-flash-messages">
+    <%= turbo_frame_tag "flash" do %>
+      <%= render "shared/dash_flash" %>
+    <% end %>
+  </div>
+
+  <% if @total_unacknowledged == 0 %>
+    <div class="dash-empty-state">
+      <i class="ri-checkbox-circle-line dash-empty-state__icon"></i>
+      <p class="dash-empty-state__text"><%= t(".all_caught_up") %></p>
+    </div>
+  <% else %>
+    <div class="page-notifications__content">
+      <% if @critical.any? %>
+        <div class="notifications-section">
+          <h2 class="notifications-section__title notifications-section__title--critical">
+            <i class="ri-error-warning-line"></i>
+            <%= t(".critical") %>
+            <span class="badge badge--red"><%= @critical.size %></span>
+          </h2>
+          <div class="notifications-list">
+            <% @critical.each do |alert| %>
+              <div class="notification notification--<%= alert.notification_color %>" data-controller="alert-ack">
+                <div class="notification__icon notification__icon--<%= alert.notification_color %>">
+                  <i class="<%= alert.notification_icon %>"></i>
+                </div>
+                <div class="notification__body">
+                  <div class="notification__content">
+                    <div class="notification__header">
+                      <span class="notification__title"><%= alert.title %></span>
+                    </div>
+                    <p class="notification__text"><%= alert.message %></p>
+                    <div class="notification__meta">
+                      <span class="notification__patient">
+                        <i class="ri-user-line"></i>
+                        <%= alert.patient.full_name %>
+                      </span>
+                      <span class="notification__time">
+                        <i class="ri-time-line"></i>
+                        <%= time_ago_in_words(alert.created_at) %> ago
+                      </span>
+                    </div>
+                  </div>
+                  <div class="notification__actions">
+                    <%= link_to specialist_patient_path(id: alert.patient.id, locale: I18n.locale),
+                        class: "notification__action notification__action--view" do %>
+                      <i class="ri-eye-line"></i>
+                      <span><%= t(".view_patient") %></span>
+                    <% end %>
+                    <button class="notification__action notification__action--resolve"
+                            data-action="alert-ack#openResolveModal"
+                            data-alert-id="<%= alert.id %>">
+                      <i class="ri-check-line"></i>
+                      <span><%= t(".resolve") %></span>
+                    </button>
+                  </div>
+                </div>
+
+                <div id="resolve_alert_<%= alert.id %>" class="resolve-modal" data-alert-ack-target="resolveModal">
+                  <div class="resolve-modal__backdrop"></div>
+                  <div class="resolve-modal__content">
+                    <div class="modal-box">
+                      <h3 class="font-bold text-lg"><%= t(".resolve_alert") %></h3>
+                      <%= form_with url: specialist_notification_acknowledgment_path(notification_id: alert.id) do |f| %>
+                        <div class="form-group">
+                          <%= f.label :note, t(".clinical_note"), class: "form-label" %>
+                          <%= f.text_area :note, required: true, rows: 4,
+                                          placeholder: t(".note_placeholder"),
+                                          class: "form-textarea" %>
+                        </div>
+                        <div class="form-group">
+                          <%= f.label :defer_until, t(".remind_me"), class: "form-label" %>
+                          <%= f.select :defer_until, [
+                            [t(".dont_defer"), ""],
+                            [t(".in_1_hour"), 1.hour.from_now],
+                            [t(".in_4_hours"), 4.hours.from_now],
+                            [t(".in_1_day"), 1.day.from_now],
+                            [t(".in_3_days"), 3.days.from_now],
+                            [t(".in_1_week"), 1.week.from_now]
+                          ], {}, class: "form-select" %>
+                        </div>
+                        <div class="modal-action">
+                          <%= f.submit t(".resolve"), class: "btn btn-primary" %>
+                          <%= button_tag type: "button", class: "btn",
+                                         data: { action: "alert-ack#closeResolveModal" } do %>
+                            <%= t(".cancel") %>
+                          <% end %>
+                        </div>
+                      <% end %>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            <% end %>
+          </div>
+        </div>
+      <% end %>
+
+      <% if @warning.any? %>
+        <div class="notifications-section">
+          <h2 class="notifications-section__title notifications-section__title--warning">
+            <i class="ri-error-warning-line"></i>
+            <%= t(".warning") %>
+            <span class="badge badge--yellow"><%= @warning.size %></span>
+          </h2>
+          <div class="notifications-list">
+            <% @warning.each do |alert| %>
+              <div class="notification notification--<%= alert.notification_color %>" data-controller="alert-ack">
+                <div class="notification__icon notification__icon--<%= alert.notification_color %>">
+                  <i class="<%= alert.notification_icon %>"></i>
+                </div>
+                <div class="notification__body">
+                  <div class="notification__content">
+                    <div class="notification__header">
+                      <span class="notification__title"><%= alert.title %></span>
+                    </div>
+                    <p class="notification__text"><%= alert.message %></p>
+                    <div class="notification__meta">
+                      <span class="notification__patient">
+                        <i class="ri-user-line"></i>
+                        <%= alert.patient.full_name %>
+                      </span>
+                      <span class="notification__time">
+                        <i class="ri-time-line"></i>
+                        <%= time_ago_in_words(alert.created_at) %> ago
+                      </span>
+                    </div>
+                  </div>
+                  <div class="notification__actions">
+                    <%= link_to specialist_patient_path(id: alert.patient.id, locale: I18n.locale),
+                        class: "notification__action notification__action--view" do %>
+                      <i class="ri-eye-line"></i>
+                      <span><%= t(".view_patient") %></span>
+                    <% end %>
+                    <button class="notification__action notification__action--resolve"
+                            data-action="alert-ack#openResolveModal"
+                            data-alert-id="<%= alert.id %>">
+                      <i class="ri-check-line"></i>
+                      <span><%= t(".resolve") %></span>
+                    </button>
+                  </div>
+                </div>
+
+                <div id="resolve_alert_<%= alert.id %>" class="resolve-modal" data-alert-ack-target="resolveModal">
+                  <div class="resolve-modal__backdrop"></div>
+                  <div class="resolve-modal__content">
+                    <div class="modal-box">
+                      <h3 class="font-bold text-lg"><%= t(".resolve_alert") %></h3>
+                      <%= form_with url: specialist_notification_acknowledgment_path(notification_id: alert.id) do |f| %>
+                        <div class="form-group">
+                          <%= f.label :note, t(".clinical_note"), class: "form-label" %>
+                          <%= f.text_area :note, required: true, rows: 4,
+                                          placeholder: t(".note_placeholder"),
+                                          class: "form-textarea" %>
+                        </div>
+                        <div class="form-group">
+                          <%= f.label :defer_until, t(".remind_me"), class: "form-label" %>
+                          <%= f.select :defer_until, [
+                            [t(".dont_defer"), ""],
+                            [t(".in_1_hour"), 1.hour.from_now],
+                            [t(".in_4_hours"), 4.hours.from_now],
+                            [t(".in_1_day"), 1.day.from_now],
+                            [t(".in_3_days"), 3.days.from_now],
+                            [t(".in_1_week"), 1.week.from_now]
+                          ], {}, class: "form-select" %>
+                        </div>
+                        <div class="modal-action">
+                          <%= f.submit t(".resolve"), class: "btn btn-primary" %>
+                          <%= button_tag type: "button", class: "btn",
+                                         data: { action: "alert-ack#closeResolveModal" } do %>
+                            <%= t(".cancel") %>
+                          <% end %>
+                        </div>
+                      <% end %>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            <% end %>
+          </div>
+        </div>
+      <% end %>
+
+      <% if @info.any? %>
+        <div class="notifications-section">
+          <h2 class="notifications-section__title notifications-section__title--info">
+            <i class="ri-information-line"></i>
+            <%= t(".info") %>
+            <span class="badge badge--blue"><%= @info.size %></span>
+          </h2>
+          <div class="notifications-list">
+            <% @info.each do |alert| %>
+              <div class="notification notification--<%= alert.notification_color %>" data-controller="alert-ack">
+                <div class="notification__icon notification__icon--<%= alert.notification_color %>">
+                  <i class="<%= alert.notification_icon %>"></i>
+                </div>
+                <div class="notification__body">
+                  <div class="notification__content">
+                    <div class="notification__header">
+                      <span class="notification__title"><%= alert.title %></span>
+                    </div>
+                    <p class="notification__text"><%= alert.message %></p>
+                    <div class="notification__meta">
+                      <span class="notification__patient">
+                        <i class="ri-user-line"></i>
+                        <%= alert.patient.full_name %>
+                      </span>
+                      <span class="notification__time">
+                        <i class="ri-time-line"></i>
+                        <%= time_ago_in_words(alert.created_at) %> ago
+                      </span>
+                    </div>
+                  </div>
+                  <div class="notification__actions">
+                    <%= link_to specialist_patient_path(id: alert.patient.id, locale: I18n.locale),
+                        class: "notification__action notification__action--view" do %>
+                      <i class="ri-eye-line"></i>
+                      <span><%= t(".view_patient") %></span>
+                    <% end %>
+                    <button class="notification__action notification__action--resolve"
+                            data-action="alert-ack#openResolveModal"
+                            data-alert-id="<%= alert.id %>">
+                      <i class="ri-check-line"></i>
+                      <span><%= t(".resolve") %></span>
+                    </button>
+                  </div>
+                </div>
+
+                <div id="resolve_alert_<%= alert.id %>" class="resolve-modal" data-alert-ack-target="resolveModal">
+                  <div class="resolve-modal__backdrop"></div>
+                  <div class="resolve-modal__content">
+                    <div class="modal-box">
+                      <h3 class="font-bold text-lg"><%= t(".resolve_alert") %></h3>
+                      <%= form_with url: specialist_notification_acknowledgment_path(notification_id: alert.id) do |f| %>
+                        <div class="form-group">
+                          <%= f.label :note, t(".clinical_note"), class: "form-label" %>
+                          <%= f.text_area :note, required: true, rows: 4,
+                                          placeholder: t(".note_placeholder"),
+                                          class: "form-textarea" %>
+                        </div>
+                        <div class="form-group">
+                          <%= f.label :defer_until, t(".remind_me"), class: "form-label" %>
+                          <%= f.select :defer_until, [
+                            [t(".dont_defer"), ""],
+                            [t(".in_1_hour"), 1.hour.from_now],
+                            [t(".in_4_hours"), 4.hours.from_now],
+                            [t(".in_1_day"), 1.day.from_now],
+                            [t(".in_3_days"), 3.days.from_now],
+                            [t(".in_1_week"), 1.week.from_now]
+                          ], {}, class: "form-select" %>
+                        </div>
+                        <div class="modal-action">
+                          <%= f.submit t(".resolve"), class: "btn btn-primary" %>
+                          <%= button_tag type: "button", class: "btn",
+                                         data: { action: "alert-ack#closeResolveModal" } do %>
+                            <%= t(".cancel") %>
+                          <% end %>
+                        </div>
+                      <% end %>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            <% end %>
+          </div>
+        </div>
+      <% end %>
+    </div>
+  <% end %>
+</div>

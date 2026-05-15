@@ -1,0 +1,172 @@
+<div class="salus-ai">
+  <!-- Sidebar with Conversations -->
+  <aside class="salus-ai__sidebar">
+    <div class="salus-ai__sidebar-header">
+      <h1 class="salus-ai__sidebar-title">
+        <i class="ri-ai-generate"></i>
+        AI Health
+      </h1>
+      <button class="salus-ai__sidebar-new-btn" id="newChatBtn" title="New conversation">
+        <i class="ri-add-line"></i>
+      </button>
+    </div>
+
+    <div class="salus-ai__sidebar-list" id="conversationList">
+      <% if @conversations.any? %>
+        <% @conversations.each do |conversation| %>
+          <div class="salus-ai__chat-item <%= @current_conversation&.id == conversation.id ? 'salus-ai__chat-item--active' : '' %>"
+               data-conversation-id="<%= conversation.id %>">
+            <div class="salus-ai__chat-item-icon">
+              <i class="ri-message-3-line"></i>
+            </div>
+            <div class="salus-ai__chat-item-content">
+              <span class="salus-ai__chat-item-name"><%= conversation.title %></span>
+              <span class="salus-ai__chat-item-preview"><%= conversation.last_message_preview %></span>
+            </div>
+          </div>
+        <% end %>
+      <% else %>
+        <div class="salus-ai__sidebar-empty">
+          <i class="ri-message-3-line"></i>
+          <p>No conversations yet</p>
+        </div>
+      <% end %>
+    </div>
+  </aside>
+
+  <!-- Main Chat Area -->
+  <main class="salus-ai__main">
+    <% if @current_conversation %>
+      <!-- Header -->
+      <header class="salus-ai__header">
+        <div class="salus-ai__header-avatar">
+          <i class="ri-ai-generate"></i>
+        </div>
+        <div class="salus-ai__header-info">
+          <h1 class="salus-ai__header-name">Health Assistant</h1>
+          <span class="salus-ai__header-status">Online</span>
+        </div>
+      </header>
+
+      <!-- Messages -->
+      <div class="salus-ai__messages" id="aiMessages">
+        <div class="salus-ai__messages-scroll" id="messagesContainer">
+          <% if @messages.any? %>
+            <% @messages.each do |message| %>
+              <% is_assistant = message.role == "assistant" %>
+              <div class="salus-ai__bubble salus-ai__bubble--<%= is_assistant ? 'received' : 'sent' %>">
+                <div class="salus-ai__bubble-content">
+                  <p class="salus-ai__bubble-text"><%= simple_format(message.content) %></p>
+                  <% if message.attachments.any? %>
+                    <div class="salus-ai__bubble-attachments">
+                      <% message.attachments.each do |att| %>
+                        <% case att["type"] %>
+                        <% when "image" %>
+                          <img src="<%= att[:data] %>" class="salus-ai__bubble-image" alt="Uploaded image">
+                        <% when "pdf" %>
+                          <div class="salus-ai__bubble-file">
+                            <i class="ri-file-pdf-line"></i>
+                            <span><%= att[:name] %></span>
+                          </div>
+                        <% when "voice" %>
+                          <div class="salus-ai__bubble-voice">
+                            <audio controls><source src="<%= att[:data] %>" type="audio/webm"></audio></div>
+                        <% end %>
+                      <% end %>
+                    </div>
+                  <% end %>
+                  <% if is_assistant %>
+                    <button class="salus-ai__speak-btn" data-text="<%= j message.content %>" title="Listen to message">
+                      <i class="ri-volume-up-line"></i>
+                    </button>
+                  <% end %>
+                </div>
+                <span class="salus-ai__bubble-time"><%= message.created_at.strftime("%H:%M") %></span>
+              </div>
+            <% end %>
+          <% else %>
+            <div class="salus-ai__empty-state">
+              <div class="salus-ai__placeholder-icon">
+                <i class="ri-ai-generate"></i>
+              </div>
+              <h2>Start a conversation</h2>
+              <p>Ask about your health, medications, or any concerns you have</p>
+            </div>
+          <% end %>
+        </div>
+      </div>
+
+      <!-- Input -->
+      <div class="salus-ai__input-area">
+        <div class="salus-ai__input-wrapper">
+          <div class="salus-ai__input-tools">
+            <button type="button" class="salus-ai__input-tool" id="attachImageBtn" title="Attach photo">
+              <i class="ri-image-line"></i>
+            </button>
+            <button type="button" class="salus-ai__input-tool" id="attachPdfBtn" title="Attach document">
+              <i class="ri-file-line"></i>
+            </button>
+            <button type="button" class="salus-ai__input-tool" id="voiceBtn" title="Record voice message">
+              <i class="ri-mic-line"></i>
+            </button>
+          </div>
+
+          <div class="salus-ai__input-field">
+            <div class="salus-ai__input-preview" id="attachmentPreview"></div>
+            <textarea
+              name="content"
+              id="aiMessageInput"
+              class="salus-ai__input"
+              rows="1"
+              placeholder="Type your message..."
+            ></textarea>
+          </div>
+
+          <button type="button" class="salus-ai__send-btn" id="sendBtn" title="Send message">
+            <i class="ri-send-plane-fill"></i>
+          </button>
+
+          <button type="button" class="salus-ai__send-btn" id="voiceSendBtn" style="display: none;" title="Send voice message">
+            <i class="ri-send-plane-fill"></i>
+          </button>
+        </div>
+
+        <div class="salus-ai__voice-recording" id="voiceRecording">
+          <div class="salus-ai__voice-indicator"></div>
+          <span class="salus-ai__voice-time" id="voiceRecordingTime">0:00</span>
+          <button type="button" class="salus-ai__voice-cancel" id="cancelVoiceRecording" title="Cancel recording">
+            <i class="ri-close-line"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- Hidden form for submission -->
+      <%= form_with url: ai_agent_messages_path, method: :post, id: "aiMessageForm", data: { turbo: false } do |f| %>
+        <input type="hidden" name="conversation_id" id="conversationId" value="<%= @current_conversation.id %>">
+        <input type="hidden" name="image_data" id="imageData">
+        <input type="hidden" name="pdf_data" id="pdfData">
+        <input type="hidden" name="pdf_name" id="pdfName">
+        <input type="hidden" name="voice_data" id="voiceData">
+        <input type="hidden" name="voice_format" id="voiceFormat">
+      <% end %>
+
+      <!-- Hidden file inputs -->
+      <input type="file" id="imageInput" accept="image/*" style="display: none;">
+      <input type="file" id="pdfInput" accept=".pdf" style="display: none;">
+
+    <% else %>
+      <!-- Empty State / Placeholder -->
+      <div class="salus-ai__placeholder">
+        <div class="salus-ai__placeholder-icon">
+          <i class="ri-ai-generate"></i>
+        </div>
+        <h2>AI Health Assistant</h2>
+        <p>Your personal health companion. Ask about medications, symptoms, or any health concerns.</p>
+        <button class="salus-ai__placeholder-btn" id="startNewChat">
+          <i class="ri-add-line"></i>
+          Start Conversation
+        </button>
+      </div>
+    <% end %>
+  </main>
+</div>

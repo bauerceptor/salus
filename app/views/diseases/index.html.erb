@@ -1,0 +1,64 @@
+<div class="page-header">
+  <div class="page-header__left">
+    <h1 class="page-header__title">
+      <i class="ri-stethoscope-line"></i>
+      <span><%= t(".title") %></span>
+    </h1>
+    <%= render "shared/breadcrumbs" %>
+  </div>
+  <div class="page-header__right">
+    <%= link_to new_disease_path, class: "dash-button dash-button--new" do %>
+      <i class="ri-add-line"></i>
+      <%= t(".button.new") %>
+    <% end %>
+  </div>
+</div>
+
+<%= turbo_frame_tag "flash" do %>
+  <%= render "shared/dash_flash" %>
+<% end %>
+
+<%= turbo_frame_tag :diseases do %>
+  <% if @diseases.to_a.any? %>
+    <div class="disease-grid">
+      <% @diseases.each do |disease| %>
+        <%= link_to disease_path(id: disease.id, locale: I18n.locale),
+            class: "disease-card", target: "_top" do %>
+          <div class="disease-card__header">
+            <h3 class="disease-card__name">
+              <%= disease.predefined_disease.name %>
+              <% if disease.diagnosed_by_hp? %>
+                <span class="disease-card__verified">
+                  <i class="ri-check-line"></i>
+                </span>
+              <% end %>
+            </h3>
+            <span class="badge badge--<%= disease.severity == 1 ? 'success' : disease.severity == 2 ? 'warning' : 'danger' %>">
+              <%= severity_to_string(disease.severity) %>
+            </span>
+          </div>
+          <div class="disease-card__footer">
+            <span class="disease-card__link">
+              <%= t(".disease.more") %>
+              <i class="ri-arrow-right-line"></i>
+            </span>
+          </div>
+        <% end %>
+      <% end %>
+    </div>
+  <% else %>
+    <div class="empty-state">
+      <i class="ri-information-line empty-state__icon"></i>
+      <p class="empty-state__text"><%= t(".no_results") %></p>
+    </div>
+  <% end %>
+
+  <div class="pagination-container">
+    <div class="dash-pagination__info">
+      <%== pagy_info(@pagy) if @pagy.pages > 1 %>
+    </div>
+    <div class="dash-pagination__nav">
+      <%== pagy_nav(@pagy, link_extra: 'data-turbo-action="advance"') if @pagy.pages > 1 %>
+    </div>
+  </div>
+<% end %>

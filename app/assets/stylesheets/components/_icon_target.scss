@@ -1,0 +1,28 @@
+.icon-target {
+  width: 100%;
+  max-width: 15em;
+  margin: 0 auto;
+
+  svg {
+    overflow: visible;
+    width: 100%;
+    height: 100%;
+  }
+
+  &:hover {
+    #arrow {
+      transform-origin: center center;
+      animation: arrow-fire 0.6s ease-in 0s;
+    }
+  }
+}
+
+@keyframes arrow-fire {
+  0% { transform: translate(60px, -60px); opacity: 0; }
+  10% { opacity: 1; }
+  70% { transform: translate(0, 0); }
+  75% { transform: rotate(-8deg); }
+  85% { transform: rotate(7deg); }
+  93% { transform: rotate(-4deg); }
+  100% { transform: rotate(0deg); }
+}

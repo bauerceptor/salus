@@ -1,0 +1,89 @@
+<div class="salus-page-container">
+  <header class="salus-page-header">
+    <div class="salus-page-header__left">
+      <h1 class="salus-page-header__title">
+        <i class="ri-calendar-line salus-page-header__icon"></i>
+        <%= t(".title", date: l(@selected_datetime, format: ' %d %B %Y')) %>
+      </h1>
+      <%= render "shared/breadcrumbs" %>
+    </div>
+    <div class="salus-page-header__actions">
+      <%= button_to generate_for_day_measurement_raports_path(day: params[:day]), method: :post,
+          class: "salus-btn salus-btn--secondary" do %>
+        <i class="ri-file-chart-line salus-btn__icon"></i>
+        <%= t(".button.generate_raport") %>
+      <% end %>
+      <%= link_to measurements_path, class: "salus-btn salus-btn--secondary" do %>
+        <i class="ri-arrow-left-line salus-btn__icon"></i>
+      <% end %>
+    </div>
+  </header>
+
+  <%= turbo_frame_tag "flash" do %>
+    <%= render "shared/dash_flash" %>
+  <% end %>
+
+  <section class="salus-card">
+    <div class="salus-card__header">
+      <h2 class="salus-card__title">
+        <i class="ri-heart-pulse-line" style="color: var(--color-primary)"></i>
+        <%= t(".measurement.title") %>
+      </h2>
+    </div>
+    <% if @measurements.present? %>
+      <table class="salus-table">
+        <thead>
+          <tr>
+            <th>Type</th>
+            <th>Value</th>
+            <th>Time</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% @measurements.each do |m| %>
+            <% measurement_name = m.measurement_type.name %>
+            <tr class="<%= !m.is_within_limits ? 'salus-measurement-row--alert' : '' %>">
+              <td>
+                <%= link_to measurement_path(id: m.id, locale: I18n.locale),
+                    class: "salus-measurement-link" do %>
+                  <%= I18n.t("activerecord.attributes.measurement_types.#{measurement_name}") %>
+                <% end %>
+              </td>
+              <td>
+                <span class="salus-measurement-value"><%= m.value %></span>
+                <span class="salus-measurement-unit"><%= m.measurement_type.unit.symbol %></span>
+              </td>
+              <td class="salus-measurement-time">
+                <%= l(m.measurement_date, format: "%H:%M") %>
+              </td>
+              <td>
+                <% unless m.is_within_limits %>
+                  <span class="salus-badge salus-badge--danger">!</span>
+                <% else %>
+                  <span class="salus-badge salus-badge--success">OK</span>
+                <% end %>
+              </td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    <% else %>
+      <div class="salus-empty">
+        <i class="ri-information-line salus-empty__icon"></i>
+        <p class="salus-empty__text"><%= t(".no_results") %></p>
+      </div>
+    <% end %>
+  </section>
+
+  <% if @pagy.pages > 1 %>
+    <div class="salus-pagination">
+      <div class="salus-pagination__info">
+        <%== pagy_info(@pagy) %>
+      </div>
+      <div class="salus-pagination__nav">
+        <%== pagy_nav(@pagy) %>
+      </div>
+    </div>
+  <% end %>
+</div>

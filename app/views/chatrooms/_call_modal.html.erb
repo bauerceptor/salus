@@ -1,0 +1,126 @@
+<div id="incoming-call-modal" class="fixed inset-0 z-50 hidden">
+  <div class="absolute inset-0 bg-black/60 backdrop-blur-sm"></div>
+  <div class="absolute inset-0 flex items-center justify-center">
+    <div class="bg-white rounded-3xl shadow-2xl w-80 overflow-hidden transform transition-all">
+      <div class="bg-gradient-to-b from-[#00a884] to-[#008069] px-6 py-8 text-center">
+        <div class="w-24 h-24 mx-auto mb-4 rounded-full bg-white/20 flex items-center justify-center overflow-hidden">
+          <img id="caller-avatar" src="" alt="" class="w-full h-full object-cover hidden" />
+          <span id="caller-avatar-fallback" class="text-4xl font-semibold text-white"></span>
+        </div>
+        <h3 id="caller-name" class="text-xl font-semibold text-white mb-1"></h3>
+        <p id="call-type-label" class="text-white/80 text-sm">Incoming audio call...</p>
+      </div>
+
+      <div class="flex justify-center gap-8 py-6 bg-white">
+        <button id="reject-call-btn" class="flex flex-col items-center gap-2 group">
+          <div class="w-14 h-14 rounded-full bg-red-500 flex items-center justify-center text-white group-hover:bg-red-600 transition-colors">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 8l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2M5 3a2 2 0 00-2 2v1c0 8.284 6.716 15 15 15h1a2 2 0 002-2v-3.28a1 1 0 00-.684-.948l-4.493-1.498a1 1 0 00-1.21.502l-1.13 2.257a11.042 11.042 0 01-5.516-5.517l2.257-1.128a1 1 0 00.502-1.21L9.228 3.683A1 1 0 008.279 3H5z" />
+            </svg>
+          </div>
+          <span class="text-xs text-[#667781]">Decline</span>
+        </button>
+
+        <button id="accept-call-btn" class="flex flex-col items-center gap-2 group">
+          <div class="w-14 h-14 rounded-full bg-[#00a884] flex items-center justify-center text-white group-hover:bg-[#008069] transition-colors">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+            </svg>
+          </div>
+          <span class="text-xs text-[#667781]">Accept</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="call-screen" class="fixed inset-0 z-50 hidden bg-gradient-to-b from-[#1a1a2e] to-[#16213e]">
+  <div class="h-full flex flex-col">
+    <div class="flex-1 flex flex-col items-center justify-center p-6">
+      <div id="remote-video-container" class="mb-8">
+        <div class="w-40 h-40 rounded-full bg-[#2a2a4a] flex items-center justify-center overflow-hidden">
+          <img id="remote-video" src="" class="hidden w-full h-full object-cover" />
+          <video id="remote-video-el" class="hidden w-full h-full object-cover" autoplay playsinline></video>
+          <span id="remote-avatar-fallback" class="text-6xl font-semibold text-white/50"></span>
+        </div>
+      </div>
+
+      <h3 id="call-with-name" class="text-2xl font-semibold text-white mb-2"></h3>
+      <p id="call-status" class="text-white/60 text-sm mb-8">Calling...</p>
+
+      <div id="local-video-container" class="absolute top-20 right-6 w-24 h-32 rounded-2xl bg-[#2a2a4a] overflow-hidden shadow-lg border-2 border-white/20">
+        <video id="local-video-el" class="w-full h-full object-cover" autoplay playsinline muted></video>
+        <div id="local-video-off" class="hidden absolute inset-0 bg-[#2a2a4a] flex items-center justify-center">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-white/50" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
+          </svg>
+        </div>
+      </div>
+    </div>
+
+    <div class="p-8 pb-12">
+      <div class="flex justify-center items-center gap-6">
+        <button id="mute-btn" class="w-14 h-14 rounded-full bg-white/10 text-white hover:bg-white/20 transition-colors flex items-center justify-center">
+          <svg id="mic-on-icon" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
+          </svg>
+          <svg id="mic-off-icon" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2" />
+          </svg>
+        </button>
+
+        <button id="speaker-btn" class="w-14 h-14 rounded-full bg-white/10 text-white hover:bg-white/20 transition-colors flex items-center justify-center">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
+          </svg>
+        </button>
+
+        <button id="video-btn" class="w-14 h-14 rounded-full bg-white/10 text-white hover:bg-white/20 transition-colors flex items-center justify-center">
+          <svg id="video-on-icon" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
+          </svg>
+          <svg id="video-off-icon" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728L5.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" />
+          </svg>
+        </button>
+
+        <button id="end-call-btn" class="w-16 h-16 rounded-full bg-red-500 text-white hover:bg-red-600 transition-colors flex items-center justify-center transform scale-110 shadow-lg">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 8l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2M5 3a2 2 0 00-2 2v1c0 8.284 6.716 15 15 15h1a2 2 0 002-2v-3.28a1 1 0 00-.684-.948l-4.493-1.498a1 1 0 00-1.21.502l-1.13 2.257a11.042 11.042 0 01-5.516-5.517l2.257-1.128a1 1 0 00.502-1.21L9.228 3.683A1 1 0 008.279 3H5z" />
+          </svg>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="outgoing-call-screen" class="fixed inset-0 z-50 hidden bg-gradient-to-b from-[#1a1a2e] to-[#16213e]">
+  <div class="h-full flex flex-col">
+    <div class="flex-1 flex flex-col items-center justify-center p-6">
+      <div class="w-40 h-40 rounded-full bg-[#2a2a4a] flex items-center justify-center overflow-hidden mb-6">
+        <img id="outgoing-avatar" src="" alt="" class="w-full h-full object-cover hidden" />
+        <span id="outgoing-avatar-fallback" class="text-6xl font-semibold text-white/50"></span>
+      </div>
+
+      <h3 id="outgoing-call-with" class="text-2xl font-semibold text-white mb-2"></h3>
+      <p id="outgoing-call-status" class="text-white/60 text-sm">Calling...</p>
+
+      <div class="mt-8 flex items-center gap-2">
+        <div class="w-2 h-2 rounded-full bg-[#00a884] animate-pulse"></div>
+        <div class="w-2 h-2 rounded-full bg-[#00a884] animate-pulse" style="animation-delay: 0.2s"></div>
+        <div class="w-2 h-2 rounded-full bg-[#00a884] animate-pulse" style="animation-delay: 0.4s"></div>
+      </div>
+    </div>
+
+    <div class="p-8 pb-12">
+      <div class="flex justify-center">
+        <button id="cancel-outgoing-btn" class="w-16 h-16 rounded-full bg-red-500 text-white hover:bg-red-600 transition-colors flex items-center justify-center shadow-lg">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 8l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2M5 3a2 2 0 00-2 2v1c0 8.284 6.716 15 15 15h1a2 2 0 002-2v-3.28a1 1 0 00-.684-.948l-4.493-1.498a1 1 0 00-1.21.502l-1.13 2.257a11.042 11.042 0 01-5.516-5.517l2.257-1.128a1 1 0 00.502-1.21L9.228 3.683A1 1 0 008.279 3H5z" />
+          </svg>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,128 @@
+<% content_for :body do %>
+  <div class="dashboard">
+    <div class="sidebar" data-controller="sidebar">
+      <div class="sidebar__header">
+        <div class="sidebar__profile">
+          <span class="sidebar__profile__initials">AD</span>
+          <div class="sidebar__profile__info">
+            <p class="sidebar__profile__name">Admin</p>
+            <p class="sidebar__profile__email">admin@salus.health</p>
+          </div>
+        </div>
+        <button type="button" class="sidebar-toggle desktop-toggle" data-action="click->sidebar#collapse">
+          <i class="ri-menu-line"></i>
+        </button>
+      </div>
+      <nav class="sidebar__nav">
+        <div class="sidebar__nav__group">
+          <p class="sidebar__nav__title"><%= t(".nav.platform") %></p>
+          <ul class="sidebar__items">
+            <li class="sidebar__item">
+              <%= link_to admin_dashboard_path, class: "sidebar__link #{current_page?(admin_dashboard_path) ? 'active' : ''}" do %>
+                <div class="sidebar__link__group">
+                  <i class="ri-dashboard-line sidebar__link__icon"></i>
+                  <span class="sidebar__link__text"><%= t(".nav.dashboard") %></span>
+                </div>
+                <i class="ri-arrow-right-s-line sidebar__link__arrow"></i>
+              <% end %>
+            </li>
+            <li class="sidebar__item">
+              <%= link_to admin_specialists_path, class: "sidebar__link #{current_page?(admin_specialists_path) ? 'active' : ''}" do %>
+                <div class="sidebar__link__group">
+                  <i class="ri-user-star-line sidebar__link__icon"></i>
+                  <span class="sidebar__link__text"><%= t(".nav.specialists") %></span>
+                </div>
+                <i class="ri-arrow-right-s-line sidebar__link__arrow"></i>
+              <% end %>
+            </li>
+            <li class="sidebar__item">
+              <%= link_to admin_assignments_path, class: "sidebar__link #{current_page?(admin_assignments_path) ? 'active' : ''}" do %>
+                <div class="sidebar__link__group">
+                  <i class="ri-user-follow-line sidebar__link__icon"></i>
+                  <span class="sidebar__link__text"><%= t(".nav.assignments") %></span>
+                </div>
+                <i class="ri-arrow-right-s-line sidebar__link__arrow"></i>
+              <% end %>
+            </li>
+          </ul>
+        </div>
+        <div class="sidebar__nav__group">
+          <p class="sidebar__nav__title"><%= t(".nav.operations") %></p>
+          <ul class="sidebar__items">
+            <li class="sidebar__item">
+              <%= link_to admin_referrals_path, class: "sidebar__link #{current_page?(admin_referrals_path) ? 'active' : ''}" do %>
+                <div class="sidebar__link__group">
+                  <i class="ri-link sidebar__link__icon"></i>
+                  <span class="sidebar__link__text"><%= t(".nav.referrals") %></span>
+                </div>
+                <i class="ri-arrow-right-s-line sidebar__link__arrow"></i>
+              <% end %>
+            </li>
+            <li class="sidebar__item">
+              <%= link_to admin_chat_health_path, class: "sidebar__link #{current_page?(admin_chat_health_path) ? 'active' : ''}" do %>
+                <div class="sidebar__link__group">
+                  <i class="ri-message-3-line sidebar__link__icon"></i>
+                  <span class="sidebar__link__text"><%= t(".nav.chat_health") %></span>
+                </div>
+                <i class="ri-arrow-right-s-line sidebar__link__arrow"></i>
+              <% end %>
+            </li>
+            <li class="sidebar__item">
+              <%= link_to admin_specialist_requests_path, class: "sidebar__link #{current_page?(admin_specialist_requests_path) ? 'active' : ''}" do %>
+                <div class="sidebar__link__group">
+                  <i class="ri-file-list-3-line sidebar__link__icon"></i>
+                  <span class="sidebar__link__text"><%= t(".nav.specialist_requests") %></span>
+                </div>
+                <i class="ri-arrow-right-s-line sidebar__link__arrow"></i>
+              <% end %>
+            </li>
+          </ul>
+        </div>
+        <div class="sidebar__nav__group">
+          <p class="sidebar__nav__title"><%= t(".nav.account") %></p>
+          <ul class="sidebar__items">
+            <li class="sidebar__item">
+              <%= button_to admin_destroy_session_path, method: :delete, class: "sidebar__form-item" do %>
+                <div class="sidebar__link">
+                  <div class="sidebar__link__group">
+                    <i class="ri-logout-box-line sidebar__link__icon"></i>
+                    <span class="sidebar__link__text"><%= t(".nav.logout") %></span>
+                  </div>
+                  <i class="ri-arrow-right-s-line sidebar__link__arrow"></i>
+                </div>
+              <% end %>
+            </li>
+          </ul>
+        </div>
+      </nav>
+      <div class="sidebar__footer">
+        <p class="sidebar__footer__text">&copy; <%= t(".footer") %></p>
+      </div>
+    </div>
+    <div class="dashboard__content">
+      <header class="header">
+        <div class="header__left">
+          <button type="button" class="header__menu-toggle sidebar-toggle expand-toggle" data-action="click->sidebar#expand">
+            <i class="ri-menu-line"></i>
+          </button>
+          <div class="header__breadcrumb">
+            <%= yield :breadcrumb if content_for?(:breadcrumb) %>
+          </div>
+        </div>
+        <div class="header__right">
+          <div class="header__buttons">
+            <%= link_to root_path, class: "header__button", title: "Back to app" do %>
+              <i class="ri-arrow-left-line"></i>
+            <% end %>
+          </div>
+        </div>
+      </header>
+      <main class="main">
+        <div class="main__container">
+          <%= yield %>
+        </div>
+      </main>
+    </div>
+  </div>
+<% end %>
+<%= render template: "layouts/application" %>

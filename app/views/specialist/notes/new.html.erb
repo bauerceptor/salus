@@ -1,0 +1,119 @@
+<div class="page-notes-new">
+  <header class="page-header">
+    <div class="page-header__left">
+      <h1 class="page-header__title">
+        <i class="ri-sticky-note-line"></i>
+        <%= t(".title", patient: @patient.full_name) %>
+      </h1>
+      <p class="page-header__subtitle"><%= t(".subtitle") %></p>
+      <%= render "shared/breadcrumbs" %>
+    </div>
+    <div class="page-header__right">
+      <%= link_to specialist_patient_path(id: @patient.id, locale: I18n.locale), class: "dash-button dash-button--back" do %>
+        <i class="ri-arrow-left-line"></i>
+      <% end %>
+    </div>
+  </header>
+
+  <%= turbo_frame_tag "flash" do %>
+    <%= render "shared/dash_flash" %>
+  <% end %>
+
+  <div class="page-content">
+    <div class="note-form-grid">
+      <div class="dash-group">
+        <header class="dash-group__header">
+          <h2 class="dash-group__title">
+            <i class="ri-edit-line dash-group__title__icon"></i>
+            <%= t(".note_details") %>
+          </h2>
+        </header>
+        <div class="dash-group__content">
+          <%= form_with model: @note, url: specialist_notes_path, method: :post, class: "dash-form dash-form--simple", id: "note-form" do |f| %>
+            <div class="dash-form__group">
+              <%= f.label :note_type, t(".note_type"), class: "dash-form__label" %>
+              <%= f.select :note_type,
+                  options_for_select(SpecialistNote::NOTE_TYPES.map { |t| [t.titleize, t] }, @note.note_type || "observation"),
+                  {},
+                  class: "dash-form__input dash-form__select" %>
+            </div>
+
+            <div class="dash-form__group">
+              <%= f.label :content, t(".content"), class: "dash-form__label" %>
+              <%= f.text_area :content, class: "dash-form__input dash-form__textarea", rows: 8, placeholder: t(".content_placeholder") %>
+            </div>
+
+            <div class="dash-form__info">
+              <i class="ri-information-line"></i>
+              <p><%= t(".info") %></p>
+            </div>
+
+            <div class="dash-form__actions">
+              <%= hidden_field_tag :patient_id, @patient.id %>
+              <%= f.submit t(".submit"), class: "dash-button dash-button--new" %>
+              <%= link_to t(".cancel"), specialist_patient_path(id: @patient.id, locale: I18n.locale), class: "dash-button dash-button--gray" %>
+            </div>
+          <% end %>
+        </div>
+      </div>
+
+      <div class="dash-group">
+        <header class="dash-group__header">
+          <h2 class="dash-group__title">
+            <i class="ri-attachment-2 dash-group__title__icon"></i>
+            <%= t(".attachments.title") %>
+          </h2>
+        </header>
+        <div class="dash-group__content">
+          <div class="attachment-upload" id="attachment-upload">
+            <div class="attachment-upload__header">
+              <div class="attachment-types">
+                <label class="attachment-type">
+                  <input type="radio" name="attachment_type" value="image" checked>
+                  <i class="ri-image-line"></i>
+                  <span><%= t(".attachments.image") %></span>
+                </label>
+                <label class="attachment-type">
+                  <input type="radio" name="attachment_type" value="video">
+                  <i class="ri-video-line"></i>
+                  <span><%= t(".attachments.video") %></span>
+                </label>
+                <label class="attachment-type">
+                  <input type="radio" name="attachment_type" value="audio">
+                  <i class="ri-mic-line"></i>
+                  <span><%= t(".attachments.audio") %></span>
+                </label>
+                <label class="attachment-type">
+                  <input type="radio" name="attachment_type" value="document">
+                  <i class="ri-file-line"></i>
+                  <span><%= t(".attachments.document") %></span>
+                </label>
+              </div>
+            </div>
+
+            <div class="attachment-upload__area" id="drop-zone">
+              <i class="ri-upload-cloud-line attachment-upload__icon"></i>
+              <p class="attachment-upload__text"><%= t(".attachments.drop_text") %></p>
+              <p class="attachment-upload__hint"><%= t(".attachments.hint") %></p>
+              <%= file_field_tag "attachments[]", multiple: true, accept: "image/*,video/*,audio/*,.pdf,.doc,.docx", class: "attachment-upload__input", id: "file-input" %>
+              <label for="file-input" class="dash-button dash-button--gray">
+                <i class="ri-folder-open-line dash-button__icon"></i>
+                <%= t(".attachments.browse") %>
+              </label>
+            </div>
+
+            <div class="attachment-preview" id="attachment-preview"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<%= javascript_include_tag "components/attachment_upload" %>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const attachmentUpload = new AttachmentUpload('drop-zone', 'file-input', 'attachment-preview');
+  });
+</script>

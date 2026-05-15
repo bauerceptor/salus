@@ -1,0 +1,8 @@
+<div class="flex justify-between items-center text-sm">
+  <div>
+    <%== pagy_info(pagy) %>
+  </div>
+  <div>
+    <%= render partial: "shared/pagination", locals: { pagy: pagy, id: "pagination-#{pagy.vars[:param]}" } %>
+  </div>
+</div>

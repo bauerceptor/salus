@@ -1,0 +1,14 @@
+<nav aria-label="Breadcrumb" class="dash-breadcrumbs">
+  <% breadcrumbs.each_with_index do |crumb, index| %>
+    <% if index > 0 %>
+      <span class="dash-breadcrumbs__separator" aria-hidden="true">›</span>
+    <% end %>
+    <span class="dash-breadcrumbs__item <%= 'dash-breadcrumbs__item--active' unless crumb.link? %>">
+      <% if crumb.link? %>
+        <%= link_to crumb.name, crumb.path, class: "dash-breadcrumbs__link" %>
+      <% else %>
+        <span class="<%= 'opacity-75' unless crumb.link? %>"><%= crumb.name %></span>
+      <% end %>
+    </span>
+  <% end %>
+</nav>

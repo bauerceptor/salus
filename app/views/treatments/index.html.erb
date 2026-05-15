@@ -1,0 +1,83 @@
+<div class="salus-page-container">
+  <header class="salus-page-header">
+    <div class="salus-page-header__left">
+      <h1 class="salus-page-header__title">
+        <i class="ri-hospital-line salus-page-header__icon"></i>
+        <%= t(".title") %>
+      </h1>
+      <%= render "shared/breadcrumbs" %>
+    </div>
+    <div class="salus-page-header__actions">
+      <% if current_user.specialist? %>
+        <%= link_to new_treatment_path, class: "salus-btn salus-btn--primary" do %>
+          <i class="ri-add-line salus-btn__icon"></i>
+          <%= t(".button.new") %>
+        <% end %>
+      <% else %>
+        <%= link_to patient_treatment_requests_path, class: "salus-btn salus-btn--secondary" do %>
+          <i class="ri-list-check salus-btn__icon"></i>
+          <%= t(".button.view_requests") %>
+        <% end %>
+        <%= link_to new_patient_treatment_request_path, class: "salus-btn salus-btn--primary" do %>
+          <i class="ri-add-line salus-btn__icon"></i>
+          <%= t(".button.new_request") %>
+        <% end %>
+      <% end %>
+      <%= link_to authenticated_root_path, class: "salus-btn salus-btn--secondary" do %>
+        <i class="ri-arrow-left-line salus-btn__icon"></i>
+      <% end %>
+    </div>
+  </header>
+
+  <%= turbo_frame_tag "flash" do %>
+    <%= render "shared/dash_flash" %>
+  <% end %>
+
+  <% if @treatments.to_a.any? %>
+    <div class="salus-cards-grid">
+      <% @treatments.each do |treatment| %>
+        <article class="salus-card salus-card--hoverable">
+          <div class="salus-card__body">
+            <div class="salus-treatment-header">
+              <span class="salus-treatment-emoji"><%= effectiveness_to_emoji(treatment.effectiveness) %></span>
+              <% if treatment.is_finished? %>
+                <span class="salus-badge salus-badge--success">
+                  <i class="ri-check-double-fill salus-badge__dot"></i>
+                  Completed
+                </span>
+              <% end %>
+            </div>
+            <h2 class="salus-card__title"><%= treatment.title %></h2>
+            <p class="salus-card__subtitle">
+              <%= t(".treatment.diseases_treated", diseases: treatment.treatment_diseases.size) %>
+            </p>
+            <div class="salus-treatment-meta">
+              <span class="salus-treatment-meta__item">
+                <i class="ri-calendar-line"></i>
+                <%= t(".treatment.duration", duration: treatment.days_difference) %>
+              </span>
+              <%= link_to t(".treatment.details"), treatment_path(id: treatment.id, locale: I18n.locale),
+                  class: "salus-btn salus-btn--primary salus-btn--sm" %>
+            </div>
+          </div>
+        </article>
+      <% end %>
+    </div>
+  <% else %>
+    <div class="salus-empty">
+      <i class="ri-information-line salus-empty__icon"></i>
+      <p class="salus-empty__text"><%= t(".no_results") %></p>
+    </div>
+  <% end %>
+
+  <% if @pagy.pages > 1 %>
+    <div class="salus-pagination">
+      <div class="salus-pagination__info">
+        <%== pagy_info(@pagy) %>
+      </div>
+      <div class="salus-pagination__nav">
+        <%== pagy_nav(@pagy) %>
+      </div>
+    </div>
+  <% end %>
+</div>

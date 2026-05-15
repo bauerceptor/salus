@@ -1,0 +1,35 @@
+<header class="group__header">
+  <div class="group__header__left">
+    <p class="group__header__overtitle">
+      <i class="ri-group-2-line"></i>
+      <%= t(".overtitle") %>
+    </p>
+    <h1 class="group__header__title">
+      <span class="group__header__title__text">
+        <%= @group.predefined_disease.name.titleize %>
+      </span>
+    </h1>
+    <%= render "shared/breadcrumbs" %>
+  </div>
+  <div class="group__header__right">
+    <div data-controller="dropdown" class="dash-dropdown dash-dropdown--big">
+      <button class="dash-dropdown__button" type="button" data-action="dropdown#toggle click@window->dropdown#hide">
+        <i class="ri-more-fill"></i>
+      </button>
+      <div
+        data-dropdown-target="menu"
+        class="hidden transition transform origin-top-right dash-dropdown__list"
+        data-transition-enter-from="opacity-0 scale-95"
+        data-transition-enter-to="opacity-100 scale-100"
+        data-transition-leave-from="opacity-100 scale-100"
+        data-transition-leave-to="opacity-0 scale-95"
+      >
+        <%= button_to leave_group_path(id: @group.id, locale: I18n.locale), method: :delete,
+          class: "dash-dropdown__item", data: { action: "dropdown#toggle", } do %>
+          <i class="ri-close-line dash-dropdown__item__icon dash-dropdown__item__icon--delete"></i>
+          <%= t(".leave") %>
+        <% end %>
+      </div>
+    </div>
+  </div>
+</header>

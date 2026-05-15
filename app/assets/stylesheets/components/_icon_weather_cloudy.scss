@@ -1,0 +1,35 @@
+.weather-cloudy {
+  position: relative;
+  display: inline-block;
+  width: 130px;
+  height: 130px;
+  border-radius: 40%;
+  background: linear-gradient(to top right, rgba(63, 81, 181, 1) 0%, rgba(3, 155, 229, 1) 40%);
+  box-shadow: 1px 1px 30px rgba(2, 119, 189, 1);
+
+  &__cloud,
+  &__cloud-2 {
+    position: absolute;
+    top: 5%;
+    width: 60px;
+    height: 20px;
+    border-radius: 10px;
+    background-color: rgba(129, 212, 250, 1);
+    box-shadow: 1px 1px 30px rgba(0, 151, 167, 1);
+    animation: weather-cloudy-drift 3s infinite linear;
+  }
+
+  &__cloud {
+    left: 70%;
+  }
+
+  &__cloud-2 {
+    top: 23%;
+    left: 55%;
+    animation-delay: -1.5s;
+  }
+}
+
+@keyframes weather-cloudy-drift {
+  50% { transform: translateX(-10px); }
+}

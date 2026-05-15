@@ -1,0 +1,25 @@
+<div class="dash-nudge" data-controller="dismiss">
+  <div class="dash-nudge__content">
+    <div class="dash-nudge__icon">
+      <i class="ri-group-line"></i>
+    </div>
+    <div class="dash-nudge__text">
+      <p class="dash-nudge__title"><%= t(".title", group_name: nudge[:group_name]) %></p>
+      <p class="dash-nudge__body"><%= t(".body") %></p>
+    </div>
+  </div>
+  <div class="dash-nudge__actions">
+    <%= button_to join_group_path(id: nudge[:group_id]),
+        method: :post,
+        class: "dash-nudge__join-btn",
+        data: { turbo_frame: "_top" } do %>
+      <%= t(".join_button") %>
+    <% end %>
+    <%= button_to disease_onboarding_nudge_path(disease_id: @disease.id),
+        method: :delete,
+        class: "dash-nudge__dismiss",
+        data: { turbo_frame: "_top" } do %>
+      <i class="ri-close-line"></i>
+    <% end %>
+  </div>
+</div>

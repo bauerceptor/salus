@@ -1,0 +1,40 @@
+default: &default
+  dispatchers:
+    - polling_interval: 1
+      batch_size: 500
+  workers:
+    - queues: "*"
+      threads: 3
+      processes: 1
+      polling_interval: 0.1
+
+development:
+  <<: *default
+
+test:
+  <<: *default
+
+production:
+  <<: *default
+  scheduler:
+    schedule:
+      daily_health_checkin:
+        class: DailyHealthCheckinJob
+        queue: default
+        args: {}
+        schedule_at: "0 8 * * *" # Daily at 8:00 AM
+      weekly_progress_summary:
+        class: WeeklyProgressSummaryJob
+        queue: default
+        args: {}
+        schedule_at: "0 18 * * 0" # Sundays at 6:00 PM
+      missed_dose_followup:
+        class: MissedDoseFollowupJob
+        queue: default
+        args: {}
+        schedule_at: "0 */2 * * *" # Every 2 hours
+
+# Cron alternative (if SolidQueue scheduler process is not used):
+# 0 8 * * * app cd /path/to/app && mise exec -- bundle exec rails proactive:daily_checkin
+# 0 18 * * 0 app cd /path/to/app && mise exec -- bundle exec rails proactive:weekly_summary
+# 0 */2 * * * app cd /path/to/app && mise exec -- bundle exec rails proactive:missed_dose_followup

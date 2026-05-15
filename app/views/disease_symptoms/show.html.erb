@@ -1,0 +1,115 @@
+<div class="page-disease-symptom">
+  <header class="dash-header">
+    <div class="dash-header__left">
+      <h1 class="dash-header__title">
+        <span class="dash-header__title__text"><%= @symptom_name %></span>
+      </h1>
+      <%= render "shared/breadcrumbs" %>
+    </div>
+    <div class="dash-header__right">
+      <%= link_to edit_disease_symptom_path, class: "dash-button dash-button--info" do %>
+        <i class="ri-edit-2-line dash-button__icon"></i>
+        <%= t(".button.edit") %>
+      <% end %>
+      <%= button_to disease_symptom_path(disease_id: @disease.id, id: @disease_symptom.id, locale: I18n.locale), class: "dash-button dash-button--delete",
+          method: :delete, form: { data: { turbo_confirm: t(".button.delete.turbo.confirm") } } do %>
+        <i class="ri-close-line dash-button__icon"></i>
+        <%= t(".button.delete.title") %>
+      <% end %>
+      <%= link_to disease_symptoms_path, class: "dash-button dash-button--back" do %>
+        <i class="ri-arrow-left-line dash-button__icon"></i>
+      <% end %>
+    </div>
+  </header>
+  <div class="dash-flash-messages">
+    <%= turbo_frame_tag "flash" do %>
+      <%= render "shared/dash_flash" %>
+    <% end %>
+  </div>
+  <div class="page-disease-symptom__content">
+    <div class="page-disease-symptom__content__left">
+      <div class="dash-group dash-group--border">
+        <header class="dash-group__header">
+          <h2 class="dash-group__title"><%= t(".info") %></h2>
+          <div class="dash-group__actions"></div>
+        </header>
+        <div class="dash-group__content">
+          <div class="dash-info">
+            <div class="dash-info__group">
+              <div class="dash-info__group__left">
+                <div class="dash-info__group__label"><%= t(".desc.title") %></div>
+                <div class="dash-info__group__desc"><%= t(".desc.description") %></div>
+              </div>
+              <div class="dash-info__group__right">
+                <div class="dash-info__group__value"><%= @disease_symptom.description %></div>
+              </div>
+            </div>
+            <div class="dash-info__group">
+              <div class="dash-info__group__left">
+                <div class="dash-info__group__label"><%= t(".first_noticed_at.title") %></div>
+                <div class="dash-info__group__desc"><%= t(".first_noticed_at.description") %></div>
+              </div>
+              <div class="dash-info__group__right">
+                <div class="dash-info__group__value">
+                  <% if @disease_symptom.first_noticed_at.present? %>
+                    <%= @disease_symptom.first_noticed_at %>
+                  <% else %>
+                    <%= t(".first_noticed_at.empty") %>
+                  <% end %>
+                </div>
+              </div>
+            </div>
+            <div class="dash-info__group">
+              <div class="dash-info__group__left">
+                <div class="dash-info__group__label"><%= t(".intensity.title") %></div>
+                <div class="dash-info__group__desc"><%= t(".intensity.description") %></div>
+              </div>
+              <div class="dash-info__group__right">
+                <div class="dash-info__group__value">
+                  <%= turbo_frame_tag :disease_symptom_updates_latest, src: disease_symptom_updates_path(disease_id: @disease.id, symptom_id: @disease_symptom.id, locale: I18n.locale) do %>
+                    <%= t(".turbo.loading") %>
+                  <% end %>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="dash-group">
+        <header class="dash-group__header">
+          <h2 class="dash-group__title"><%= t(".chart") %></h2>
+          <div class="dash-group__actions"></div>
+        </header>
+        <div class="dash-group__content">
+          <%= turbo_frame_tag :disease_symptom_updates_chart, src: disease_symptom_updates_path(disease_id: @disease.id, symptom_id: @disease_symptom.id, locale: I18n.locale) do %>
+            <%= t(".turbo.loading") %>
+          <% end %>
+        </div>
+      </div>
+    </div>
+    <div class="page-disease-symptom__content__right">
+      <div class="dash-group dash-group--border">
+        <header class="dash-group__header">
+          <h2 class="dash-group__title"><%= t(".change_intensity") %></h2>
+          <div class="dash-group__actions"></div>
+        </header>
+        <div class="dash-group__content">
+          <%= turbo_frame_tag :new_disease_symptom_update, src: new_disease_symptom_update_path(disease_id: @disease.id, symptom_id: @disease_symptom.id, locale: I18n.locale) do %>
+            <%= t(".turbo.loading") %>
+          <% end %>
+        </div>
+      </div>
+      <div class="dash-group">
+        <header class="dash-group__header">
+          <h2 class="dash-group__title"><%= t(".intensity_changes") %></h2>
+          <div class="dash-group__actions"></div>
+        </header>
+        <div class="dash-group__content">
+          <%= turbo_frame_tag :disease_symptom_updates, src: disease_symptom_updates_path(disease_id: @disease.id, symptom_id: @disease_symptom.id, locale: I18n.locale) do %>
+            <%= t(".turbo.loading") %>
+          <% end %>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

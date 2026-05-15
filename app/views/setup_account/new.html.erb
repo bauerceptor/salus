@@ -1,0 +1,22 @@
+<div class="auth auth--setup">
+  <div class="auth__content">
+    <header class="auth__header">
+      <%= link_to root_path do %>
+        <%= localized_logo_image_tag class: "auth__header__logo", alt: "" %>
+      <% end %>
+      <%= button_to auth_destroy_session_path, method: :delete, class: "auth__header__link" do %>
+        <%= t(".logout") %>
+      <% end %>
+    </header>
+    <div class="auth__main">
+      <div class=auth__heading>
+        <h1 class="auth__title"><%= t(".title") %></h1>
+        <p class="auth__desc"><%= t(".desc") %></p>
+      </div>
+      <%= render "form", account: @account %>
+    </div>
+  </div>
+  <div class="auth__sidebar" style="background-image: url(<%= asset_path("happy-people.png") %>); background-size: cover; background-position: center; background-repeat: no-repeat;">
+    <%= link_to t(".credits"), "https://www.freepik.com/free-vector/flat-pension-people-walk-park-kids-playing-riding-bicycle_27869309.htm#query=people&position=20&from_view=search&track=sph", class: "auth__credits" %>
+  </div>
+</div>

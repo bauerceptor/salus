@@ -1,0 +1,51 @@
+<div class="dash-group">
+  <header class="dash-group__header">
+    <h2 class="dash-group__title">
+      <i class="ri-time-line dash-group__title__icon"></i>
+      Care History
+    </h2>
+    <div class="dash-group__actions">
+      <% if care_history_scope == :recent %>
+        <%= link_to specialist_patient_path(id: patient.id, locale: I18n.locale, history: "full"), class: "dash-link dash-link--small" do %>
+          View All
+        <% end %>
+      <% else %>
+        <%= link_to specialist_patient_path(id: patient.id, locale: I18n.locale, history: "recent"), class: "dash-link dash-link--small" do %>
+          Last 30 Days
+        <% end %>
+      <% end %>
+    </div>
+  </header>
+  <div class="dash-group__content">
+    <% if care_history.empty? %>
+      <p class="no-results">No care events in this period.</p>
+    <% else %>
+      <div class="care-stream" data-controller="care-stream">
+        <div class="care-stream__toggle">
+          <button class="care-stream__toggle-btn" data-action="care-stream#toggle">
+            <i class="ri-arrow-down-s-line" data-care-stream-target="arrow"></i>
+            <%= care_history.count %> event<%= care_history.count == 1 ? "" : "s" %>
+          </button>
+        </div>
+        <div class="care-stream__timeline" data-care-stream-target="timeline" hidden>
+          <% care_history.each do |event| %>
+            <div class="care-stream-item care-stream-item--<%= event[:severity] %>">
+              <div class="care-stream-item__icon">
+                <i class="<%= event[:icon] %>"></i>
+              </div>
+              <div class="care-stream-item__body">
+                <p class="care-stream-item__title"><%= event[:title] %></p>
+                <% if event[:description].present? %>
+                  <p class="care-stream-item__desc"><%= event[:description] %></p>
+                <% end %>
+                <p class="care-stream-item__time">
+                  <%= event[:timestamp].strftime("%b %d, %Y") %>
+                </p>
+              </div>
+            </div>
+          <% end %>
+        </div>
+      </div>
+    <% end %>
+  </div>
+</div>

@@ -1,0 +1,91 @@
+<div class="page-specialists">
+  <header class="dash-header">
+    <div class="dash-header__left">
+      <h1 class="dash-header__title">
+        <i class="ri-nurse-line dash-header__title__icon"></i>
+        <%= t(".title") %>
+      </h1>
+      <%= render "shared/breadcrumbs" %>
+    </div>
+    <div class="dash-header__right">
+      <%= link_to specialist_requests_path, class: "dash-button dash-button--blue" do %>
+        <i class="ri-article-line dash-button__icon"></i>
+        <%= t(".button.new") %>
+      <% end %>
+      <%= link_to authenticated_root_path, class: "dash-button dash-button--back" do %>
+        <i class="ri-arrow-left-line dash-button__icon"></i>
+      <% end %>
+    </div>
+  </header>
+  <div class="dash-flash-messages">
+    <%= turbo_frame_tag "flash" do %>
+      <%= render "shared/dash_flash" %>
+    <% end %>
+  </div>
+  <div class="page-specialists__content">
+    <div class="dash-group">
+      <header class="dash-group__header">
+        <h2 class="dash-group__title">
+          <i class="ri-group-line dash-group__title__icon""></i>
+          <%= t(".specialists.title") %>
+        </h2>
+        <div class="dash-group__actions"></div>
+      </header>
+      <div class="dash-group__content">
+        <% if @specialists.to_a.any? %>
+          <div class="specialists-list">
+            <% @specialists.each do |specialist| %>
+              <% existing_link = current_account.specialist_patients.find_by(specialist: specialist) %>
+              <% specialist_profile = specialist.specialist %>
+              <% if specialist_profile %>
+                <div class="specialist">
+                  <%= image_tag "avatar-placeholder.png", alt: "", class: "specialist__photo" %>
+                  <p class="specialist__name"><%= specialist.account.full_name %></p>
+                  <p class="specialist__speciality"><%= specialist_profile.field_of_expertise %></p>
+                  <footer class="specialist__footer">
+                    <div class="specialist__footer__left">
+                      <p class="specialist__label"><%= t(".specialists.label") %></p>
+                      <p class="specialist__desc"><%= specialist_profile.specialization %></p>
+                    </div>
+                    <div class="specialist__footer__right">
+                      <% if existing_link&.active? %>
+                        <span class="specialist__status specialist__status--connected">
+                          <i class="ri-check-line"></i>
+                          Connected
+                        </span>
+                      <% elsif existing_link&.pending? %>
+                        <span class="specialist__status specialist__status--pending">
+                          <i class="ri-time-line"></i>
+                          Request Pending
+                        </span>
+                      <% else %>
+                        <%= button_to request_care_path(specialist_id: specialist.id, account_id: current_account.id),
+                            method: :post,
+                            class: "specialist__button specialist__button--request" do %>
+                          <i class="ri-user-add-line"></i>
+                          Request Care
+                        <% end %>
+                      <% end %>
+                    </div>
+                  </footer>
+                </div>
+              <% end %>
+            <% end %>
+          </div>
+        <% else %>
+          <p class="no-results">
+            <%= t(".specialists.no_results") %>
+          </p>
+        <% end %>
+      </div>
+    </div>
+  </div>
+  <div class="dash-pagination">
+    <div class="dash-pagination__controls">
+      <%== pagy_nav(@pagy) if @pagy.pages > 1 %>
+    </div>
+    <div class="dash-pagination__info">
+      <%== pagy_info(@pagy) %>
+    </div>
+  </div>
+</div>

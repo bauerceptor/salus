@@ -1,0 +1,71 @@
+<div class="page-disease-risk-factor">
+  <header class="dash-header page-disease-risk-factor__header">
+    <div class="dash-header__left">
+      <h1 class="dash-header__title"><%= @disease_risk_factor.name %></h1>
+      <%= render "shared/breadcrumbs" %>
+    </div>
+    <div class="dash-header__right">
+      <%= link_to edit_disease_risk_factor_path, class: "dash-button dash-button--info" do %>
+        <i class="ri-edit-2-line dash-button__icon"></i>
+        <%= t(".button.edit") %>
+      <% end %>
+      <%= button_to disease_risk_factor_path(disease_id: @disease.id, id: @disease_risk_factor.id, locale: I18n.locale),
+          class: "dash-button dash-button--delete", method: :delete,
+          form: { data: { turbo_confirm: t(".button.turbo.confirm") } } do %>
+        <i class="ri-close-line dash-button__icon"></i>
+        <%= t(".button.delete") %>
+      <% end %>
+      <%= link_to disease_risk_factors_path, class: "dash-button dash-button--back" do %>
+        <i class="ri-arrow-left-line dash-button__icon"></i>
+      <% end %>
+    </div>
+  </header>
+  <div class="dash-flash-messages">
+    <%= turbo_frame_tag "flash" do %>
+      <%= render "shared/dash_flash" %>
+    <% end %>
+  </div>
+  <div class="page-disease-risk-factor__content">
+    <div class="dash-group dash-group--border">
+      <header class="dash-group__header">
+        <h2 class="dash-group__title"><%= t(".info") %></h2>
+        <div class="dash-group__actions"></div>
+      </header>
+      <div class="dash-group__content">
+        <div class="dash-info">
+          <div class="dash-info__group">
+            <div class="dash-info__group__left">
+              <div class="dash-info__group__label"><%= t(".name.title") %></div>
+              <div class="dash-info__group__desc"><%= t(".name.description") %></div>
+            </div>
+            <div class="dash-info__group__right">
+              <div class="dash-info__group__value"><%= @disease_risk_factor.name %></div>
+            </div>
+          </div>
+          <div class="dash-info__group">
+            <div class="dash-info__group__left">
+              <div class="dash-info__group__label"><%= t(".desc.title") %></div>
+              <div class="dash-info__group__desc"><%= t(".desc.description") %></div>
+            </div>
+            <div class="dash-info__group__right">
+              <div class="dash-info__group__value">
+                <%= @disease_risk_factor.description %>
+              </div>
+            </div>
+          </div>
+          <div class="dash-info__group">
+            <div class="dash-info__group__left">
+              <div class="dash-info__group__label"><%= t(".severity.title") %></div>
+              <div class="dash-info__group__desc"><%= t(".severity.description") %></div>
+            </div>
+            <div class="dash-info__group__right">
+              <div class="dash-info__group__value">
+                <%= @disease_risk_factor.severity %>/5 <%= intensity_to_emoji(@disease_risk_factor.severity) %>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

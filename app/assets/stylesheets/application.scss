@@ -1,0 +1,67 @@
+@charset 'utf-8';
+
+// Utils
+@import "utils/variables";
+
+// Base
+@import "base/base";
+
+// External
+@import "external/tom-select";
+@import "external/simple-calendar";
+@import "external/quill";
+
+// Layouts
+@import "layouts/dashboard";
+
+// Components
+@import "components/salus-ui";
+@import "components/dashboard";
+@import "components/disease_status";
+@import "components/simple_dropdown";
+@import "components/pagination";
+@import "components/ai_health_chat";
+
+// DaisyUI overrides - MUST be after components to take precedence
+@import "utilities/daisyui-overrides";
+
+// Pages
+@import "pages/home";
+@import "pages/auth";
+@import "pages/diseases";
+@import "pages/disease";
+@import "pages/disease_symptoms";
+@import "pages/disease_symptom";
+@import "pages/disease_risk_factors";
+@import "pages/disease_risk_factor";
+@import "pages/disease_treatments";
+@import "pages/disease_photos";
+@import "pages/disease_statuses";
+@import "pages/treatments";
+@import "pages/treatment";
+@import "pages/treatment_requests";
+@import "pages/settings";
+@import "pages/settings_2fa";
+@import "pages/notes";
+@import "pages/note";
+@import "pages/measurements";
+@import "pages/measurement_raports";
+@import "pages/measurements_by_day";
+@import "pages/measurements_all";
+@import "pages/measurement";
+@import "pages/medications";
+@import "pages/accounts";
+@import "pages/account";
+@import "pages/friend_requests";
+@import "pages/groups";
+@import "pages/group";
+@import "pages/specialists";
+@import "pages/specialist_requests";
+@import "pages/schedules";
+@import "pages/dash_home";
+@import "pages/article";
+@import "pages/articles";
+@import "pages/conversations";
+@import "pages/notifications";
+@import "pages/help";
+@import "pages/posts";

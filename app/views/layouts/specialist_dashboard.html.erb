@@ -1,0 +1,151 @@
+<% content_for :body do %>
+  <%= turbo_frame_tag :dash_toast %>
+  <div class="dashboard">
+    <div class="sidebar">
+      <div class="sidebar__profile">
+        <% if user_has_image? %>
+          <%= image_tag user_image, alt: "profile picture", class: "sidebar__profile__picture" %>
+        <% else %>
+          <span class="sidebar__profile__initials"><%= user_initials %></span>
+        <% end %>
+        <%= link_to specialist_profile_path, class: "sidebar__profile__info" do %>
+          <p class="sidebar__profile__name">
+            <%= user_full_name %>
+            <span class="mark-specialist">
+              <i class="ri-check-line"></i>
+            </span>
+          </p>
+          <p class="sidebar__profile__email"><%= user_username %></p>
+        <% end %>
+      </div>
+      <nav class="sidebar__nav">
+        <div class="sidebar__nav__group">
+          <p class="sidebar__nav__title"><%= t(".nav.main") %></p>
+          <ul class="sidebar__items">
+            <li class="sidebar__item">
+              <%= link_to specialist_dashboard_path, class: "sidebar__link" do %>
+                <div class="sidebar__link__group">
+                  <i class="ri-dashboard-line sidebar__link__icon"></i>
+                  <span class="sidebar__link__text"><%= t(".nav.dashboard") %></span>
+                </div>
+                <i class="ri-arrow-right-s-line sidebar__link__icon"></i>
+              <% end %>
+            </li>
+            <li class="sidebar__item">
+              <%= link_to specialist_patients_path, class: "sidebar__link" do %>
+                <div class="sidebar__link__group">
+                  <i class="ri-user-line sidebar__link__icon"></i>
+                  <span class="sidebar__link__text"><%= t(".nav.patients") %></span>
+                </div>
+                <i class="ri-arrow-right-s-line sidebar__link__icon"></i>
+              <% end %>
+            </li>
+            <li class="sidebar__item">
+              <%= link_to specialist_schedules_path, class: "sidebar__link" do %>
+                <div class="sidebar__link__group">
+                  <i class="ri-calendar-check-line sidebar__link__icon"></i>
+                  <span class="sidebar__link__text"><%= t(".nav.schedule") %></span>
+                </div>
+                <i class="ri-arrow-right-s-line sidebar__link__icon"></i>
+              <% end %>
+            </li>
+          </ul>
+        </div>
+        <div class="sidebar__nav__group">
+          <p class="sidebar__nav__title"><%= t(".nav.communications") %></p>
+          <ul class="sidebar__items">
+            <li class="sidebar__item">
+              <%= link_to specialist_messages_path, class: "sidebar__link" do %>
+                <div class="sidebar__link__group">
+                  <i class="ri-message-3-line sidebar__link__icon"></i>
+                  <span class="sidebar__link__text"><%= t(".nav.messages") %></span>
+                </div>
+                <i class="ri-arrow-right-s-line sidebar__link__icon"></i>
+              <% end %>
+            </li>
+            <li class="sidebar__item">
+              <%= link_to specialist_recommendations_path, class: "sidebar__link" do %>
+                <div class="sidebar__link__group">
+                  <i class="ri-file-list-3-line sidebar__link__icon"></i>
+                  <span class="sidebar__link__text"><%= t(".nav.recommendations") %></span>
+                </div>
+                <i class="ri-arrow-right-s-line sidebar__link__icon"></i>
+              <% end %>
+            </li>
+            <li class="sidebar__item">
+              <%= link_to specialist_notifications_path, class: "sidebar__link" do %>
+                <div class="sidebar__link__group">
+                  <i class="ri-notification-3-line sidebar__link__icon"></i>
+                  <span class="sidebar__link__text"><%= t(".nav.notifications") %></span>
+                </div>
+                <i class="ri-arrow-right-s-line sidebar__link__icon"></i>
+              <% end %>
+            </li>
+          </ul>
+        </div>
+        <div class="sidebar__nav__group">
+          <p class="sidebar__nav__title"><%= t(".nav.account") %></p>
+          <ul class="sidebar__items">
+            <li class="sidebar__item">
+              <%= link_to specialist_profile_path, class: "sidebar__link" do %>
+                <div class="sidebar__link__group">
+                  <i class="ri-user-settings-line sidebar__link__icon"></i>
+                  <span class="sidebar__link__text"><%= t(".nav.profile") %></span>
+                </div>
+                <i class="ri-arrow-right-s-line sidebar__link__icon"></i>
+              <% end %>
+            </li>
+            <li class="sidebar__item">
+              <%= button_to specialist_destroy_session_path, method: :delete, class: "sidebar__form-item" do %>
+                <div class="sidebar__link">
+                  <div class="sidebar__link__group">
+                    <i class="ri-logout-box-line sidebar__link__icon"></i>
+                    <span class="sidebar__link__text"><%= t(".nav.logout") %></span>
+                  </div>
+                  <i class="ri-arrow-right-s-line sidebar__link__icon"></i>
+                </div>
+              <% end %>
+            </li>
+          </ul>
+        </div>
+      </nav>
+      <div class="sidebar__footer">
+        <p class="sidebar__footer__text">&copy; <%= t(".footer") %></p>
+      </div>
+    </div>
+    <div class="dashboard__content">
+      <header class="header">
+        <%= link_to root_path do %>
+          <%= localized_logo_image_tag class: "header__logo", alt: "" %>
+        <% end %>
+        <div class="header__right">
+          <div class="header__buttons">
+            <%= link_to specialist_notifications_path, class: "header__button" do %>
+              <i class="ri-notification-3-line"></i>
+            <% end %>
+            <%= render SimpleDropdownComponent.new(icon: "ri-more-line", button_class: "header__button") do %>
+              <%= link_to specialist_profile_path, class: "simple-dropdown__link" do %>
+                <i class="ri-user-settings-line simple-dropdown__link__icon"></i>
+                <%= t(".header.profile") %>
+              <% end %>
+              <%= link_to help_path, class: "simple-dropdown__link" do %>
+                <i class="ri-question-line simple-dropdown__link__icon"></i>
+                <%= t(".header.help") %>
+              <% end %>
+              <%= button_to specialist_destroy_session_path, method: :delete, class: "simple-dropdown__link" do %>
+                <i class="ri-logout-box-line simple-dropdown__link__icon"></i>
+                <%= t(".header.logout") %>
+              <% end %>
+            <% end %>
+          </div>
+        </div>
+      </header>
+      <main class="main">
+        <div class="main__container">
+          <%= yield %>
+        </div>
+      </main>
+    </div>
+  </div>
+<% end %>
+<%= render template: "layouts/application" %>

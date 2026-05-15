@@ -1,0 +1,40 @@
+<div class="measurement-charts">
+  <div class="measurement-charts__header">
+    <h3 class="measurement-charts__title">
+      <i class="ri-line-chart-line"></i>
+      Measurement Trends
+    </h3>
+    <div class="measurement-charts__period-selector">
+      <a href="?period=7&patient_id=<%= @patient.id %>" class="period-link <%= @period == 7 ? 'active' : '' %>">7 days</a>
+      <a href="?period=30&patient_id=<%= @patient.id %>" class="period-link <%= @period == 30 ? 'active' : '' %>">30 days</a>
+      <a href="?period=90&patient_id=<%= @patient.id %>" class="period-link <%= @period == 90 ? 'active' : '' %>">90 days</a>
+    </div>
+  </div>
+
+  <% if @chart_data.values.all? { |d| d[:labels].empty? } %>
+    <div class="measurement-charts__empty">
+      <i class="ri-line-chart"></i>
+      <p>No measurement data in the selected period.</p>
+    </div>
+  <% else %>
+    <div class="measurement-charts__grid">
+      <% @chart_data.each do |type_name, data| %>
+        <% next if data[:labels].empty? %>
+        <div class="measurement-chart-card">
+          <h4 class="measurement-chart-card__title">
+            <%= type_name.humanize.gsub('_', ' ') %>
+          </h4>
+          <div class="measurement-chart-card__chart">
+            <%= line_chart data[:values],
+                           xlabel: "Date",
+                           ylabel: data[:unit],
+                           colors: ["#0d7377"],
+                           height: "180px",
+                           points: true,
+                           curve: false %>
+          </div>
+        </div>
+      <% end %>
+    </div>
+  <% end %>
+</div>

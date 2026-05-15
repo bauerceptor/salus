@@ -1,0 +1,183 @@
+<div class="page-help">
+  <header class="dash-header">
+    <div class="dash-header__left">
+      <h1 class="dash-header__title">
+        <i class="ri-question-line dash-header__title__icon"></i>
+        <%= t(".title") %>
+      </h1>
+      <%= render "shared/breadcrumbs" %>
+    </div>
+    <div class="dash-header__right">
+      <%= link_to authenticated_root_path, class: "dash-button dash-button--back" do %>
+        <i class="ri-arrow-left-line dash-button__icon"></i>
+      <% end %>
+    </div>
+  </header>
+
+  <div class="dash-flash-messages">
+    <%= turbo_frame_tag "flash" do %>
+      <%= render "shared/dash_flash" %>
+    <% end %>
+  </div>
+
+  <div class="page-help__content">
+    <div class="help-intro">
+      <div class="help-intro__icon">
+        <i class="ri-lifebuoy-line"></i>
+      </div>
+      <h2 class="help-intro__title"><%= t(".intro.title") %></h2>
+      <p class="help-intro__text"><%= t(".intro.description") %></p>
+    </div>
+
+    <div class="help-sections">
+      <div class="help-section">
+        <h3 class="help-section__title">
+          <i class="ri-user-settings-line help-section__icon"></i>
+          <%= t(".sections.getting_started.title") %>
+        </h3>
+        <div class="help-faqs">
+          <div class="help-faq">
+            <button class="help-faq__question" aria-expanded="false">
+              <span><%= t(".sections.getting_started.q1.question") %></span>
+              <i class="ri-add-line help-faq__icon"></i>
+            </button>
+            <div class="help-faq__answer">
+              <p><%= t(".sections.getting_started.q1.answer") %></p>
+            </div>
+          </div>
+          <div class="help-faq">
+            <button class="help-faq__question" aria-expanded="false">
+              <span><%= t(".sections.getting_started.q2.question") %></span>
+              <i class="ri-add-line help-faq__icon"></i>
+            </button>
+            <div class="help-faq__answer">
+              <p><%= t(".sections.getting_started.q2.answer") %></p>
+            </div>
+          </div>
+          <div class="help-faq">
+            <button class="help-faq__question" aria-expanded="false">
+              <span><%= t(".sections.getting_started.q3.question") %></span>
+              <i class="ri-add-line help-faq__icon"></i>
+            </button>
+            <div class="help-faq__answer">
+              <p><%= t(".sections.getting_started.q3.answer") %></p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="help-section">
+        <h3 class="help-section__title">
+          <i class="ri-heart-pulse-line help-section__icon"></i>
+          <%= t(".sections.health_tracking.title") %>
+        </h3>
+        <div class="help-faqs">
+          <div class="help-faq">
+            <button class="help-faq__question" aria-expanded="false">
+              <span><%= t(".sections.health_tracking.q1.question") %></span>
+              <i class="ri-add-line help-faq__icon"></i>
+            </button>
+            <div class="help-faq__answer">
+              <p><%= t(".sections.health_tracking.q1.answer") %></p>
+            </div>
+          </div>
+          <div class="help-faq">
+            <button class="help-faq__question" aria-expanded="false">
+              <span><%= t(".sections.health_tracking.q2.question") %></span>
+              <i class="ri-add-line help-faq__icon"></i>
+            </button>
+            <div class="help-faq__answer">
+              <p><%= t(".sections.health_tracking.q2.answer") %></p>
+            </div>
+          </div>
+          <div class="help-faq">
+            <button class="help-faq__question" aria-expanded="false">
+              <span><%= t(".sections.health_tracking.q3.question") %></span>
+              <i class="ri-add-line help-faq__icon"></i>
+            </button>
+            <div class="help-faq__answer">
+              <p><%= t(".sections.health_tracking.q3.answer") %></p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="help-section">
+        <h3 class="help-section__title">
+          <i class="ri-team-line help-section__icon"></i>
+          <%= t(".sections.care_team.title") %>
+        </h3>
+        <div class="help-faqs">
+          <div class="help-faq">
+            <button class="help-faq__question" aria-expanded="false">
+              <span><%= t(".sections.care_team.q1.question") %></span>
+              <i class="ri-add-line help-faq__icon"></i>
+            </button>
+            <div class="help-faq__answer">
+              <p><%= t(".sections.care_team.q1.answer") %></p>
+            </div>
+          </div>
+          <div class="help-faq">
+            <button class="help-faq__question" aria-expanded="false">
+              <span><%= t(".sections.care_team.q2.question") %></span>
+              <i class="ri-add-line help-faq__icon"></i>
+            </button>
+            <div class="help-faq__answer">
+              <p><%= t(".sections.care_team.q2.answer") %></p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="help-section">
+        <h3 class="help-section__title">
+          <i class="ri-shield-check-line help-section__icon"></i>
+          <%= t(".sections.privacy_security.title") %>
+        </h3>
+        <div class="help-faqs">
+          <div class="help-faq">
+            <button class="help-faq__question" aria-expanded="false">
+              <span><%= t(".sections.privacy_security.q1.question") %></span>
+              <i class="ri-add-line help-faq__icon"></i>
+            </button>
+            <div class="help-faq__answer">
+              <p><%= t(".sections.privacy_security.q1.answer") %></p>
+            </div>
+          </div>
+          <div class="help-faq">
+            <button class="help-faq__question" aria-expanded="false">
+              <span><%= t(".sections.privacy_security.q2.question") %></span>
+              <i class="ri-add-line help-faq__icon"></i>
+            </button>
+            <div class="help-faq__answer">
+              <p><%= t(".sections.privacy_security.q2.answer") %></p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="help-contact">
+      <h3 class="help-contact__title"><%= t(".contact.title") %></h3>
+      <p class="help-contact__text"><%= t(".contact.description") %></p>
+      <div class="help-contact__links">
+        <a href="mailto:support@salus.health" class="help-contact__link">
+          <i class="ri-mail-line"></i>
+          <span>support@salus.health</span>
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  document.querySelectorAll('.help-faq__question').forEach(button => {
+    button.addEventListener('click', () => {
+      const isExpanded = button.getAttribute('aria-expanded') === 'true';
+      button.setAttribute('aria-expanded', !isExpanded);
+      button.querySelector('.help-faq__icon').classList.toggle('ri-add-line');
+      button.querySelector('.help-faq__icon').classList.toggle('ri-subtract-line');
+      button.nextElementSibling.classList.toggle('help-faq__answer--open');
+    });
+  });
+</script>

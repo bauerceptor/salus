@@ -1,0 +1,151 @@
+<div class="salus-page-container">
+  <header class="salus-page-header">
+    <div class="salus-page-header__left">
+      <h1 class="salus-page-header__title">
+        <i class="ri-upload-cloud-line salus-page-header__icon"></i>
+        Import FHIR Data
+      </h1>
+      <%= render "shared/breadcrumbs" %>
+    </div>
+    <div class="salus-page-header__actions">
+      <%= link_to authenticated_root_path, class: "salus-btn salus-btn--secondary" do %>
+        <i class="ri-arrow-left-line salus-btn__icon"></i>
+      <% end %>
+    </div>
+  </header>
+
+  <div style="max-width: 42rem;">
+
+    <section class="salus-card" style="margin-bottom: var(--space-lg);">
+      <div class="salus-card__header">
+        <h2 class="salus-card__title">Upload FHIR Bundle</h2>
+      </div>
+      <%= form_with(url: fhir_import_path, method: :post, html: { multipart: true }) do |form| %>
+        <div class="salus-form-group">
+          <label class="salus-label">Select FHIR JSON File</label>
+          <input type="file" name="file" accept=".json,application/json" required
+                 style="padding: var(--space-sm); background: var(--color-bg); cursor: pointer;">
+        </div>
+        <div style="display: flex; gap: var(--space-sm);">
+          <%= form.submit "Import FHIR Data", class: "salus-btn salus-btn--primary" %>
+        </div>
+      <% end %>
+    </section>
+
+    <section class="salus-card" style="margin-bottom: var(--space-lg);">
+      <div class="salus-card__header">
+        <h2 class="salus-card__title">Upload PDF Document</h2>
+      </div>
+      <%= form_with(url: fhir_import_document_path, method: :post, html: { multipart: true, id: "pdf_import_form" }) do |form| %>
+        <div class="salus-form-group">
+          <label class="salus-label">Select PDF File</label>
+          <input type="file" name="file" accept=".pdf,application/pdf" required
+                 style="padding: var(--space-sm); background: var(--color-bg); cursor: pointer;">
+        </div>
+        <div class="salus-form-group">
+          <label class="salus-label">Document Type</label>
+          <select name="document_type" class="salus-select" style="padding: var(--space-sm); background: var(--color-bg);">
+            <option value="lab_result">Lab Result</option>
+            <option value="imaging_report">Imaging Report</option>
+            <option value="clinical_note">Clinical Note</option>
+            <option value="discharge_summary">Discharge Summary</option>
+            <option value="other">Other</option>
+          </select>
+        </div>
+        <div style="display: flex; gap: var(--space-sm);">
+          <%= form.submit "Import PDF Document", class: "salus-btn salus-btn--primary" %>
+        </div>
+      <% end %>
+    </section>
+
+    <% if @import_result %>
+      <section class="salus-card" style="margin-bottom: var(--space-lg);">
+        <div class="salus-card__header">
+          <h2 class="salus-card__title">Import Results</h2>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: var(--space-md);">
+          <% if @import_result[:observations].any? %>
+            <div class="salus-alert salus-alert--success">
+              <i class="ri-heart-pulse-line salus-alert__icon"></i>
+              <div class="salus-alert__content">
+                Imported <strong><%= @import_result[:observations].count %></strong> measurements
+              </div>
+            </div>
+          <% end %>
+
+          <% if @import_result[:conditions].any? %>
+            <div class="salus-alert salus-alert--success">
+              <i class="ri-stethoscope-line salus-alert__icon"></i>
+              <div class="salus-alert__content">
+                Imported <strong><%= @import_result[:conditions].count %></strong> diseases
+              </div>
+            </div>
+          <% end %>
+
+          <% if @import_result[:medications].any? %>
+            <div class="salus-alert salus-alert--success">
+              <i class="ri-medicine-bottle-line salus-alert__icon"></i>
+              <div class="salus-alert__content">
+                Imported <strong><%= @import_result[:medications].count %></strong> medications
+              </div>
+            </div>
+          <% end %>
+
+          <% if @import_result[:documents].any? %>
+            <div class="salus-alert salus-alert--success">
+              <i class="ri-file-pdf-line salus-alert__icon"></i>
+              <div class="salus-alert__content">
+                Imported <strong><%= @import_result[:documents].count %></strong> documents
+              </div>
+            </div>
+          <% end %>
+
+          <% if @import_result[:errors].any? %>
+            <div class="salus-alert salus-alert--danger">
+              <i class="ri-error-warning-line salus-alert__icon"></i>
+              <div class="salus-alert__content">
+                <div class="salus-alert__title"><%= @import_result[:errors].count %> errors occurred:</div>
+                <ul style="list-style: disc; margin-left: var(--space-lg); margin-top: var(--space-sm); font-size: var(--text-xs);">
+                  <% @import_result[:errors].first(5).each do |error| %>
+                    <li><strong><%= error[:resource_type] %>:</strong> <%= error[:error] %></li>
+                  <% end %>
+                  <% if @import_result[:errors].count > 5 %>
+                    <li>...and <%= @import_result[:errors].count - 5 %> more errors</li>
+                  <% end %>
+                </ul>
+              </div>
+            </div>
+          <% end %>
+        </div>
+      </section>
+    <% end %>
+
+    <section class="salus-card">
+      <div class="salus-card__header">
+        <h2 class="salus-card__title">Supported FHIR Resources</h2>
+      </div>
+      <div class="salus-fhir-grid">
+        <div class="salus-fhir-resource">
+          <div class="salus-fhir-resource__name">Observation</div>
+          <div class="salus-fhir-resource__desc">Measurements (weight, blood pressure, etc.)</div>
+        </div>
+        <div class="salus-fhir-resource">
+          <div class="salus-fhir-resource__name">Condition</div>
+          <div class="salus-fhir-resource__desc">Diseases and diagnoses</div>
+        </div>
+        <div class="salus-fhir-resource">
+          <div class="salus-fhir-resource__name">MedicationStatement</div>
+          <div class="salus-fhir-resource__desc">Medications being taken</div>
+        </div>
+        <div class="salus-fhir-resource">
+          <div class="salus-fhir-resource__name">CarePlan</div>
+          <div class="salus-fhir-resource__desc">Treatments and care plans</div>
+        </div>
+        <div class="salus-fhir-resource">
+          <div class="salus-fhir-resource__name">DocumentReference</div>
+          <div class="salus-fhir-resource__desc">PDF documents (lab results, imaging reports, etc.)</div>
+        </div>
+      </div>
+    </section>
+  </div>
+</div>

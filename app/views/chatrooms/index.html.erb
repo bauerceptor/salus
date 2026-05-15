@@ -1,0 +1,924 @@
+<div class="wa-app">
+
+  <aside class="wa-conversations">
+    <div class="wa-conversations__header">
+      <h1 class="wa-conversations__title">Chats</h1>
+    </div>
+    <div class="wa-conversations__list">
+      <% if @chatrooms.any? %>
+        <% @chatrooms.each do |chatroom| %>
+          <% other_user = chatroom.other_participant(current_account) %>
+          <% unread = chatroom.unread_count(current_account) %>
+          <%= link_to chatrooms_path(id: chatroom.id, locale: I18n.locale), class: "wa-conversation-item #{@chatroom&.id == chatroom.id ? 'wa-conversation-item--active' : ''}" do %>
+            <div class="wa-conversation-item__avatar">
+              <% if other_user.image.present? && other_user.image.attached? %>
+                <%= image_tag other_user.image, class: "rounded-full object-cover w-full h-full" %>
+              <% else %>
+                <i class="ri-user-3-line"></i>
+              <% end %>
+            </div>
+            <div class="wa-conversation-item__content">
+              <div class="wa-conversation-item__row">
+                <span class="wa-conversation-item__name"><%= other_user.username %></span>
+                <% if chatroom.last_message %>
+                  <span class="wa-conversation-item__time"><%= chatroom.last_message.created_at.strftime("%H:%M") %></span>
+                <% end %>
+              </div>
+              <div class="wa-conversation-item__row">
+                <span class="wa-conversation-item__preview">
+                  <% if chatroom.last_message %>
+                    <% if unread > 0 %>
+                      <span class="wa-conversation-item__typing"></span>
+                    <% end %>
+                    <%= chatroom.last_message.body.truncate(40) %>
+                  <% else %>
+                    No messages yet
+                  <% end %>
+                </span>
+                <% if unread > 0 %>
+                  <span class="wa-conversation-item__badge"><%= unread %></span>
+                <% end %>
+              </div>
+            </div>
+          <% end %>
+        <% end %>
+      <% else %>
+        <div class="wa-conversations__empty">
+          <p>No conversations yet</p>
+        </div>
+      <% end %>
+    </div>
+  </aside>
+
+  <main class="wa-chat">
+    <% if @chatroom && @other_participant %>
+      <header class="wa-chat__header">
+        <div class="wa-chat__user">
+          <div class="wa-chat__avatar">
+            <% if @other_participant.image.present? && @other_participant.image.attached? %>
+              <%= image_tag @other_participant.image, class: "rounded-full object-cover w-full h-full" %>
+            <% else %>
+              <i class="ri-user-3-line"></i>
+            <% end %>
+          </div>
+          <div class="wa-chat__info">
+            <h2 class="wa-chat__name"><%= @other_participant.username %></h2>
+            <% if @other_participant.online_status == "online" %>
+              <p class="wa-chat__status">online</p>
+            <% elsif @other_participant.last_seen_at %>
+              <p class="wa-chat__status">Last seen <%= time_ago_in_words(@other_participant.last_seen_at) %> ago</p>
+            <% else %>
+              <p class="wa-chat__status">offline</p>
+            <% end %>
+          </div>
+        </div>
+        <div class="wa-chat__actions">
+          <button class="wa-chat__action" title="Voice call">
+            <i class="ri-phone-line"></i>
+          </button>
+          <button class="wa-chat__action" title="Video call">
+            <i class="ri-video-line"></i>
+          </button>
+        </div>
+      </header>
+
+      <div class="wa-chat__messages" id="messages-container" data-chatroom-id="<%= @chatroom.id %>" data-current-account-id="<%= current_account.id %>">
+        <% if @messages.any? %>
+          <% @messages.each do |message| %>
+            <% is_sent = message.account_id == current_account.id %>
+            <div class="wa-msg wa-msg--<%= is_sent ? 'out' : 'in' %>">
+              <div class="wa-msg__bubble">
+                <% if message.message_type == 'photo' && message.attachment.attached? %>
+                  <img src="<%= url_for(message.attachment) %>" class="wa-msg__image" alt="">
+                <% elsif message.message_type == 'video' && message.attachment.attached? %>
+                  <video controls class="wa-msg__video"><source src="<%= url_for(message.attachment) %>" type="<%= message.attachment.content_type %>"></video>
+                <% elsif message.message_type == 'audio' && message.attachment.attached? %>
+                  <audio controls class="wa-msg__audio"><source src="<%= url_for(message.attachment) %>" type="<%= message.attachment.content_type %>"></audio>
+                <% elsif message.message_type == 'document' && message.attachment.attached? %>
+                  <div class="wa-msg__file">
+                    <i class="ri-file-line"></i>
+                    <span><%= message.body %></span>
+                  </div>
+                <% end %>
+                <% if message.body.present? && message.message_type != 'document' %>
+                  <p class="wa-msg__text"><%= message.body %></p>
+                <% end %>
+                <div class="wa-msg__meta">
+                  <span class="wa-msg__time"><%= message.created_at.strftime("%H:%M") %></span>
+                  <% if is_sent %>
+                    <i class="<%= message.read_by?(current_account) ? 'ri-check-double-line wa-msg__read' : 'ri-check-line' %>"></i>
+                  <% end %>
+                </div>
+              </div>
+            </div>
+          <% end %>
+        <% else %>
+          <div class="wa-chat__messages-empty">
+            <p>No messages yet. Say hello!</p>
+          </div>
+        <% end %>
+      </div>
+
+      <div class="wa-chat__input">
+        <button class="wa-chat__tool" id="attach-btn" title="Attach">
+          <i class="ri-attachment-2"></i>
+        </button>
+        <div class="wa-chat__attach-menu" id="attach-menu">
+          <label class="wa-chat__attach-option">
+            <div class="wa-chat__attach-icon wa-chat__attach-icon--photo">
+              <i class="ri-image-line"></i>
+            </div>
+            <span>Photo</span>
+            <input type="file" id="attachment-photo" class="hidden" accept="image/*" />
+          </label>
+          <label class="wa-chat__attach-option">
+            <div class="wa-chat__attach-icon wa-chat__attach-icon--video">
+              <i class="ri-vidicon-line"></i>
+            </div>
+            <span>Video</span>
+            <input type="file" id="attachment-video" class="hidden" accept="video/*" />
+          </label>
+          <label class="wa-chat__attach-option">
+            <div class="wa-chat__attach-icon wa-chat__attach-icon--doc">
+              <i class="ri-file-line"></i>
+            </div>
+            <span>Document</span>
+            <input type="file" id="attachment-doc" class="hidden" accept=".pdf,.doc,.docx,.txt" />
+          </label>
+        </div>
+        <div id="voice-recorder-container" class="wa-chat__voice-btn">
+          <button type="button" id="voice-btn" class="wa-chat__mic-btn" title="Voice">
+            <svg id="mic-icon" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
+            </svg>
+            <svg id="stop-icon" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <rect x="6" y="6" width="12" height="12" rx="2" stroke-width="2" stroke="currentColor" fill="currentColor" />
+            </svg>
+          </button>
+          <span id="recording-duration" class="text-sm text-[#667781] hidden font-mono">0:00</span>
+        </div>
+        <div class="wa-chat__field">
+          <textarea id="message-body" rows="1" placeholder="Message"></textarea>
+        </div>
+        <button class="wa-chat__send" id="send-message">
+          <i class="ri-send-line"></i>
+        </button>
+      </div>
+    <% else %>
+      <div class="wa-chat__placeholder">
+        <div class="wa-chat__placeholder-icon">
+          <i class="ri-chat-smile-3-line"></i>
+        </div>
+        <p>Select a conversation</p>
+      </div>
+    <% end %>
+  </main>
+</div>
+
+<style>
+* {
+  box-sizing: border-box;
+}
+
+.wa-app {
+  display: flex;
+  height: calc(100vh - 4rem);
+  width: 100%;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: #ddd;
+}
+
+.wa-conversations {
+  width: 30%;
+  min-width: 280px;
+  max-width: 380px;
+  display: flex;
+  flex-direction: column;
+  background: #fff;
+}
+
+.wa-conversations__header {
+  padding: 15px 16px;
+  background: #f0f2f5;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.wa-conversations__title {
+  font-size: 20px;
+  font-weight: 600;
+  color: #111;
+  margin: 0;
+}
+
+.wa-conversations__list {
+  flex: 1;
+  overflow-y: auto;
+}
+
+.wa-conversations__empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 200px;
+  color: #667781;
+}
+
+.wa-conversation-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background 0.15s;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.wa-conversation-item:hover {
+  background: #f5f5f5;
+}
+
+.wa-conversation-item--active {
+  background: #f5f5f5;
+}
+
+.wa-conversation-item__avatar {
+  width: 48px;
+  height: 48px;
+  background: #d9d9d9;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #666;
+  font-size: 22px;
+  flex-shrink: 0;
+  overflow: hidden;
+}
+
+.wa-conversation-item__avatar img {
+  width: 100%;
+  height: 100%;
+}
+
+.wa-conversation-item__content {
+  flex: 1;
+  min-width: 0;
+}
+
+.wa-conversation-item__row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+}
+
+.wa-conversation-item__name {
+  font-size: 16px;
+  font-weight: 500;
+  color: #111;
+}
+
+.wa-conversation-item__time {
+  font-size: 12px;
+  color: #667781;
+  flex-shrink: 0;
+}
+
+.wa-conversation-item__preview {
+  font-size: 14px;
+  color: #667781;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.wa-conversation-item__typing {
+  width: 8px;
+  height: 8px;
+  background: #00a884;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.wa-conversation-item__badge {
+  background: #00a884;
+  color: #fff;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 2px 6px;
+  border-radius: 10px;
+  flex-shrink: 0;
+}
+
+.wa-chat {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  background: #efeae2;
+}
+
+.wa-chat__header {
+  padding: 10px 16px;
+  background: #f0f2f5;
+  border-bottom: 1px solid #e0e0e0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.wa-chat__user {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.wa-chat__avatar {
+  width: 38px;
+  height: 38px;
+  background: #00a884;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-size: 18px;
+  overflow: hidden;
+}
+
+.wa-chat__avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.wa-chat__info {
+  display: flex;
+  flex-direction: column;
+}
+
+.wa-chat__name {
+  font-size: 16px;
+  font-weight: 500;
+  color: #111;
+  margin: 0;
+}
+
+.wa-chat__status {
+  font-size: 13px;
+  color: #667781;
+  margin: 0;
+}
+
+.wa-chat__actions {
+  display: flex;
+  gap: 8px;
+}
+
+.wa-chat__action {
+  width: 36px;
+  height: 36px;
+  border: none;
+  background: transparent;
+  border-radius: 50%;
+  color: #54656f;
+  font-size: 20px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.wa-chat__action:hover {
+  background: rgba(84, 101, 111, 0.1);
+}
+
+.wa-chat__messages {
+  flex: 1;
+  overflow-y: auto;
+  padding: 8px 12%;
+}
+
+.wa-chat__messages-empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  color: #667781;
+}
+
+.wa-msg {
+  display: flex;
+  margin-bottom: 4px;
+}
+
+.wa-msg--in {
+  justify-content: flex-start;
+}
+
+.wa-msg--out {
+  justify-content: flex-end;
+}
+
+.wa-msg__bubble {
+  max-width: 55%;
+  padding: 6px 8px 4px 8px;
+  position: relative;
+  border-radius: 7.5px;
+}
+
+.wa-msg--in .wa-msg__bubble {
+  background: #fff;
+  box-shadow: 0 1px 0.5px rgba(11, 20, 26, 0.13);
+}
+
+.wa-msg--in .wa-msg__bubble::before {
+  content: '';
+  position: absolute;
+  left: -8px;
+  top: 0;
+  width: 0;
+  height: 0;
+  border-top: 10px solid transparent;
+  border-bottom: 10px solid transparent;
+  border-right: 10px solid #fff;
+}
+
+.wa-msg--out .wa-msg__bubble {
+  background: #dcf8c6;
+}
+
+.wa-msg--out .wa-msg__bubble::after {
+  content: '';
+  position: absolute;
+  right: -8px;
+  top: 0;
+  width: 0;
+  height: 0;
+  border-top: 10px solid transparent;
+  border-bottom: 10px solid transparent;
+  border-left: 10px solid #dcf8c6;
+}
+
+.wa-msg__text {
+  font-size: 14.2px;
+  line-height: 1.35;
+  color: #111;
+  margin: 0;
+  word-wrap: break-word;
+}
+
+.wa-msg__attachments {
+  margin-bottom: 4px;
+}
+
+.wa-msg__image {
+  max-width: 260px;
+  border-radius: 6px;
+  display: block;
+}
+
+.wa-msg__audio {
+  height: 30px;
+  width: 200px;
+}
+
+.wa-msg__video {
+  max-width: 260px;
+  border-radius: 6px;
+}
+
+.wa-msg__file {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  background: rgba(0,0,0,0.05);
+  border-radius: 6px;
+  font-size: 13px;
+}
+
+.wa-msg__meta {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 3px;
+  margin-top: 2px;
+}
+
+.wa-msg__time {
+  font-size: 11px;
+  color: #667781;
+}
+
+.wa-msg__read {
+  color: #53bdeb;
+  font-size: 16px;
+}
+
+.wa-chat__input {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  background: #f0f2f5;
+  position: relative;
+}
+
+.wa-chat__tool {
+  width: 44px;
+  height: 44px;
+  background: transparent;
+  border: none;
+  border-radius: 50%;
+  color: #54656f;
+  font-size: 24px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.wa-chat__tool:hover {
+  background: rgba(84, 101, 111, 0.1);
+}
+
+.wa-chat__attach-menu {
+  position: absolute;
+  bottom: 70px;
+  left: 16px;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  padding: 8px;
+  display: none;
+  flex-direction: column;
+  gap: 4px;
+  z-index: 100;
+}
+
+.wa-chat__attach-menu.show {
+  display: flex;
+}
+
+.wa-chat__attach-option {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 12px;
+  cursor: pointer;
+  border-radius: 6px;
+}
+
+.wa-chat__attach-option:hover {
+  background: #f5f5f5;
+}
+
+.wa-chat__attach-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+}
+
+.wa-chat__attach-icon--photo {
+  background: #d9fdd3;
+  color: #00a884;
+}
+
+.wa-chat__attach-icon--video {
+  background: #d9fdd3;
+  color: #00a884;
+}
+
+.wa-chat__attach-icon--doc {
+  background: #f0f0f0;
+  color: #666;
+}
+
+.wa-chat__voice-btn {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.wa-chat__mic-btn {
+  width: 36px;
+  height: 36px;
+  background: transparent;
+  border: none;
+  border-radius: 50%;
+  color: #54656f;
+  font-size: 18px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s;
+}
+
+.wa-chat__mic-btn:hover {
+  background: rgba(84, 101, 111, 0.1);
+}
+
+.wa-chat__mic-btn.recording {
+  color: #e74c3c;
+  background: rgba(231, 76, 60, 0.1);
+}
+
+.wa-chat__mic-btn svg {
+  width: 18px;
+  height: 18px;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+.wa-chat__field {
+  flex: 1;
+  background: #fff;
+  border-radius: 24px;
+  padding: 8px 16px;
+}
+
+.wa-chat__field textarea {
+  width: 100%;
+  border: none;
+  background: transparent;
+  resize: none;
+  font-size: 15px;
+  line-height: 1.4;
+  max-height: 100px;
+  outline: none;
+}
+
+.wa-chat__send {
+  width: 48px;
+  height: 48px;
+  background: #00a884;
+  border: none;
+  border-radius: 50%;
+  color: #fff;
+  font-size: 24px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.wa-chat__send:hover {
+  background: #008069;
+}
+
+.wa-chat__placeholder {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: #f0f2f5;
+  color: #667781;
+}
+
+.wa-chat__placeholder-icon {
+  font-size: 80px;
+  margin-bottom: 16px;
+  opacity: 0.3;
+}
+
+.wa-chat__placeholder p {
+  font-size: 16px;
+}
+</style>
+
+<script>
+(function() {
+  var chat = document.querySelector('.wa-chat');
+  if (!chat) return;
+
+  var body = document.getElementById('message-body');
+  var sendBtn = document.getElementById('send-message');
+  var attachBtn = document.getElementById('attach-btn');
+  var attachMenu = document.getElementById('attach-menu');
+  var voiceBtn = document.getElementById('voice-btn');
+  var micIcon = document.getElementById('mic-icon');
+  var stopIcon = document.getElementById('stop-icon');
+  var recordingDuration = document.getElementById('recording-duration');
+
+  var voiceRecorder = null;
+  var mediaRecorder = null;
+  var audioChunks = [];
+
+  if (body) {
+    body.addEventListener('input', function() {
+      this.style.height = 'auto';
+      this.style.height = Math.min(this.scrollHeight, 100) + 'px';
+    });
+
+    body.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        sendMessage();
+      }
+    });
+  }
+
+  if (sendBtn) {
+    sendBtn.addEventListener('click', sendMessage);
+  }
+
+  if (attachBtn && attachMenu) {
+    attachBtn.addEventListener('click', function(e) {
+      e.stopPropagation();
+      attachMenu.classList.toggle('show');
+    });
+
+    document.addEventListener('click', function(e) {
+      if (!attachMenu.contains(e.target) && e.target !== attachBtn) {
+        attachMenu.classList.remove('show');
+      }
+    });
+
+    var fileInputs = attachMenu.querySelectorAll('input[type="file"]');
+    fileInputs.forEach(function(input) {
+      input.addEventListener('change', function() {
+        if (this.files && this.files.length > 0) {
+          handleFileUpload(this.files[0], this.accept);
+          attachMenu.classList.remove('show');
+        }
+      });
+    });
+  }
+
+  if (voiceBtn) {
+    voiceBtn.addEventListener('click', toggleVoiceRecording);
+  }
+
+  function toggleVoiceRecording() {
+    if (!voiceRecorder && !mediaRecorder) {
+      startRecording();
+    } else if (mediaRecorder && mediaRecorder.state === 'recording') {
+      stopRecording();
+    }
+  }
+
+  function startRecording() {
+    navigator.mediaDevices.getUserMedia({ audio: true })
+      .then(function(stream) {
+        mediaRecorder = new MediaRecorder(stream);
+        audioChunks = [];
+
+        mediaRecorder.ondataavailable = function(e) {
+          audioChunks.push(e.data);
+        };
+
+        mediaRecorder.onstop = function() {
+          var audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+          sendVoiceMessage(audioBlob);
+          stream.getTracks().forEach(function(track) { track.stop(); });
+        };
+
+        mediaRecorder.start();
+        voiceBtn.classList.add('recording');
+        micIcon.classList.add('hidden');
+        stopIcon.classList.remove('hidden');
+        recordingDuration.classList.remove('hidden');
+        updateDuration();
+      })
+      .catch(function(err) {
+        console.error('Error accessing microphone:', err);
+      });
+  }
+
+  function stopRecording() {
+    if (mediaRecorder && mediaRecorder.state === 'recording') {
+      mediaRecorder.stop();
+      voiceBtn.classList.remove('recording');
+      micIcon.classList.remove('hidden');
+      stopIcon.classList.add('hidden');
+      recordingDuration.classList.add('hidden');
+    }
+  }
+
+  var recordingStartTime;
+  function updateDuration() {
+    recordingStartTime = Date.now();
+    durationInterval = setInterval(function() {
+      var elapsed = Math.floor((Date.now() - recordingStartTime) / 1000);
+      var minutes = Math.floor(elapsed / 60);
+      var seconds = elapsed % 60;
+      recordingDuration.textContent = minutes + ':' + (seconds < 10 ? '0' : '') + seconds;
+    }, 1000);
+  }
+
+  var durationInterval;
+
+  function sendVoiceMessage(audioBlob) {
+    var chatroomId = document.querySelector('[data-chatroom-id]')?.dataset.chatroomId;
+    if (!chatroomId) return;
+
+    var formData = new FormData();
+    formData.append('chatroom_message[body]', 'Voice message');
+    formData.append('chatroom_message[message_type]', 'audio');
+    formData.append('attachment', audioBlob, 'voice_message.webm');
+
+    fetch('/<%= I18n.locale %>/chatrooms/' + chatroomId + '/chatroom_messages', {
+      method: 'POST',
+      headers: {
+        'Accept': 'application/json',
+        'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]').content
+      },
+      body: formData
+    }).then(function(response) {
+      if (response.ok) {
+        return response.json();
+      }
+    }).catch(function(error) {
+      console.error('Send voice error:', error);
+    });
+
+    if (durationInterval) clearInterval(durationInterval);
+  }
+
+  function handleFileUpload(file, acceptType) {
+    var chatroomId = document.querySelector('[data-chatroom-id]')?.dataset.chatroomId;
+    if (!chatroomId) return;
+
+    var formData = new FormData();
+    var messageType = 'document';
+
+    if (file.type.startsWith('image/')) {
+      messageType = 'photo';
+    } else if (file.type.startsWith('video/')) {
+      messageType = 'video';
+    } else if (file.type.startsWith('audio/')) {
+      messageType = 'audio';
+    }
+
+    formData.append('chatroom_message[body]', file.name);
+    formData.append('chatroom_message[message_type]', messageType);
+    formData.append('attachment', file);
+
+    fetch('/<%= I18n.locale %>/chatrooms/' + chatroomId + '/chatroom_messages', {
+      method: 'POST',
+      headers: {
+        'Accept': 'application/json',
+        'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]').content
+      },
+      body: formData
+    }).then(function(response) {
+      if (response.ok) {
+        return response.json();
+      }
+    }).catch(function(error) {
+      console.error('Send error:', error);
+    });
+  }
+
+  function sendMessage() {
+    if (!body || !body.value.trim()) return;
+
+    var chatroomId = document.querySelector('[data-chatroom-id]')?.dataset.chatroomId;
+    if (!chatroomId) return;
+
+    var formData = new FormData();
+    formData.append('chatroom_message[body]', body.value.trim());
+
+    fetch('/<%= I18n.locale %>/chatrooms/' + chatroomId + '/chatroom_messages', {
+      method: 'POST',
+      headers: {
+        'Accept': 'application/json',
+        'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]').content
+      },
+      body: formData
+    }).then(function(response) {
+      if (response.ok) {
+        body.value = '';
+        body.style.height = 'auto';
+      }
+    }).catch(function(error) {
+      console.error('Send error:', error);
+    });
+  }
+
+  var container = document.getElementById('messages-container');
+  if (container) {
+    container.scrollTop = container.scrollHeight;
+  }
+
+  setTimeout(function() {
+    var container = document.getElementById('messages-container');
+    if (container) {
+      container.scrollTop = container.scrollHeight;
+    }
+  }, 100);
+})();
+</script>

@@ -1,0 +1,127 @@
+<div class="page-account">
+  <div class="page-account__container">
+    <div class="dash-flash-messages">
+      <%= turbo_frame_tag "flash" %>
+    </div>
+    <%= render "card" %>
+    <div class="card-group">
+      <header class="card-group__header">
+        <div class="card-group__header__left">
+          <h2 class="card-group__header__title"><%= t(".title") %></h2>
+        </div>
+        <div class="card-group__header__right">
+        </div>
+      </header>
+      <div class="card-group__content">
+        <% if policy(@account).show? %>
+          <div class="profile-info">
+            <% if @account.bio.present? %>
+              <div class="profile-info__item">
+                <i class="ri-file-text-line profile-info__icon"></i>
+                <div class="profile-info__content">
+                  <p class="profile-info__label"><%= t(".bio") %></p>
+                  <p class="profile-info__value"><%= @account.bio %></p>
+                </div>
+              </div>
+            <% end %>
+
+            <% if @account.city.present? || @account.country.present? %>
+              <div class="profile-info__item">
+                <i class="ri-map-pin-line profile-info__icon"></i>
+                <div class="profile-info__content">
+                  <p class="profile-info__label"><%= t(".location") %></p>
+                  <p class="profile-info__value"><%= [@account.city, @account.country].compact.join(", ") %></p>
+                </div>
+              </div>
+            <% end %>
+
+            <% if @account.birthday.present? %>
+              <div class="profile-info__item">
+                <i class="ri-cake-line profile-info__icon"></i>
+                <div class="profile-info__content">
+                  <p class="profile-info__label"><%= t(".birthday") %></p>
+                  <p class="profile-info__value"><%= l(@account.birthday, format: :long) if @account.birthday %></p>
+                </div>
+              </div>
+            <% end %>
+
+            <% if @account.gender.present? %>
+              <div class="profile-info__item">
+                <i class="ri-user-line profile-info__icon"></i>
+                <div class="profile-info__content">
+                  <p class="profile-info__label"><%= t(".gender") %></p>
+                  <p class="profile-info__value"><%= @account.gender %></p>
+                </div>
+              </div>
+            <% end %>
+
+            <% if @account.education.present? %>
+              <div class="profile-info__item">
+                <i class="ri-graduation-cap-line profile-info__icon"></i>
+                <div class="profile-info__content">
+                  <p class="profile-info__label"><%= t(".education") %></p>
+                  <p class="profile-info__value"><%= @account.education.humanize if @account.education %></p>
+                </div>
+              </div>
+            <% end %>
+
+            <% if @account.user&.specialist? %>
+              <div class="profile-info__item">
+                <i class="ri-stethoscope-line profile-info__icon"></i>
+                <div class="profile-info__content">
+                  <p class="profile-info__label"><%= t(".expertise") %></p>
+                  <p class="profile-info__value"><%= @account.user.specialist.field_of_expertise %></p>
+                </div>
+              </div>
+            <% end %>
+
+            <div class="profile-info__item">
+              <i class="ri-star-line profile-info__icon"></i>
+              <div class="profile-info__content">
+                <p class="profile-info__label"><%= t(".karma_score") %></p>
+                <p class="profile-info__value"><%= @account.karma_score %> (<%= t(".badge_#{@account.badge}") %>)</p>
+              </div>
+            </div>
+
+            <div class="profile-info__item">
+              <i class="ri-calendar-line profile-info__icon"></i>
+              <div class="profile-info__content">
+                <p class="profile-info__label"><%= t(".joined") %></p>
+                <p class="profile-info__value"><%= l(@account.created_at, format: :long) %></p>
+              </div>
+            </div>
+
+            <% if @account.bio.blank? && @account.city.blank? && @account.birthday.blank? && @account.gender.blank? && @account.education.blank? %>
+              <p class="card-group__text"><%= t(".no_information") %></p>
+            <% end %>
+          </div>
+        <% else %>
+          <p class="dash-text"><%= t(".unauthorized") %></p>
+        <% end %>
+      </div>
+    </div>
+
+    <% if @posts.any? %>
+      <div class="card-group">
+        <header class="card-group__header">
+          <div class="card-group__header__left">
+            <h2 class="card-group__header__title"><%= t(".recent_posts") %></h2>
+          </div>
+        </header>
+        <div class="card-group__content">
+          <% @posts.each do |post| %>
+            <div class="post-item">
+              <p class="post-item__body"><%= post.body %></p>
+              <p class="post-item__meta">
+                <%= t(".post_meta", count: post.reactions.count) %>
+                <% if post.hashtags.any? %>
+                  · <%= post.hashtags.pluck(:name).map { |h| "##{h}" }.join(" ") %>
+                <% end %>
+              </p>
+            </div>
+          <% end %>
+        </div>
+      </div>
+    <% end %>
+  </div>
+</div>

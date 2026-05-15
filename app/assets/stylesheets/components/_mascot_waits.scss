@@ -1,0 +1,27 @@
+.mascot-waits {
+  width: 100%;
+  height: 100vh;
+  position: relative;
+
+  &__svg-holder {
+    width: 400px;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+
+    div {
+      padding-bottom: 100%;
+      height: 0;
+      position: relative;
+
+      svg {
+        width: 100%;
+        height: 100%;
+        position: absolute;
+        top: 0;
+        left: 0;
+      }
+    }
+  }
+}

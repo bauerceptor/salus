@@ -1,0 +1,57 @@
+<div class="page-note">
+  <header class="dash-header">
+    <div class="dash-header__left">
+      <h1 class="dash-header__title"><%= @note.title %></h1>
+      <%= render "shared/breadcrumbs" %>
+    </div>
+    <div class="dash-header__right">
+      <%= link_to edit_note_path, class: "dash-button dash-button--info" do %>
+        <i class="ri-edit-2-line dash-button__icon"></i>
+        <%= t(".button.edit") %>
+      <% end %>
+      <%= button_to note_path(id: @note.id, locale: I18n.locale), class: "dash-button dash-button--delete",
+          method: :delete, form: { data: { turbo_confirm: t(".button.delete.turbo.confirm") } } do %>
+        <i class="ri-close-line"></i>
+        <%= t(".button.delete.title") %>
+      <% end %>
+      <%= link_to notes_path, class: "dash-button dash-button--back" do %>
+        <i class="ri-arrow-left-line dash-button__icon"></i>
+      <% end %>
+    </div>
+  </header>
+  <div class="dash-flash-messages">
+    <%= turbo_frame_tag "flash" do %>
+      <%= render "shared/dash_flash" %>
+    <% end %>
+  </div>
+  <div class="page-note__content">
+    <div class="page-note__left">
+      <div class="note">
+        <p class="note__label">
+          <%= t(".created_at", date: @note.created_at.strftime("%d.%m.%Y")) %> -
+          <%= t(".edited_at", date: time_ago_in_words(@note.updated_at)) %>
+        </p>
+        <div class="note__body">
+          <%= simple_format(@note.content) %>
+        </div>
+      </div>
+    </div>
+    <div class="page-note__right">
+      <div class="dash-group">
+        <header class="dash-group__header">
+          <h2 class="dash-group__title">
+            <i class="ri-hashtag dash-group__title__icon"></i>
+            <%= t(".assign_tags") %>
+          </h2>
+          <div class="dash-group__actions"></div>
+        </header>
+        <div class="dash-group__content">
+          <%= turbo_frame_tag :add_note_tag_association, src: new_note_note_tag_association_path(note_id: @note.id, locale: I18n.locale) %>
+          <%= turbo_frame_tag :note_tag_associations, src: note_note_tag_associations_path(note_id: @note.id, locale: I18n.locale) do %>
+            <p><%= t(".turbo.loading") %></p>
+          <% end %>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

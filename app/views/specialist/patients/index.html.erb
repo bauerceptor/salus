@@ -1,0 +1,141 @@
+<div class="page-patients" data-controller="patient-filter">
+  <header class="dash-header">
+    <div class="dash-header__left">
+      <h1 class="dash-header__title">
+        <i class="ri-user-line dash-header__title__icon"></i>
+        <%= t(".title") %>
+      </h1>
+      <%= render "shared/breadcrumbs" %>
+    </div>
+    <div class="dash-header__right">
+      <%= link_to specialist_dashboard_path, class: "dash-button dash-button--back" do %>
+        <i class="ri-arrow-left-line dash-button__icon"></i>
+      <% end %>
+    </div>
+  </header>
+
+  <div class="dash-flash-messages">
+    <%= turbo_frame_tag "flash" do %>
+      <%= render "shared/dash_flash" %>
+    <% end %>
+  </div>
+
+  <div class="dash-group">
+    <header class="dash-group__header">
+      <h2 class="dash-group__title">
+        <i class="ri-user-line dash-group__title__icon"></i>
+        <%= t(".subtitle") %>
+      </h2>
+    </header>
+
+    <div class="dash-filter-bar" data-patient-filter-target="filterBar">
+      <div class="dash-filter-bar__search">
+        <%= form_with url: specialist_patients_path, method: :get,
+                      data: { search_target: "form" } do |f| %>
+          <div class="search-input-wrapper">
+            <i class="ri-search-line search-input-icon"></i>
+            <%= f.text_field :q, value: params[:q], placeholder: t(".search_placeholder"),
+                            class: "search-input",
+                            data: { action: "input->patient-filter#search" } %>
+          </div>
+        <% end %>
+      </div>
+
+      <div class="dash-filter-bar__chips">
+        <%= link_to specialist_patients_path(risk_filter: nil, q: params[:q]),
+                    class: "filter-chip filter-chip--all #{params[:risk_filter].blank? ? 'filter-chip--active' : ''}",
+                    data: { action: "click->patient-filter#filter" } do %>
+          <%= t(".filter.all") %>
+        <% end %>
+        <%= link_to specialist_patients_path(risk_filter: "High", q: params[:q]),
+                    class: "filter-chip filter-chip--high #{params[:risk_filter] == 'High' ? 'filter-chip--active' : ''}",
+                    data: { action: "click->patient-filter#filter" } do %>
+          <i class="ri-arrow-up-s-line"></i>
+          <%= t(".filter.high_risk") %>
+        <% end %>
+        <%= link_to specialist_patients_path(risk_filter: "Medium", q: params[:q]),
+                    class: "filter-chip filter-chip--medium #{params[:risk_filter] == 'Medium' ? 'filter-chip--active' : ''}",
+                    data: { action: "click->patient-filter#filter" } do %>
+          <i class="ri-arrow-right-s-line"></i>
+          <%= t(".filter.medium_risk") %>
+        <% end %>
+        <%= link_to specialist_patients_path(risk_filter: "Low", q: params[:q]),
+                    class: "filter-chip filter-chip--low #{params[:risk_filter] == 'Low' ? 'filter-chip--active' : ''}",
+                    data: { action: "click->patient-filter#filter" } do %>
+          <i class="ri-arrow-down-s-line"></i>
+          <%= t(".filter.low_risk") %>
+        <% end %>
+      </div>
+    </div>
+
+    <div class="dash-group__content">
+      <% if @patients.to_a.any? %>
+        <div class="patient-list">
+          <% @patients.each do |sp| %>
+            <%= link_to specialist_patient_path(id: sp.account_id, locale: I18n.locale),
+                        class: "patient-card patient-card--hoverable" do %>
+              <div class="patient-card__avatar">
+                <%= render "shared/avatar", account: sp.account, css_class: "", alt: "" %>
+              </div>
+              <div class="patient-card__info">
+                <p class="patient-card__name"><%= sp.account.full_name %></p>
+                <p class="patient-card__meta">
+                  <% if sp.account.diseases.any? %>
+                    <%= sp.account.diseases.first.predefined_disease&.name || sp.account.diseases.first.name %>
+                  <% else %>
+                    <%= t(".no_disease") %>
+                  <% end %>
+                </p>
+                <p class="patient-card__joined">
+                  <%= t(".joined") %> <%= sp.created_at.strftime("%b %d, %Y") %>
+                </p>
+              </div>
+              <div class="patient-card__badges">
+                <span class="badge badge--<%= sp.account.risk_level.downcase %>">
+                  <%= sp.account.risk_level %>
+                </span>
+              </div>
+              <div class="patient-card__actions">
+                <%= link_to new_specialist_note_path(patient_id: sp.account_id),
+                            class: "dash-button dash-button--small dash-button--gray",
+                            title: t(".actions.add_note") do %>
+                  <i class="ri-file-text-line"></i>
+                <% end %>
+                <%= link_to new_specialist_recommendation_path(patient_id: sp.account_id, recommendation_type: "medication"),
+                            class: "dash-button dash-button--small dash-button--gray",
+                            title: t(".actions.send_medication") do %>
+                  <i class="ri-pill-line"></i>
+                <% end %>
+                <%= link_to specialist_messages_path(sp.account_id),
+                            class: "dash-button dash-button--small dash-button--gray",
+                            title: t(".actions.message") do %>
+                  <i class="ri-message-3-line"></i>
+                <% end %>
+              </div>
+              <i class="ri-arrow-right-s-line patient-card__arrow"></i>
+            <% end %>
+          <% end %>
+        </div>
+      <% else %>
+        <div class="dash-empty-state">
+          <i class="ri-user-search-line dash-empty-state__icon"></i>
+          <p class="dash-empty-state__text"><%= t(".empty") %></p>
+          <% if params[:q].present? || params[:risk_filter].present? %>
+            <%= link_to specialist_patients_path, class: "dash-button dash-button--gray" do %>
+              <%= t(".clear_filters") %>
+            <% end %>
+          <% end %>
+        </div>
+      <% end %>
+    </div>
+  </div>
+
+  <div class="dash-pagination">
+    <div class="dash-pagination__controls">
+      <%== pagy_nav(@pagy) if @pagy.pages > 1 %>
+    </div>
+    <div class="dash-pagination__info">
+      <%== pagy_info(@pagy) %>
+    </div>
+  </div>
+</div>

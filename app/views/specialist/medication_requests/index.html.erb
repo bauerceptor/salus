@@ -1,0 +1,75 @@
+<div class="page-medication-requests">
+  <header class="page-header">
+    <div class="page-header__left">
+      <h1 class="page-header__title">
+        <i class="ri-capsule-line"></i>
+        Medication Requests
+      </h1>
+      <%= render "shared/breadcrumbs" %>
+    </div>
+    <div class="page-header__right">
+      <%= link_to specialist_dashboard_path, class: "dash-button dash-button--back" do %>
+        <i class="ri-arrow-left-line"></i>
+      <% end %>
+    </div>
+  </header>
+
+  <%= turbo_frame_tag "flash" do %>
+    <%= render "shared/dash_flash" %>
+  <% end %>
+
+  <% if @medication_requests.to_a.any? %>
+    <div class="medication-requests-list">
+      <% @medication_requests.each do |request| %>
+        <div class="medication-request-item">
+          <div class="medication-request-item__header">
+            <div class="medication-request-item__patient">
+              <div class="medication-request-item__avatar">
+                <%= render "shared/avatar", account: request.account, css_class: "", alt: "" %>
+              </div>
+              <div class="medication-request-item__patient-info">
+                <p class="medication-request-item__name"><%= request.account.full_name %></p>
+                <p class="medication-request-item__date"><%= time_ago_in_words(request.requested_at) %> ago</p>
+              </div>
+            </div>
+            <span class="badge badge--pending">Pending</span>
+          </div>
+          <div class="medication-request-item__body">
+            <h3 class="medication-request-item__title"><%= request.medication_name %></h3>
+            <p class="medication-request-item__description"><%= request.reason %></p>
+            <div class="medication-request-item__meta">
+              <span><i class="ri-calendar-line"></i> Dosage: <%= request.dosage %></span>
+              <span><i class="ri-time-line"></i> <%= request.frequency %></span>
+            </div>
+          </div>
+          <div class="medication-request-item__actions">
+            <%= button_to specialist_medication_request_path(id: request, status: "approved"),
+                method: :patch,
+                class: "dash-button dash-button--small dash-button--new" do %>
+              <i class="ri-check-line"></i> Approve
+            <% end %>
+            <%= button_to specialist_medication_request_path(id: request, status: "rejected"),
+                method: :patch,
+                class: "dash-button dash-button--small dash-button--delete" do %>
+              <i class="ri-close-line"></i> Reject
+            <% end %>
+          </div>
+        </div>
+      <% end %>
+    </div>
+  <% else %>
+    <div class="empty-state">
+      <i class="ri-checkbox-circle-line empty-state__icon"></i>
+      <p class="empty-state__text">No pending medication requests</p>
+    </div>
+  <% end %>
+
+  <div class="pagination-container">
+    <div class="dash-pagination__info">
+      <%== pagy_info(@pagy) if @pagy.pages > 1 %>
+    </div>
+    <div class="dash-pagination__nav">
+      <%== pagy_nav(@pagy) if @pagy.pages > 1 %>
+    </div>
+  </div>
+</div>

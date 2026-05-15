@@ -1,0 +1,47 @@
+<div class="page-disease-statuses">
+  <header class="dash-header">
+    <div class="dash-header__left">
+      <h1 class="dash-header__title">
+        <i class="ri-hearts-line dash-header__title__icon"></i>
+        <%= t(".title") %>
+      </h1>
+      <%= render "shared/breadcrumbs" %>
+    </div>
+    <div class="dash-header__right">
+      <%= link_to new_disease_status_path, class: "dash-button dash-button--new" do %>
+        <i class="ri-add-line dash-button__icon"></i>
+        <%= t(".button.new") %>
+      <% end %>
+      <%= link_to disease_path(id: @disease.id, locale: I18n.locale), class: "dash-button dash-button--back" do %>
+        <i class="ri-arrow-left-line dash-button__icon"></i>
+      <% end %>
+    </div>
+  </header>
+  <div class="dash-flash-messages">
+    <%= turbo_frame_tag "flash" do %>
+      <%= render "shared/dash_flash" %>
+    <% end %>
+  </div>
+  <div class="page-disease-statuses__content">
+    <% if @disease_statuses.to_a.any? %>
+      <% @disease_statuses.each do |disease_status| %>
+        <div class="dash-posts-container">
+          <%= render partial: disease_status, locals: { disease: @disease,
+              disease_status:, liked_statuses: @liked_statuses } %>
+        </div>
+      <% end %>
+    <% else %>
+      <p class="no-results">
+        <%= t(".no_results") %>
+      </p>
+    <% end %>
+  </div>
+  <div class="dash-pagination">
+    <div class="dash-pagination__controls">
+      <%== pagy_nav(@pagy) if @pagy.pages > 1 %>
+    </div>
+    <div class="dash-pagination__info">
+      <%== pagy_info(@pagy) %>
+    </div>
+  </div>
+</div>

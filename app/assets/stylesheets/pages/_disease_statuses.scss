@@ -1,0 +1,29 @@
+.page-disease-statuses {
+  &__content {
+    padding: 30px 0;
+    display: flex;
+    border-bottom: 1px solid $dash-base-border;
+    gap: 40px;
+    align-items: center;
+    flex-direction: column;
+    justify-content: center;
+  }
+}
+
+@media (max-width: 768px) {
+  .page-disease-statuses {
+    &__content {
+      padding: 20px 0;
+      gap: 30px;
+    }
+  }
+}
+
+@media (max-width: 640px) {
+  .page-disease-statuses {
+    &__content {
+      padding: 15px 0;
+      gap: 20px;
+    }
+  }
+}

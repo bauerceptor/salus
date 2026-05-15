@@ -1,0 +1,117 @@
+<div class="page-settings">
+  <header class="dash-header">
+    <div class="dash-header__left">
+      <h1 class="dash-header__title">
+        <i class="ri-shield-check-line dash-header__title__icon"></i>
+        <%= t(".title") %>
+      </h1>
+      <%= render "shared/breadcrumbs" %>
+    </div>
+    <div class="dash-header__right">
+      <%= link_to authenticated_root_path, class: "dash-button dash-button--back" do %>
+        <i class="ri-arrow-left-line dash-button__icon"></i>
+      <% end %>
+    </div>
+  </header>
+  <div class="dash-flash-messages">
+    <%= turbo_frame_tag "flash" do %>
+      <%= render "shared/dash_flash" %>
+    <% end %>
+  </div>
+  <div class="page-settings__content">
+    <div class="page-settings__nav">
+      <%= render "settings/nav" %>
+    </div>
+    <div class="page-settings__frame">
+      <%= form_with(url: settings_privacy_path, method: :patch, html: { class: "settings-form" }) do |f| %>
+        <div class="settings-group">
+          <header class="settings-group__header">
+            <h3 class="settings-group__header__title"><%= t(".profile.title") %></h3>
+          </header>
+          <div class="settings-group__content">
+            <div class="settings-group__field">
+              <label for="privacy_profile_visibility"><%= t(".profile.visibility.label") %></label>
+              <select name="privacy[profile_visibility]" id="privacy_profile_visibility" class="settings-select">
+                <option value="public" <%= "selected" if @account.privacy_settings[:profile_visibility] == "public" %>><%= t(".profile.visibility.options.public") %></option>
+                <option value="friends" <%= "selected" if @account.privacy_settings[:profile_visibility] == "friends" %>><%= t(".profile.visibility.options.friends") %></option>
+                <option value="private" <%= "selected" if @account.privacy_settings[:profile_visibility] == "private" %>><%= t(".profile.visibility.options.private") %></option>
+              </select>
+              <p class="settings-group__hint"><%= t(".profile.visibility.hint") %></p>
+            </div>
+          </div>
+        </div>
+
+        <div class="settings-group">
+          <header class="settings-group__header">
+            <h3 class="settings-group__header__title"><%= t(".health_data.title") %></h3>
+          </header>
+          <div class="settings-group__content">
+            <div class="settings-group__toggle">
+              <label for="privacy_show_health_data">
+                <div class="settings-toggle">
+                  <input type="checkbox" name="privacy[show_health_data]" id="privacy_show_health_data"
+                         <%= "checked" if @account.privacy_settings[:show_health_data] %>>
+                  <span class="settings-toggle__slider"></span>
+                </div>
+                <span class="settings-toggle__label"><%= t(".health_data.show.description") %></span>
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <div class="settings-group">
+          <header class="settings-group__header">
+            <h3 class="settings-group__header__title"><%= t(".friends.title") %></h3>
+          </header>
+          <div class="settings-group__content">
+            <div class="settings-group__toggle">
+              <label for="privacy_allow_friend_requests">
+                <div class="settings-toggle">
+                  <input type="checkbox" name="privacy[allow_friend_requests]" id="privacy_allow_friend_requests"
+                         <%= "checked" if @account.privacy_settings[:allow_friend_requests] %>>
+                  <span class="settings-toggle__slider"></span>
+                </div>
+                <span class="settings-toggle__label"><%= t(".friends.requests.description") %></span>
+              </label>
+            </div>
+            <div class="settings-group__toggle">
+              <label for="privacy_show_online_status">
+                <div class="settings-toggle">
+                  <input type="checkbox" name="privacy[show_online_status]" id="privacy_show_online_status"
+                         <%= "checked" if @account.privacy_settings[:show_online_status] %>>
+                  <span class="settings-toggle__slider"></span>
+                </div>
+                <span class="settings-toggle__label"><%= t(".friends.online.description") %></span>
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <div class="settings-group">
+          <header class="settings-group__header">
+            <h3 class="settings-group__header__title"><%= t(".sharing.title") %></h3>
+          </header>
+          <div class="settings-group__content">
+            <div class="settings-group__toggle">
+              <label for="privacy_share_measurements">
+                <div class="settings-toggle">
+                  <input type="checkbox" name="privacy[share_measurements]" id="privacy_share_measurements"
+                         <%= "checked" if @account.privacy_settings[:share_measurements] %>>
+                  <span class="settings-toggle__slider"></span>
+                </div>
+                <span class="settings-toggle__label"><%= t(".sharing.measurements.description") %></span>
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <div class="settings-form__actions">
+          <button type="submit" class="dash-button dash-button--new">
+            <i class="ri-save-line dash-button__icon"></i>
+            <%= t(".save") %>
+          </button>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</div>

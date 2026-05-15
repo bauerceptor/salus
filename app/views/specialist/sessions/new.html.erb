@@ -1,0 +1,51 @@
+<div class="auth auth--login auth--specialist">
+  <div class="auth__content">
+    <header class="auth__header">
+      <div class="auth__portal-badge auth__portal-badge--specialist">
+        <i class="ri-nurse-line"></i>
+        <span>Doctor Portal</span>
+      </div>
+      <%= link_to root_path do %>
+        <%= localized_logo_image_tag class: "auth__header__logo", alt: "" %>
+      <% end %>
+    </header>
+    <div class="auth__main">
+      <div class=auth__heading>
+        <h1 class="auth__title">Doctor Login</h1>
+        <p class="auth__desc">Sign in to access your patient dashboard</p>
+      </div>
+      <%= form_with url: specialist_session_path, scope: :session, html: { class: "auth-form" } do |f| %>
+        <% if alert %>
+          <div class="auth-form__flash auth-form__alert">
+            <%= alert %>
+          </div>
+        <% end %>
+        <div class="auth-form__group">
+          <%= f.label :email, "Email", class: "auth-form__label" %>
+          <%= f.email_field :email, autofocus: true, autocomplete: "email",
+                class: "auth-form__input", placeholder: "doctor@example.com" %>
+        </div>
+        <div class="auth-form__group">
+          <%= f.label :password, "Password", class: "auth-form__label" %>
+          <%= f.password_field :password, autocomplete: "new-password",
+                class: "auth-form__input", placeholder: "Enter your password" %>
+        </div>
+        <%= f.submit "Sign In", class: "auth-form__submit auth-form__submit--specialist" %>
+      <% end %>
+      <div class="auth__portal-links">
+        <p class="auth__portal-links__text">Other Portals:</p>
+        <div class="auth__portal-buttons">
+          <%= link_to "/auth/sign_in", class: "auth__portal-btn auth__portal-btn--patient" do %>
+            <i class="ri-user-line"></i>
+            Patient Login
+          <% end %>
+          <%= link_to "/admin/sign_in", class: "auth__portal-btn auth__portal-btn--admin" do %>
+            <i class="ri-admin-line"></i>
+            Admin Login
+          <% end %>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="auth__sidebar auth__sidebar--specialist" style="background-image: url(<%= asset_path("login-doctor.jpg") %>); background-size: cover; background-position: center; background-repeat: no-repeat;">
+</div>

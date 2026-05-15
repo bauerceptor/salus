@@ -1,0 +1,70 @@
+# Bundler
+/.bundle
+/vendor/bundle
+
+# Logs
+/log/*
+!/log/.keep
+
+# Temp
+/tmp/*
+!/tmp/.keep
+
+# Pids
+/tmp/pids/*
+!/tmp/pids/
+!/tmp/pids/.keep
+
+# Storage
+/storage/*
+!/storage/.keep
+/tmp/storage/*
+!/tmp/storage/
+!/tmp/storage/.keep
+
+# Assets
+/public/assets
+/public/packs
+/public/packs-test
+/public/system
+/app/assets/builds/*
+!/app/assets/builds/.keep
+
+# Uploads
+/public/uploads
+
+# Rails master key
+/config/master.key
+
+# Environment files
+.env
+.env.*
+
+# Node
+node_modules/
+
+# Docs (yard, rdoc auto-gen)
+doc/
+
+# ERD
+/erd.png
+/erd.pdf
+
+# Test coverage
+/coverage
+
+# SQLite databases
+db/*.sqlite3
+db/*.sqlite3-shm
+db/*.sqlite3-wal
+
+# OpenCode config
+opencode.jsonc
+
+# Byebug history
+.byebug_history
+
+# OS files
+.DS_Store
+*.swp
+*~

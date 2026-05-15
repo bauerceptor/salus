@@ -1,0 +1,33 @@
+# Pin npm packages by running ./bin/importmap
+
+pin "application", preload: true
+pin "@hotwired/turbo-rails", to: "turbo.min.js", preload: true
+pin "@rails/actioncable", to: "https://cdn.jsdelivr.net/npm/@rails/actioncable@8.1.0/app/assets/javascripts/actioncable.esm.js"
+pin "@hotwired/stimulus-loading", to: "stimulus-loading.js", preload: true
+pin_all_from "app/javascript/controllers", under: "controllers"
+pin "stimulus-notification", to: "https://ga.jspm.io/npm:stimulus-notification@2.2.0/dist/stimulus-notification.mjs"
+pin "@hotwired/stimulus", to: "https://ga.jspm.io/npm:@hotwired/stimulus@3.2.2/dist/stimulus.js"
+pin "hotkeys-js", to: "https://ga.jspm.io/npm:hotkeys-js@3.11.2/dist/hotkeys.esm.js"
+pin "stimulus-use", to: "https://ga.jspm.io/npm:stimulus-use@0.51.3/dist/index.js"
+pin "sweetalert2", to: "https://ga.jspm.io/npm:sweetalert2@11.7.16/dist/sweetalert2.all.js"
+pin "stimulus-dropdown", to: "https://ga.jspm.io/npm:stimulus-dropdown@2.1.0/dist/stimulus-dropdown.mjs"
+pin "fslightbox", to: "https://ga.jspm.io/npm:fslightbox@3.4.1/index.js"
+pin "chartkick", to: "chartkick.js"
+pin "Chart.bundle", to: "Chart.bundle.js"
+pin "chart.js", to: "https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.js"
+pin "stimulus-textarea-autogrow", to: "https://ga.jspm.io/npm:stimulus-textarea-autogrow@4.1.0/dist/stimulus-textarea-autogrow.mjs"
+pin "tom-select", to: "https://ga.jspm.io/npm:tom-select@2.2.2/dist/js/tom-select.complete.js"
+pin "quill", to: "https://ga.jspm.io/npm:quill@1.3.7/dist/quill.js"
+pin "buffer", to: "https://ga.jspm.io/npm:@jspm/core@2.0.1/nodelibs/browser/buffer.js"
+pin "stimulus-popover", to: "https://ga.jspm.io/npm:stimulus-popover@6.2.0/dist/stimulus-popover.mjs"
+pin "dashboard_charts", to: "dashboard_charts.js"
+pin "wavesurfer", to: "https://ga.jspm.io/npm:wavesurfer.js@7.8.0/dist/wavesurfer.esm.js"
+pin "@peerjs/peerjs", to: "https://cdn.jsdelivr.net/npm/peerjs@1.5.4/dist/peerjs.min.js"
+pin "peerjs", to: "https://cdn.jsdelivr.net/npm/peerjs@1.5.4/dist/peerjs.min.js"
+pin "conversations", to: "conversations.js"
+pin "ai_agent", to: "ai_agent.js"
+pin "voice_recorder", to: "voice_recorder.js"
+pin "voice_note_player", to: "voice_note_player.js"
+pin "channels/consumer", to: "channels/consumer.js"
+pin "channels/chatroom_channel", to: "channels/chatroom_channel.js"
+pin "webrtc/call_manager", to: "webrtc/call_manager.js"

@@ -1,0 +1,74 @@
+<div class="page-treatment-requests">
+  <header class="page-header">
+    <div class="page-header__left">
+      <h1 class="page-header__title">
+        <i class="ri-hospital-line"></i>
+        <%= t(".title") %>
+      </h1>
+      <%= render "shared/breadcrumbs" %>
+    </div>
+    <div class="page-header__right">
+      <%= link_to new_patient_treatment_request_path, class: "dash-button dash-button--new" do %>
+        <i class="ri-add-line"></i>
+        <%= t(".button.new") %>
+      <% end %>
+      <%= link_to authenticated_root_path, class: "dash-button dash-button--back" do %>
+        <i class="ri-arrow-left-line"></i>
+      <% end %>
+    </div>
+  </header>
+
+  <%= turbo_frame_tag "flash" do %>
+    <%= render "shared/dash_flash" %>
+  <% end %>
+
+  <% if @treatment_requests.to_a.any? %>
+    <div class="treatment-requests-grid">
+      <% @treatment_requests.each do |request| %>
+        <div class="treatment-request-card">
+          <div class="treatment-request-card__status treatment-request-card__status--<%= request.status %>">
+            <%= request.status.humanize %>
+          </div>
+          <h2 class="treatment-request-card__title"><%= request.title %></h2>
+          <p class="treatment-request-card__description"><%= request.description %></p>
+          <div class="treatment-request-card__meta">
+            <span><i class="ri-calendar-line"></i> <%= request.start_date.strftime("%b %d, %Y") %></span>
+            <span><i class="ri-time-line"></i> <%= time_ago_in_words(request.requested_at) %> ago</span>
+          </div>
+          <% if request.approved? && request.specialist %>
+            <p class="treatment-request-card__specialist">
+              <i class="ri-user-line"></i> Dr. <%= request.specialist.account.full_name %>
+            </p>
+          <% elsif request.rejected? && request.rejection_reason.present? %>
+            <p class="treatment-request-card__rejection">
+              <i class="ri-error-warning-line"></i> <%= request.rejection_reason %>
+            </p>
+          <% end %>
+          <div class="treatment-request-card__actions">
+            <% if request.pending? %>
+              <%= button_to patient_treatment_request_path(id: request.id, locale: I18n.locale), method: :delete,
+                  class: "dash-button dash-button--small dash-button--delete",
+                  data: { turbo_confirm: t(".confirm.delete") } do %>
+                <i class="ri-close-line"></i> <%= t(".button.cancel") %>
+              <% end %>
+            <% end %>
+          </div>
+        </div>
+      <% end %>
+    </div>
+  <% else %>
+    <div class="empty-state">
+      <i class="ri-hospital-line empty-state__icon"></i>
+      <p class="empty-state__text"><%= t(".empty") %></p>
+    </div>
+  <% end %>
+
+  <div class="pagination-container">
+    <div class="dash-pagination__info">
+      <%== pagy_info(@pagy) if @pagy.pages > 1 %>
+    </div>
+    <div class="dash-pagination__nav">
+      <%== pagy_nav(@pagy) if @pagy.pages > 1 %>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,67 @@
+<div class="page-recommendation-new">
+  <header class="page-header">
+    <div class="page-header__left">
+      <h1 class="page-header__title">
+        <i class="ri-heart-pulse-line"></i>
+        <%= t(".title", type: @recommendation.recommendation_type.titleize) %>
+      </h1>
+      <p class="page-header__subtitle"><%= @patient.full_name %></p>
+      <%= render "shared/breadcrumbs" %>
+    </div>
+    <div class="page-header__right">
+      <%= link_to specialist_patient_path(id: @patient.id, locale: I18n.locale), class: "dash-button dash-button--back" do %>
+        <i class="ri-arrow-left-line"></i>
+      <% end %>
+    </div>
+  </header>
+
+  <div class="dash-flash-messages">
+    <%= turbo_frame_tag "flash" do %>
+      <%= render "shared/dash_flash" %>
+    <% end %>
+  </div>
+
+  <div class="page-content">
+    <div class="dash-group">
+      <header class="dash-group__header">
+        <h2 class="dash-group__title">
+          <i class="ri-file-list-3-line dash-group__title__icon"></i>
+          <%= t(".form_title") %>
+        </h2>
+      </header>
+      <div class="dash-group__content">
+        <%= form_with model: @recommendation, url: specialist_create_recommendation_path(patient_id: @patient.id), method: :post, class: "dash-form dash-form--simple", id: "recommendation-form" do |f| %>
+          <div class="dash-form__group">
+            <%= f.label :recommendation_type, t(".form.type.label"), class: "dash-form__label" %>
+            <%= f.select :recommendation_type, [["Medication", "medication"], ["Treatment", "treatment"]], {}, class: "dash-form__input dash-form__select" %>
+          </div>
+
+          <div class="dash-form__group">
+            <%= f.label :name, t(".form.name.label"), class: "dash-form__label" %>
+            <%= f.text_field :name, class: "dash-form__input", placeholder: t(".form.name.placeholder") %>
+          </div>
+
+          <div class="dash-form__group">
+            <%= f.label :dosage, t(".form.dosage.label"), class: "dash-form__label" %>
+            <%= f.text_field :dosage, class: "dash-form__input", placeholder: t(".form.dosage.placeholder") %>
+          </div>
+
+          <div class="dash-form__group">
+            <%= f.label :notes, t(".form.notes.label"), class: "dash-form__label" %>
+            <%= f.text_area :notes, class: "dash-form__input dash-form__textarea", rows: 4, placeholder: t(".form.notes.placeholder") %>
+          </div>
+
+          <div class="dash-form__info">
+            <i class="ri-information-line"></i>
+            <p><%= t(".info") %></p>
+          </div>
+
+          <div class="dash-form__actions">
+            <%= f.submit t(".form.submit"), class: "dash-button dash-button--blue" %>
+            <%= link_to t(".form.cancel"), specialist_patient_path(id: @patient.id, locale: I18n.locale), class: "dash-button dash-button--gray" %>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,87 @@
+<div class="dash-home">
+  <div class="dash-home__content">
+    <header class="dash-header">
+      <div class="dash-header__left">
+        <h1 class="dash-header__title">
+          <i class="ri-link dash-header__title__icon"></i>
+          Referral Analytics
+        </h1>
+      </div>
+    </header>
+
+    <div class="dash-group">
+      <div class="dash-group__header">
+        <h2 class="dash-group__title">
+          <i class="ri-bar-chart-line dash-group__title__icon"></i>
+          Specialist Referral Performance
+        </h2>
+      </div>
+      <div class="dash-group__content">
+        <% if @referrals_data.any? %>
+          <div class="dash-table-wrapper">
+            <table class="dash-table">
+              <thead>
+                <tr>
+                  <th>Specialist</th>
+                  <th>Specialization</th>
+                  <th>Referral URL</th>
+                  <th>Clicks (30d)</th>
+                  <th>Conversions</th>
+                  <th>Conv. Rate</th>
+                  <th>QR Code</th>
+                </tr>
+              </thead>
+              <tbody>
+                <% @referrals_data.each do |row| %>
+                  <% clicks = row["click_count"].to_i %>
+                  <% conversions = row["conversion_count"].to_i %>
+                  <% rate = clicks > 0 ? ((conversions.to_f / clicks) * 100).round : 0 %>
+                  <tr class="dash-table__row">
+                    <td>
+                      <p class="patient-list-item__name"><%= row["specialist_email"] %></p>
+                    </td>
+                    <td>
+                      <p class="text-muted"><%= row["specialization"] || "—" %></p>
+                    </td>
+                    <td>
+                      <% if row["hash_code"].present? %>
+                        <%= link_to join_specialist_path(hash: row["hash_code"]), class: "dash-link", target: "_blank" do %>
+                          <%= row["hash_code"] %>
+                          <i class="ri-external-link-line"></i>
+                        <% end %>
+                      <% else %>
+                        <span class="text-muted">—</span>
+                      <% end %>
+                    </td>
+                    <td><span class="dash-stat__value"><%= clicks %></span></td>
+                    <td><span class="dash-stat__value"><%= conversions %></span></td>
+                    <td>
+                      <span class="badge badge--<%= rate > 10 ? 'success' : rate > 0 ? 'warning' : 'error' %>">
+                        <%= rate %>%
+                      </span>
+                    </td>
+                    <td>
+                      <div class="qr-code-container" style="width: 60px; height: 60px; overflow: hidden;">
+                        <% if row["hash_code"].present? %>
+                          <% qr = RQRCode::QRCode.new(join_specialist_url(hash: row["hash_code"])) %>
+                          <%= qr.as_svg(offset: 0, module_size: 3, view_box: true).html_safe %>
+                        <% end %>
+                      </div>
+                    </td>
+                  </tr>
+                <% end %>
+              </tbody>
+            </table>
+          </div>
+        <% else %>
+          <div class="dash-empty-state">
+            <div class="dash-empty-state__icon-wrapper">
+              <i class="ri-link dash-empty-state__icon"></i>
+            </div>
+            <p class="dash-empty-state__text">No referral data yet</p>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  </div>
+</div>

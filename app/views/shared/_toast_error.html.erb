@@ -1,0 +1,10 @@
+<input type="checkbox" name="t-error" id="t-error-<%= id ||= 'default' %>" <%= checked ? 'checked' : '' %>>
+<div class="toast-panel">
+  <div class="toast-item error">
+    <div class="toast error">
+      <label for="t-error-<%= id ||= 'default' %>" class="close"></label>
+      <h3>Error!</h3>
+      <p>Change a few thing up and try submitting again.</p>
+    </div>
+  </div>
+</div>

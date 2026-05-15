@@ -1,0 +1,472 @@
+/* import fonts */
+@import url("https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&family=Barlow:wght@400;700&display=swap");
+
+/* vars */
+:root {
+  --font--barlow: "Barlow", sans-serif;
+  --font--barlowCondensed: "Barlow Condensed", sans-serif;
+
+  --color--orangeAccent-1: #fc723c;
+  --color--orangeAccent-2: #db4f14;
+  --color--orangeAccent-3: #b8390b;
+  --color--orangeBase-1: #e84f20;
+  --color--orangeBase-2: #c42e0c;
+  --color--orangeBase-3: #9e1e02;
+  --color--orangeBase-4: #781500;
+  --color--black: #191919;
+
+  --path--armR-1: "M72.246 35.982l13.586-4.421L117 61.07 87.316 85.807";
+  --path--armR-2: "M78.246 37.982l7.586-6.421L117 61.07 87.316 85.807";
+  --path--armR-3: "M84.246 41.982l1.586-10.421L117 61.07 87.316 85.807";
+  --path--armR-4: "M97.832 21.561l1.331 4.234L109 57.07 87.316 85.807";
+  --path--armR-5: "M113.832 18.561l-.112 5.159-.72 33.35-25.684 28.737";
+  --path--armR-6: "M129.832 20.561L128.264 25.846 119 57.07 87.316 85.807";
+  --path--armL-1: "M42.263 124.561L20 107.246 52.982 87.456";
+  --path--armL-2: "M34.263 121.561L13 105.246l39.982-17.79";
+  --path--armL-3: "M43.5 159.5l-1-36 10.482-36.044";
+}
+
+html {
+  height: 100%;
+}
+body {
+  color: var(--color--black);
+  font-family: var(--font--barlow);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  height: 100%;
+  margin: 0;
+  padding: 2em;
+}
+* {
+  box-sizing: border-box;
+}
+
+section {
+  min-height: 100vh;
+  width: 100%;
+
+  display: grid;
+  place-items: center start;
+  min-height: 100%;
+}
+
+.helpButton {
+  --w: 100%;
+
+  background: none;
+  border: 0;
+  border-radius: 0.25em;
+  color: #fff;
+  font-size: 2.5em;
+  font-weight: 700;
+  font-family: var(--font--barlowCondensed);
+  line-height: 1;
+  padding: 0.5em 1em;
+  position: relative;
+  text-align: left;
+  text-transform: uppercase;
+
+  display: grid;
+  grid-template-columns: auto 1fr;
+  grid-template-rows: auto;
+  align-items: center;
+  column-gap: 0.5em;
+
+  .helpButton--icon {
+    background: var(--color--orangeAccent-1);
+    border-radius: 50%;
+    margin-right: 0.25em;
+    transition: background 0.15s linear;
+    vertical-align: middle;
+    width: 1.5em;
+  }
+
+  .helpButton--unpressedLabel,
+  .helpButton--pressedLabel {
+    grid-column: 2;
+    grid-row: 1;
+  }
+
+  .helpButton--unpressedLabel {
+    color: #fff;
+  }
+  .helpButton--pressedLabel {
+    color: #fff;
+  }
+
+  &::after {
+    background: var(--color--orangeBase-1);
+    border: solid 4px var(--color--orangeBase-2);
+    border-radius: inherit;
+    box-shadow:
+      0 2px 3px rgba(0, 0, 0, 0.3),
+      0 10px 35px 15px rgba(0, 0, 0, 0.12);
+    box-sizing: border-box;
+    content: "";
+    display: block;
+    height: 100%;
+    position: absolute;
+    left: 0;
+    top: 0;
+    //transform: translateX(-50%);
+    transition:
+      background 0.15s linear,
+      width 0.2s ease-in-out;
+    width: calc(var(--w) * 1px);
+    z-index: -1;
+  }
+
+  &:hover {
+    .helpButton--icon {
+      background: var(--color--orangeAccent-2);
+    }
+    &::after {
+      background: var(--color--orangeBase-2);
+      border-color: var(--color--orangeBase-3);
+    }
+  }
+  &:focus {
+    outline: none;
+    &::after {
+      border-color: var(--color--black);
+    }
+  }
+  &::-moz-focus-inner {
+    border: 0;
+  }
+}
+
+.helpButton[aria-pressed="false"] {
+  .helpButton--icon {
+    .armR {
+      d: path(var(--path--armR-5));
+      animation:
+        thinkSetup 0.3s linear both 0s,
+        think 1s ease-out both 0.3s,
+        thinkInfinite 6s ease-out both 3.3s infinite;
+    }
+    .armL {
+      d: path(var(--path--armL-3));
+      animation: handOnHip 0.3s linear both 0s;
+    }
+  }
+
+  .helpButton--unpressedLabel {
+    animation: textFadeIn 0.4s ease-out both 0.2s;
+  }
+}
+
+.helpButton[aria-pressed="true"] {
+  &::after {
+    background: var(--color--orangeBase-2);
+    border-color: var(--color--orangeBase-3);
+  }
+
+  &:hover {
+    .helpButton--icon {
+      background: var(--color--orangeAccent-3);
+    }
+    &::after {
+      background: var(--color--orangeBase-3);
+      border-color: var(--color--orangeBase-4);
+    }
+  }
+
+  &:focus {
+    &::after {
+      border-color: var(--color--black);
+    }
+  }
+
+  .helpButton--icon {
+    background: var(--color--orangeAccent-2);
+    .armR {
+      d: path(var(--path--armR-2));
+      animation:
+        waveSetup 0.1s linear both 0s,
+        wave 1s ease-out both 0.1s,
+        waveInfinite 6s ease-out both 3.3s infinite;
+    }
+    .armL {
+      d: path(var(--path--armL-1));
+      animation: dropArm 0.3s linear both 0s;
+    }
+  }
+
+  .helpButton--pressedLabel {
+    animation: textFadeIn 0.4s ease-out both 0.2s;
+    span {
+      opacity: 0;
+    }
+    span:nth-of-type(1) {
+      animation: dotFade 4s linear both 0s infinite;
+    }
+    span:nth-of-type(2) {
+      animation: dotFade2 4s linear both 0s infinite;
+    }
+    span:nth-of-type(3) {
+      animation: dotFade3 4s linear both 0s infinite;
+    }
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .helpButton {
+    &::after {
+      transition: background 0.15s linear;
+    }
+  }
+  .helpButton[aria-pressed="false"] {
+    .helpButton--icon {
+      .armR {
+        animation: none;
+        d: path(var(--path--armR-2));
+      }
+      .armL {
+        animation: none;
+        d: path(var(--path--armL-1));
+      }
+    }
+    .helpButton--unpressedLabel {
+      animation: none;
+    }
+  }
+  .helpButton[aria-pressed="true"] {
+    .helpButton--icon {
+      .armR {
+        animation: none;
+        d: path(var(--path--armR-5));
+      }
+      .armL {
+        animation: none;
+        d: path(var(--path--armL-3));
+      }
+    }
+    .helpButton--pressedLabel {
+      animation: none;
+      span {
+        opacity: 1;
+      }
+      span:nth-of-type(1),
+      span:nth-of-type(2),
+      span:nth-of-type(3) {
+        animation: none;
+      }
+    }
+  }
+}
+
+@keyframes dotFade {
+  0% {
+    opacity: 0;
+  }
+  10%,
+  70% {
+    opacity: 1;
+  }
+  80%,
+  100% {
+    opacity: 0;
+  }
+}
+
+@keyframes dotFade2 {
+  0%,
+  10% {
+    opacity: 0;
+  }
+  20%,
+  70% {
+    opacity: 1;
+  }
+  80%,
+  100% {
+    opacity: 0;
+  }
+}
+
+@keyframes dotFade3 {
+  0%,
+  20% {
+    opacity: 0;
+  }
+  30%,
+  70% {
+    opacity: 1;
+  }
+  80%,
+  100% {
+    opacity: 0;
+  }
+}
+
+@keyframes textFadeOut {
+  0% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+@keyframes textFadeIn {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+@keyframes dropArm {
+  100% {
+    d: path(var(--path--armL-3));
+    animation-timing-function: ease;
+  }
+}
+
+@keyframes handOnHip {
+  60% {
+    d: path(var(--path--armL-2));
+    animation-timing-function: ease;
+  }
+  100% {
+    d: path(var(--path--armL-1));
+    animation-timing-function: ease;
+  }
+}
+
+@keyframes thinkSetup {
+  100% {
+    d: path(var(--path--armR-1));
+    animation-timing-function: ease-in;
+  }
+}
+
+@keyframes think {
+  15%,
+  45%,
+  75% {
+    d: path(var(--path--armR-3));
+    animation-timing-function: ease;
+  }
+  30%,
+  60%,
+  90% {
+    d: path(var(--path--armR-1));
+    animation-timing-function: ease;
+  }
+  100% {
+    d: path(var(--path--armR-2));
+    animation-timing-function: ease-out;
+  }
+}
+
+@keyframes thinkInfinite {
+  2.5%,
+  7.5%,
+  12.5% {
+    d: path(var(--path--armR-3));
+    animation-timing-function: ease;
+  }
+  5%,
+  10%,
+  15% {
+    d: path(var(--path--armR-1));
+    animation-timing-function: ease;
+  }
+  17.5% {
+    d: path(var(--path--armR-2));
+    animation-timing-function: ease-out;
+  }
+}
+
+@keyframes waveSetup {
+  100% {
+    d: path(var(--path--armR-4));
+    animation-timing-function: ease-in;
+  }
+}
+
+@keyframes wave {
+  15%,
+  45%,
+  75% {
+    d: path(var(--path--armR-6));
+    animation-timing-function: ease;
+  }
+  30%,
+  60%,
+  90% {
+    d: path(var(--path--armR-4));
+    animation-timing-function: ease;
+  }
+  100% {
+    d: path(var(--path--armR-5));
+    animation-timing-function: ease-out;
+  }
+}
+
+@keyframes waveInfinite {
+  2.5%,
+  7.5%,
+  12.5% {
+    d: path(var(--path--armR-6));
+    animation-timing-function: ease;
+  }
+  5%,
+  10%,
+  15% {
+    d: path(var(--path--armR-4));
+    animation-timing-function: ease;
+  }
+  17.5% {
+    d: path(var(--path--armR-5));
+    animation-timing-function: ease-out;
+  }
+}
+
+/* utilities */
+.svgHolder {
+  display: inline-block;
+  div,
+  span {
+    display: block;
+    height: 0;
+    padding-bottom: 100%;
+    position: relative;
+    width: 100%;
+    svg {
+      height: 100%;
+      overflow: hidden;
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+    }
+  }
+}
+
+.visuallyHidden:not(:focus):not(:active) {
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  height: 1px;
+  overflow: hidden;
+  position: absolute;
+  white-space: nowrap;
+  width: 1px;
+}
+
+.hidden {
+  display: none !important;
+}
+
+.offscreen {
+  height: 1px;
+  left: -10000px;
+  overflow: hidden;
+  position: absolute;
+  top: auto;
+  width: 1px;
+}

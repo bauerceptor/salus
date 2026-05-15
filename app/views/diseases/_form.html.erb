@@ -1,0 +1,87 @@
+<%= form_with model: @disease, html: { class: "dash-form" } do |f| %>
+  <div class="dash-form__container">
+    <div class="dash-form__group">
+      <div class="dash-form__group__container">
+        <div class="dash-form__group__left">
+          <div class="dash-form__group__title"><%= t(".predefined_disease_id.title") %></div>
+          <p class="dash-form__group__description"><%= t(".predefined_disease_id.description") %></p>
+        </div>
+        <div class="dash-form__group__right">
+          <%= f.select :predefined_disease_id, options_for_select(@predefined_diseases, @selected_disease_id),
+            { include_blank: false }, class: "dash-form__input", disabled: @selected_disease_id.present? %>
+        </div>
+      </div>
+      <%= render DashFormErrorComponent.new(model: @disease, field: :predefined_disease_id) %>
+    </div>
+  </div>
+  <div class="dash-form__container">
+    <div class="dash-form__group">
+      <div class="dash-form__group__container">
+        <div class="dash-form__group__left">
+          <div class="dash-form__group__title"><%= t(".diagnosed_by_hp.title") %></div>
+          <p class="dash-form__group__description"><%= t(".diagnosed_by_hp.description") %></p>
+        </div>
+        <div class="dash-form__group__right">
+          <div class="dash-form__checkbox">
+            <%= f.check_box :diagnosed_by_hp, class: "dash-form__checkbox__input" %>
+            <%= f.label :diagnosed_by_hp, class: "dash-form__checkbox__label" do %>
+              <%= t(".diagnosed_by_hp.label") %>
+            <% end %>
+          </div>
+        </div>
+      </div>
+      <%= render DashFormErrorComponent.new(model: @disease, field: :diagnosed_by_hp) %>
+    </div>
+  </div>
+  <div class="dash-form__container">
+    <div class="dash-form__group">
+      <div class="dash-form__group__container">
+        <div class="dash-form__group__left">
+          <div class="dash-form__group__title"><%= t(".diagnosed_at.title") %></div>
+          <p class="dash-form__group__description"><%= t(".diagnosed_at.description") %></p>
+        </div>
+        <div class="dash-form__group__right">
+          <%= f.date_field :diagnosed_at, class: "dash-form__input dash-form__input-date" %>
+        </div>
+      </div>
+      <%= render DashFormErrorComponent.new(model: @disease, field: :diagnosed_at) %>
+    </div>
+  </div>
+  <div class="dash-form__container">
+    <div class="dash-form__group">
+      <div class="dash-form__group__container">
+        <div class="dash-form__group__left">
+          <div class="dash-form__group__title"><%= t(".severity.title") %></div>
+          <p class="dash-form__group__description"><%= t(".severity.description") %></p>
+        </div>
+        <div class="dash-form__group__right">
+          <div class="dash-form__range" data-controller="range-slider">
+            <%= f.range_field :severity, min: 1, max: 5, step: 1, class: "dash-form__range__input",
+                data: { range_slider_target: "value", action: "input->range-slider#updateValue"} %>
+            <span class="dash-form__range__value" data-range-slider-target="output">1</span>
+          </div>
+        </div>
+      </div>
+      <%= render DashFormErrorComponent.new(model: @disease, field: :severity) %>
+    </div>
+  </div>
+  <div class="dash-form__container">
+    <div class="dash-form__group">
+      <div class="dash-form__group__container">
+        <div class="dash-form__group__left">
+          <div class="dash-form__group__title"><%= t(".color.title") %></div>
+          <p class="dash-form__group__description"><%= t(".color.description") %></p>
+        </div>
+        <div class="dash-form__group__right">
+          <div class="dash-form__checkbox">
+            <%= f.color_field :color, value: "#f18449" %>
+          </div>
+        </div>
+      </div>
+      <%= render DashFormErrorComponent.new(model: @disease, field: :color) %>
+    </div>
+  </div>
+  <div class="dash-form__group">
+    <%= f.submit t("dash_form.submit"), class: "dash-form__submit dash-button dash-button--new" %>
+  </div>
+<% end %>

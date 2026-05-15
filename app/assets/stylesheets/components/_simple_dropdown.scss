@@ -1,0 +1,104 @@
+@keyframes slide-down-in {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slide-down-out {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+}
+
+.simple-dropdown {
+  position: relative;
+
+  &__button {
+    width: 40px;
+    height: 40px;
+    border: 1px solid $dash-base-border;
+    border-radius: $radius-md;
+    background: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background-color 0.15s ease, border-color 0.15s ease;
+
+    &:hover {
+      background: $dash-bg;
+      border-color: darken($dash-base-border, 5%);
+    }
+  }
+
+  &__content {
+    position: absolute;
+    top: calc(100% + 4px);
+    right: 0;
+    width: 180px;
+    background: #ffffff;
+    border: 1px solid $dash-base-border;
+    border-radius: $radius-lg;
+    box-shadow: $shadow-lg;
+    z-index: 100;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-4px);
+    transition: opacity 0.15s ease, visibility 0.15s ease, transform 0.15s ease;
+
+    &--active {
+      opacity: 1;
+      visibility: visible;
+      transform: translateY(0);
+      animation: slide-down-in 0.15s ease forwards;
+    }
+
+    &--hidden {
+      animation: slide-down-out 0.15s ease forwards;
+    }
+  }
+
+  &__link {
+    display: flex;
+    align-items: center;
+    padding: $space-sm $space-md;
+    gap: $space-md;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: $dash-text-dark;
+    width: 100%;
+    cursor: pointer;
+    transition: background-color 0.15s ease;
+
+    &:first-child {
+      border-radius: $radius-lg $radius-lg 0 0;
+    }
+
+    &:last-child {
+      border-radius: 0 0 $radius-lg $radius-lg;
+    }
+
+    &:not(:last-child) {
+      border-bottom: 1px solid $dash-base-border;
+    }
+
+    &:hover {
+      background: $dash-bg;
+    }
+
+    &__icon {
+      color: $dash-base;
+      font-size: 1rem;
+    }
+  }
+}

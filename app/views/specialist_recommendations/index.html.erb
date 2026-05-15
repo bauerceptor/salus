@@ -1,0 +1,101 @@
+<div class="page-recommendations">
+  <header class="dash-header">
+    <div class="dash-header__left">
+      <h1 class="dash-header__title">
+        <i class="ri-heart-pulse-line dash-header__title__icon"></i>
+        <%= t(".title") %>
+      </h1>
+      <%= render "shared/breadcrumbs" %>
+    </div>
+  </header>
+
+  <div class="dash-flash-messages">
+    <%= turbo_frame_tag "flash" do %>
+      <%= render "shared/dash_flash" %>
+    <% end %>
+  </div>
+
+  <div class="dash-group">
+    <header class="dash-group__header">
+      <h2 class="dash-group__title">
+        <i class="ri-time-line dash-group__title__icon"></i>
+        <%= t(".pending") %>
+      </h2>
+    </header>
+    <div class="dash-group__content">
+      <% pending = @recommendations.select(&:pending?) %>
+      <% if pending.any? %>
+        <div class="recommendation-list">
+          <% pending.each do |rec| %>
+            <div class="recommendation-card recommendation-card--pending">
+              <div class="recommendation-card__header">
+                <span class="badge badge--yellow">
+                  <i class="ri-time-line"></i>
+                  <%= t(".status.pending") %>
+                </span>
+                <span class="recommendation-card__doctor">
+                  Dr. <%= rec.specialist.account.full_name %>
+                </span>
+              </div>
+              <h3 class="recommendation-card__name"><%= rec.name %></h3>
+              <% if rec.dosage.present? %>
+                <p class="recommendation-card__dosage"><%= rec.dosage %></p>
+              <% end %>
+              <% if rec.notes.present? %>
+                <p class="recommendation-card__notes"><%= rec.notes %></p>
+              <% end %>
+              <div class="recommendation-card__actions">
+                <%= button_to accept_received_recommendation_path(id: rec.id, locale: I18n.locale),
+                    { method: :patch, class: "dash-button dash-button--green", data: { turbo: false } } do %>
+                  <i class="ri-check-line dash-button__icon"></i>
+                  <%= t(".button.accept") %>
+                <% end %>
+                <%= button_to reject_received_recommendation_path(id: rec.id, locale: I18n.locale),
+                    { method: :patch, class: "dash-button dash-button--red", data: { turbo: false } } do %>
+                  <i class="ri-close-line dash-button__icon"></i>
+                  <%= t(".button.reject") %>
+                <% end %>
+              </div>
+            </div>
+          <% end %>
+        </div>
+      <% else %>
+        <p class="no-results"><%= t(".empty_pending") %></p>
+      <% end %>
+    </div>
+  </div>
+
+  <div class="dash-group">
+    <header class="dash-group__header">
+      <h2 class="dash-group__title">
+        <i class="ri-checkbox-circle-line dash-group__title__icon"></i>
+        <%= t(".history") %>
+      </h2>
+    </header>
+    <div class="dash-group__content">
+      <% history = @recommendations.reject(&:pending?) %>
+      <% if history.any? %>
+        <div class="recommendation-list">
+          <% history.each do |rec| %>
+            <div class="recommendation-card recommendation-card--<%= rec.status %>">
+              <div class="recommendation-card__header">
+                <span class="badge badge--<%= rec.status %>">
+                  <%= rec.status.humanize %>
+                </span>
+                <span class="recommendation-card__doctor">
+                  Dr. <%= rec.specialist.account.full_name %>
+                </span>
+              </div>
+              <h3 class="recommendation-card__name"><%= rec.name %></h3>
+              <% if rec.dosage.present? %>
+                <p class="recommendation-card__dosage"><%= rec.dosage %></p>
+              <% end %>
+            </div>
+          <% end %>
+        </div>
+      <% else %>
+        <p class="no-results"><%= t(".empty_history") %></p>
+      <% end %>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,68 @@
+<div class="page-settings">
+  <header class="dash-header">
+    <div class="dash-header__left">
+      <h1 class="dash-header__title">
+        <i class="ri-settings-3-line dash-header__title__icon"></i>
+        <%= t(".title") %>
+      </h1>
+      <%= render "shared/breadcrumbs" %>
+    </div>
+    <div class="dash-header__right">
+      <%= link_to authenticated_root_path, class: "dash-button dash-button--back" do %>
+        <i class="ri-arrow-left-line dash-button__icon"></i>
+      <% end %>
+    </div>
+  </header>
+  <div class="dash-flash-messages">
+    <%= turbo_frame_tag "flash" do %>
+      <%= render "shared/dash_flash" %>
+    <% end %>
+  </div>
+  <div class="page-settings__content">
+    <div class="page-settings__nav">
+      <%= render "settings/nav" %>
+    </div>
+    <div class="page-settings__frame">
+      <div class="settings-group">
+        <header class="settings-group__header">
+          <h3 class="settings-group__header__title"><%= t(".personal_data.title") %></h3>
+        </header>
+        <div class="settings-group__content">
+          <%= render "account_form" %>
+        </div>
+      </div>
+      <div class="settings-group">
+        <header class="settings-group__header">
+          <h3 class="settings-group__header__title"><%= t(".avatar.title") %></h3>
+        </header>
+        <div class="settings-group__content">
+          <%= render "avatar_form" %>
+        </div>
+      </div>
+      <div class="settings-group">
+        <header class="settings-group__header">
+          <h3 class="settings-group__header__title"><%= t(".address.title") %></h3>
+        </header>
+        <div class="settings-group__content">
+          <%= render "address_form" %>
+        </div>
+      </div>
+      <div class="settings-group">
+        <header class="settings-group__header">
+          <h3 class="settings-group__header__title"><%= t(".education.title") %></h3>
+        </header>
+        <div class="settings-group__content">
+          <%= render "education_form" %>
+        </div>
+      </div>
+      <div class="settings-group">
+        <header class="settings-group__header">
+          <h3 class="settings-group__header__title"><%= t(".search.title") %></h3>
+        </header>
+        <div class="settings-group__content">
+          <%= render "search_form" %>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

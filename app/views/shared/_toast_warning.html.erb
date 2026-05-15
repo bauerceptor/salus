@@ -1,0 +1,10 @@
+<input type="checkbox" name="t-warning" id="t-warning-<%= id ||= 'default' %>" <%= checked ? 'checked' : '' %>>
+<div class="toast-panel">
+  <div class="toast-item warning">
+    <div class="toast warning">
+      <label for="t-warning-<%= id ||= 'default' %>" class="close"></label>
+      <h3>Warning!</h3>
+      <p>Sorry, there was a problem with your request.</p>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,54 @@
+<div class="auth auth--login">
+  <div class="auth__content">
+    <header class="auth__header">
+      <%= link_to root_path do %>
+        <%= localized_logo_image_tag class: "auth__header__logo", alt: "" %>
+      <% end %>
+      <%= link_to t(".home"), root_path, class: "auth__header__link" %>
+    </header>
+    <div class="auth__main">
+      <div class="auth__heading">
+        <h1 class="auth__title"><%= @specialist_request.account.full_name %></h1>
+        <p class="auth__desc"><%= @specialist_request.specialist.specialist&.specialization || @specialist_request.specialist.email %></p>
+      </div>
+
+      <% if notice %>
+        <div class="auth-form__flash auth-form__notice">
+          <%= notice %>
+        </div>
+      <% end %>
+
+      <% if alert %>
+        <div class="auth-form__flash auth-form__alert">
+          <%= alert %>
+        </div>
+      <% end %>
+
+      <div class="auth-form__group">
+        <% if user_signed_in? && current_account.present? %>
+          <% existing = SpecialistPatient.active.exists?(account: current_account, specialist: @specialist_request.specialist) %>
+          <% if existing %>
+            <div class="auth-form__flash auth-form__alert">
+              <%= t(".already_associated") %>
+            </div>
+          <% else %>
+            <div class="auth-form__actions">
+              <%= button_to join_specialist_create_path(hash: @specialist_request.hash_code),
+                  method: :post,
+                  class: "auth-form__submit" do %>
+                <%= t(".request_to_join") %>
+              <% end %>
+            </div>
+          <% end %>
+        <% else %>
+          <div class="auth-form__flash auth-form__alert">
+            <%= t(".sign_in_required") %>
+          </div>
+          <div class="auth-form__actions">
+            <%= link_to t(".sign_in"), auth_new_session_path(locale: I18n.locale), class: "auth-form__submit" %>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  </div>
+</div>

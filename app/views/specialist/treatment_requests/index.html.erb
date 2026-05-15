@@ -1,0 +1,161 @@
+<div class="page-treatment-requests">
+  <header class="page-header">
+    <div class="page-header__left">
+      <h1 class="page-header__title">
+        <i class="ri-hospital-line"></i>
+        <%= t(".title") %>
+      </h1>
+      <%= render "shared/breadcrumbs" %>
+    </div>
+    <div class="page-header__right">
+      <%= link_to specialist_dashboard_path, class: "dash-button dash-button--back" do %>
+        <i class="ri-arrow-left-line"></i>
+      <% end %>
+    </div>
+  </header>
+
+  <%= turbo_frame_tag "flash" do %>
+    <%= render "shared/dash_flash" %>
+  <% end %>
+
+  <div class="tab-nav">
+    <%= link_to specialist_treatment_requests_path(tab: "patient_requests",),
+        class: "tab-nav__item #{@tab == 'patient_requests' ? 'tab-nav__item--active' : ''}" do %>
+      <i class="ri-file-list-3-line"></i>
+      Patient Requests
+      <% if @pending_requests_count.to_i > 0 %>
+        <span class="tab-nav__badge"><%= @pending_requests_count %></span>
+      <% end %>
+    <% end %>
+    <%= link_to specialist_treatment_requests_path(tab: "doctor_prescriptions"),
+        class: "tab-nav__item #{@tab == 'doctor_prescriptions' ? 'tab-nav__item--active' : ''}" do %>
+      <i class="ri-capsule-line"></i>
+      Prescriptions Sent
+    <% end %>
+  </div>
+
+  <% if @tab == "patient_requests" %>
+    <% if @treatment_requests.to_a.any? %>
+      <div class="treatment-requests-list">
+        <% @treatment_requests.each do |request| %>
+          <div class="treatment-request-item">
+            <div class="treatment-request-item__header">
+              <div class="treatment-request-item__patient">
+                <div class="treatment-request-item__avatar">
+                  <%= render "shared/avatar", account: request.account, css_class: "", alt: "" %>
+                </div>
+                <div class="treatment-request-item__patient-info">
+                  <p class="treatment-request-item__name"><%= request.account.full_name %></p>
+                  <p class="treatment-request-item__date"><%= time_ago_in_words(request.requested_at) %> ago</p>
+                </div>
+              </div>
+              <span class="badge badge--pending">Pending</span>
+            </div>
+            <div class="treatment-request-item__body">
+              <h3 class="treatment-request-item__title"><%= request.title %></h3>
+              <p class="treatment-request-item__description"><%= request.description %></p>
+              <div class="treatment-request-item__meta">
+                <span><i class="ri-calendar-line"></i> <%= t(".start_date") %>: <%= request.start_date.strftime("%b %d, %Y") %></span>
+              </div>
+            </div>
+            <div class="treatment-request-item__actions">
+              <%= button_to specialist_treatment_request_path(id: request, status: "approved"),
+                  method: :patch,
+                  class: "dash-button dash-button--small dash-button--new" do %>
+                <i class="ri-check-line"></i> <%= t(".button.approve") %>
+              <% end %>
+              <button type="button" class="dash-button dash-button--small dash-button--delete" onclick="openRejectModal('<%= request.id %>')">
+                <i class="ri-close-line"></i> <%= t(".button.reject") %>
+              </button>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    <% else %>
+      <div class="empty-state">
+        <i class="ri-checkbox-circle-line empty-state__icon"></i>
+        <p class="empty-state__text">No pending patient treatment requests</p>
+      </div>
+    <% end %>
+
+    <div class="pagination-container">
+      <div class="dash-pagination__info">
+        <%== pagy_info(@pagy) if @pagy.pages > 1 %>
+      </div>
+      <div class="dash-pagination__nav">
+        <%== pagy_nav(@pagy) if @pagy.pages > 1 %>
+      </div>
+    </div>
+  <% else %>
+    <% if @prescriptions.to_a.any? %>
+      <div class="prescriptions-list">
+        <% @prescriptions.each do |prescription| %>
+          <div class="prescription-item prescription-item--<%= prescription.status %>">
+            <div class="prescription-item__header">
+              <div class="prescription-item__patient">
+                <div class="prescription-item__avatar">
+                  <%= render "shared/avatar", account: prescription.account, css_class: "", alt: "" %>
+                </div>
+                <div class="prescription-item__patient-info">
+                  <p class="prescription-item__name"><%= prescription.account.full_name %></p>
+                  <p class="prescription-item__date"><%= time_ago_in_words(prescription.created_at) %> ago</p>
+                </div>
+              </div>
+              <span class="badge badge--<%= prescription.status %>"><%= prescription.status.humanize %></span>
+            </div>
+            <div class="prescription-item__body">
+              <h3 class="prescription-item__title"><%= prescription.name %></h3>
+              <% if prescription.notes.present? %>
+                <p class="prescription-item__notes"><%= prescription.notes %></p>
+              <% end %>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    <% else %>
+      <div class="empty-state">
+        <i class="ri-capsule-line empty-state__icon"></i>
+        <p class="empty-state__text">No treatment prescriptions sent yet</p>
+      </div>
+    <% end %>
+
+    <div class="pagination-container">
+      <div class="dash-pagination__info">
+        <%== pagy_info(@pagy) if @pagy.pages > 1 %>
+      </div>
+      <div class="dash-pagination__nav">
+        <%== pagy_nav(@pagy) if @pagy.pages > 1 %>
+      </div>
+    </div>
+  <% end %>
+</div>
+
+<div id="rejectModal" class="modal" style="display: none;">
+  <div class="modal-backdrop" onclick="closeRejectModal()"></div>
+  <div class="modal-content">
+    <h3 class="modal-title"><%= t(".reject_modal.title") %></h3>
+    <%= form_with url: specialist_treatment_request_path(id: "REPLACE_ID", status: "rejected"),
+        method: :patch, html: { id: "rejectForm" } do %>
+      <div class="form-group">
+        <label><%= t(".reject_modal.reason_label") %></label>
+        <textarea name="reason" class="dash-form__input" rows="3" placeholder="<%= t(".reject_modal.reason_placeholder") %>"></textarea>
+      </div>
+      <div class="modal-actions">
+        <button type="button" class="dash-button" onclick="closeRejectModal()"><%= t(".button.cancel") %></button>
+        <button type="submit" class="dash-button dash-button--delete"><%= t(".button.confirm_reject") %></button>
+      </div>
+    <% end %>
+  </div>
+</div>
+
+<script>
+  function openRejectModal(requestId) {
+    const form = document.getElementById('rejectForm');
+    form.action = form.action.replace('REPLACE_ID', requestId);
+    document.getElementById('rejectModal').style.display = 'block';
+  }
+
+  function closeRejectModal() {
+    document.getElementById('rejectModal').style.display = 'none';
+  }
+</script>

@@ -1,0 +1,247 @@
+<div class="wa-app">
+
+  <!-- Left: Conversation List (40%) -->
+  <aside class="wa-conversations">
+    <div class="wa-conversations__header">
+      <h1 class="wa-conversations__title">Chats</h1>
+    </div>
+    <div class="wa-conversations__list">
+      <% if @conversations.any? %>
+        <% @conversations.each do |msg| %>
+          <% last_message = current_user.specialist_messages.where(account_id: msg.account_id).order(created_at: :desc).first %>
+          <% unread_count = current_user.specialist_messages.where(account_id: msg.account_id, is_read: false, sender_type: 'patient').count %>
+          <%= link_to specialist_message_path(id: last_message.id, locale: I18n.locale), class: "wa-conversation-item" do %>
+            <div class="wa-conversation-item__avatar">
+              <i class="ri-user-3-line"></i>
+            </div>
+            <div class="wa-conversation-item__content">
+              <div class="wa-conversation-item__row">
+                <span class="wa-conversation-item__name"><%= msg.account.full_name %></span>
+                <span class="wa-conversation-item__time"><%= last_message.created_at.strftime("%H:%M") %></span>
+              </div>
+              <div class="wa-conversation-item__row">
+                <span class="wa-conversation-item__preview">
+                  <% if last_message.reply_from_patient? %>
+                    <i class="ri-check-line"></i>
+                  <% end %>
+                  <%= last_message.subject %>
+                </span>
+                <% if unread_count > 0 %>
+                  <span class="wa-conversation-item__badge"><%= unread_count %></span>
+                <% end %>
+              </div>
+            </div>
+          <% end %>
+        <% end %>
+      <% else %>
+        <div class="wa-conversations__empty">
+          <i class="ri-user-search-line"></i>
+          <p>No conversations yet</p>
+          <span>Connect with patients to start chatting</span>
+          <%= link_to specialist_patients_path, class: "wa-conversations__find-btn" do %>
+            <i class="ri-user-add-line"></i>
+            Find Patients
+          <% end %>
+        </div>
+      <% end %>
+    </div>
+  </aside>
+
+  <!-- Right: Placeholder -->
+  <main class="wa-chat">
+    <div class="wa-chat__placeholder">
+      <div class="wa-chat__placeholder-icon">
+        <i class="ri-chat-smile-3-line"></i>
+      </div>
+      <p>Select a conversation</p>
+    </div>
+  </main>
+</div>
+
+<style>
+.wa-app {
+  display: flex;
+  height: 100vh;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+.wa-conversations {
+  width: 30%;
+  min-width: 280px;
+  max-width: 380px;
+  border-right: 1px solid #e0e0e0;
+  display: flex;
+  flex-direction: column;
+  background: #fff;
+}
+
+.wa-conversations__header {
+  padding: 15px 16px;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.wa-conversations__title {
+  font-size: 20px;
+  font-weight: 600;
+  color: #111;
+  margin: 0;
+}
+
+.wa-conversations__list {
+  flex: 1;
+  overflow-y: auto;
+}
+
+.wa-conversations__empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 200px;
+  color: #667781;
+  text-align: center;
+  padding: 20px;
+}
+
+.wa-conversations__empty i {
+  font-size: 48px;
+  margin-bottom: 12px;
+  color: #d1d5db;
+}
+
+.wa-conversations__empty p {
+  font-size: 16px;
+  font-weight: 500;
+  color: #5f6368;
+  margin: 0 0 4px 0;
+}
+
+.wa-conversations__empty span {
+  font-size: 14px;
+  color: #9aa0a6;
+  margin-bottom: 16px;
+}
+
+.wa-conversations__find-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 20px;
+  background: var(--color-primary);
+  color: white;
+  border-radius: 24px;
+  font-size: 14px;
+  font-weight: 500;
+  text-decoration: none;
+  transition: background 0.2s ease, transform 0.15s ease;
+}
+
+.wa-conversations__find-btn i {
+  font-size: 18px;
+  margin: 0;
+  color: white;
+}
+
+.wa-conversations__find-btn:hover {
+  background: var(--color-primary-dark);
+  transform: translateY(-1px);
+}
+
+.wa-conversation-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.wa-conversation-item:hover {
+  background: #f5f5f5;
+}
+
+.wa-conversation-item__avatar {
+  width: 50px;
+  height: 50px;
+  background: #d9d9d9;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #666;
+  font-size: 24px;
+  flex-shrink: 0;
+}
+
+.wa-conversation-item__content {
+  flex: 1;
+  min-width: 0;
+}
+
+.wa-conversation-item__row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.wa-conversation-item__name {
+  font-size: 16px;
+  font-weight: 500;
+  color: #111;
+}
+
+.wa-conversation-item__time {
+  font-size: 12px;
+  color: #667781;
+  flex-shrink: 0;
+}
+
+.wa-conversation-item__preview {
+  font-size: 14px;
+  color: #667781;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.wa-conversation-item__badge {
+  background: #00a884;
+  color: #fff;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 10px;
+  flex-shrink: 0;
+}
+
+.wa-chat {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  background: #efeae2;
+}
+
+.wa-chat__placeholder {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: #f0f2f5;
+  color: #667781;
+}
+
+.wa-chat__placeholder-icon {
+  font-size: 80px;
+  margin-bottom: 16px;
+  opacity: 0.3;
+}
+
+.wa-chat__placeholder p {
+  font-size: 16px;
+}
+</style>

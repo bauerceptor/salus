@@ -1,0 +1,26 @@
+conda create -n llamaenv python=3.10 -y
+conda activate llamaenv
+conda install -c conda-forge llama-cpp-python -y
+# also install other packages you need, e.g.
+conda install -c conda-forge numpy pytorch -y
+
+3a) Use the conda env when running your project (recommended)
+
+    Activate the env in terminals where you run uv or your app:
+
+conda activate llamaenv
+uv <your commands>
+
+python librarian.py ingest "C:\Users\Lenovo\Docs\liver_cirrhosis.pdf"
+
+python librarian.py ingest "C:\Users\Lenovo\Docs\clinical_note.pdf" --model clinicalbert
+
+python librarian.py ask "What are the complications of liver cirrhosis?"
+
+
+python librarian.py ask "Explain hepatitis B serology" --no-context
+
+python librarian.py vision "Describe this chest X-ray" "C:\Users\Lenovo\Pictures\cxr.jpg"
+
+python librarian.py list              # Show all indexed documents
+python librarian.py search "hepatocellular carcinoma" --top-k 3

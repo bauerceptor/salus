@@ -1,0 +1,135 @@
+<%= form_with(model: [@group, @post], url: group_posts_path(group_id: @group.id), html: { class: "add-post-form", id: "group-post-form" },
+    data: { controller: "reset-form", action: "turbo:submit-end->reset-form#clear" }) do |f| %>
+  <%= f.text_area :body, id: "group-post-content",
+      data: { controller: "textarea-autogrow" },
+      class: "add-post-form__body",
+      placeholder: "Write what's on your mind"%>
+  <footer class="add-post-form__footer">
+    <div class="add-post-form__actions">
+      <button type="button" class="add-post-form__action" id="emoji-btn">
+        <i class="ri-emoji-sticker-line"></i>
+      </button>
+
+      <div class="emoji-menu" id="emoji-menu" style="display: none;">
+        <div class="emoji-grid">
+          <% ["😀", "😃", "😄", "😁", "😆", "😅", "🤣", "😂", "🙂", "🙃", "😉", "😊", "😇", "🥰", "😍", "🤩", "😘", "😗", "😋", "😛", "😜", "🤪", "🤤", "😴", "😷", "🤒", "👍", "👏", "🙏", "💪", "❤️", "🧡", "💛", "💚", "💙", "💜", "🖤", "💯", "🔥", "⭐", "✨", "⚡"].each do |emoji| %>
+              <button type="button" class="emoji-item" data-emoji="<%= emoji %>"><%= emoji %></button>
+          <% end %>
+        </div>
+      </div>
+
+      <button type="button" class="add-post-form__action" id="gif-btn">
+        <i class="ri-file-gif-line"></i>
+      </button>
+
+      <div class="gif-input" id="gif-input" style="display: none;">
+        <input type="url" placeholder="Paste GIF URL and press Enter" id="gif-url">
+      </div>
+
+      <button type="button" class="add-post-form__action" id="image-btn">
+        <i class="ri-image-add-line"></i>
+      </button>
+      <input type="file" accept="image/*" id="image-file" style="display: none;">
+    </div>
+    <%= button_tag type: :submit, class: "add-post-form__submit" do %>
+      <i class="ri-send-plane-2-fill"></i>
+    <% end %>
+  </footer>
+<% end %>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+  var emojiBtn = document.getElementById("emoji-btn");
+  var emojiMenu = document.getElementById("emoji-menu");
+  var gifBtn = document.getElementById("gif-btn");
+  var gifInput = document.getElementById("gif-input");
+  var gifUrl = document.getElementById("gif-url");
+  var imageBtn = document.getElementById("image-btn");
+  var imageFile = document.getElementById("image-file");
+  var textarea = document.getElementById("group-post-content");
+
+  if (!emojiBtn || !textarea) {
+    console.log("Group post elements not found, skipping");
+    return;
+  }
+
+  console.log("Group post emoji picker initializing...");
+
+  emojiBtn.addEventListener("click", function(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    console.log("Emoji button clicked");
+    var isHidden = emojiMenu.style.display === "none";
+    emojiMenu.style.display = isHidden ? "block" : "none";
+    gifInput.style.display = "none";
+  });
+
+  document.querySelectorAll(".emoji-item").forEach(function(item) {
+    item.addEventListener("click", function(e) {
+      e.preventDefault();
+      var emoji = this.dataset.emoji;
+      console.log("Inserting emoji:", emoji);
+      var start = textarea.selectionStart;
+      var end = textarea.selectionEnd;
+      var text = textarea.value;
+      textarea.value = text.substring(0, start) + emoji + text.substring(end);
+      textarea.selectionStart = textarea.selectionEnd = start + emoji.length;
+      textarea.focus();
+      emojiMenu.style.display = "none";
+    });
+  });
+
+  gifBtn.addEventListener("click", function(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    console.log("GIF button clicked");
+    var isHidden = gifInput.style.display === "none";
+    gifInput.style.display = isHidden ? "block" : "none";
+    emojiMenu.style.display = "none";
+    if (isHidden) {
+      gifUrl.focus();
+    }
+  });
+
+  gifUrl.addEventListener("keydown", function(e) {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      console.log("GIF URL submitted:", this.value);
+      var url = this.value.trim();
+      if (url) {
+        textarea.value += (textarea.value ? "\n" : "") + "[GIF](" + url + ")";
+        textarea.focus();
+      }
+      this.value = "";
+      gifInput.style.display = "none";
+    }
+  });
+
+  imageBtn.addEventListener("click", function(e) {
+    e.preventDefault();
+    console.log("Image button clicked");
+    imageFile.click();
+  });
+
+  imageFile.addEventListener("change", function(e) {
+    var file = e.target.files[0];
+    if (file) {
+      console.log("Image selected:", file.name);
+      textarea.value += (textarea.value ? "\n" : "") + "[📷 " + file.name + "]";
+      textarea.focus();
+    }
+    this.value = "";
+  });
+
+  document.addEventListener("click", function(e) {
+    if (!emojiBtn.contains(e.target) && !emojiMenu.contains(e.target)) {
+      emojiMenu.style.display = "none";
+    }
+    if (!gifBtn.contains(e.target) && !gifInput.contains(e.target)) {
+      gifInput.style.display = "none";
+    }
+  });
+
+  console.log("Group post emoji picker initialized");
+});
+</script>

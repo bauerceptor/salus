@@ -1,0 +1,24 @@
+default: &default
+  adapter: postgresql
+  encoding: unicode
+  host: <%= ENV['POSTGRES_HOST'] || 'localhost' %>
+  port: <%= ENV['POSTGRES_PORT'] || 5432 %>
+  username: <%= ENV['POSTGRES_USERNAME'] || 'postgres' %>
+  password: <%= ENV['POSTGRES_PASSWORD'] || 'postgres' %>
+  pool: <%= ENV.fetch('RAILS_MAX_THREADS') { 5 } %>
+
+development:
+  <<: *default
+  database: <%= ENV.fetch('POSTGRES_DB', 'salus_development') %>
+
+test:
+  <<: *default
+  host: <%= ENV['POSTGRES_HOST'] || 'localhost' %>
+  port: <%= ENV['TEST_POSTGRES_PORT'] || 5433 %>
+  username: <%= ENV['TEST_POSTGRES_USERNAME'] || 'rails_app' %>
+  password: <%= ENV['TEST_POSTGRES_PASSWORD'] || 'postgres_secure_pass' %>
+  database: salus_test
+
+production:
+  <<: *default
+  database: <%= ENV.fetch('DB_NAME', 'salus_production') %>

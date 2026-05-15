@@ -1,0 +1,150 @@
+<div class="page-measurement-raport-show">
+  <header class="dash-header">
+    <div class="dash-header__left">
+      <h1 class="dash-header__title">
+        <i class="ri-file-chart-line dash-header__title__icon"></i>
+        <%= @measurement_raport.name %>
+      </h1>
+      <%= render "shared/breadcrumbs" %>
+    </div>
+    <div class="dash-header__right">
+      <%= link_to measurement_raport_path(id: @measurement_raport.id, locale: I18n.locale, format: :pdf), class: "dash-button" do %>
+        <i class="ri-download-line dash-button__icon"></i>
+        <%= t(".download") %>
+      <% end %>
+      <%= link_to measurement_raports_path, class: "dash-button dash-button--back" do %>
+        <i class="ri-arrow-left-line dash-button__icon"></i>
+      <% end %>
+    </div>
+  </header>
+  <div class="dash-flash-messages">
+    <%= turbo_frame_tag "flash" do %>
+      <%= render "shared/dash_flash" %>
+    <% end %>
+  </div>
+  <div class="page-measurement-raport-show__content">
+    <div class="dash-group">
+      <header class="dash-group__header">
+        <h2 class="dash-group__title">
+          <i class="ri-calendar-line dash-group__title__icon"></i>
+          <%= t(".summary") %>
+        </h2>
+        <div class="dash-group__actions"></div>
+      </header>
+      <div class="dash-group__content">
+        <div class="report-summary">
+          <div class="report-summary__date">
+            <p><%= t(".report_date", date: l(@report_date, format: '%d %B %Y')) %></p>
+            <p><%= t(".generated_at", time: l(@measurement_raport.created_at, format: '%H:%M')) %></p>
+          </div>
+          <div class="report-summary__stats">
+            <div class="report-stat">
+              <span class="report-stat__value"><%= @total_measurements %></span>
+              <span class="report-stat__label"><%= t(".total_measurements") %></span>
+            </div>
+            <div class="report-stat">
+              <span class="report-stat__value"><%= @measurement_types_count %></span>
+              <span class="report-stat__label"><%= t(".measurement_types") %></span>
+            </div>
+            <div class="report-stat">
+              <span class="report-stat__value"><%= @within_limits %></span>
+              <span class="report-stat__label"><%= t(".within_limits") %></span>
+            </div>
+            <div class="report-stat">
+              <span class="report-stat__value"><%= @out_of_limits %></span>
+              <span class="report-stat__label"><%= t(".out_of_limits") %></span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="dash-group">
+      <header class="dash-group__header">
+        <h2 class="dash-group__title">
+          <i class="ri-health-book-line dash-group__title__icon"></i>
+          <%= t(".measurements_breakdown") %>
+        </h2>
+        <div class="dash-group__actions"></div>
+      </header>
+      <div class="dash-group__content">
+        <% @measurements_by_type.each do |type, data| %>
+          <div class="measurement-type-summary">
+            <h3 class="measurement-type-summary__title">
+              <%= I18n.t("activerecord.attributes.measurement_types.#{type}") %>
+            </h3>
+            <div class="measurement-type-summary__stats">
+              <div class="mini-stat">
+                <span class="mini-stat__label"><%= t(".count") %>:</span>
+                <span class="mini-stat__value"><%= data[:count] %></span>
+              </div>
+              <% if data[:latest] %>
+                <div class="mini-stat">
+                  <span class="mini-stat__label"><%= t(".latest") %>:</span>
+                  <span class="mini-stat__value"><%= data[:latest].value %> <%= data[:latest].measurement_type.unit.symbol %></span>
+                </div>
+              <% end %>
+              <% if data[:min] %>
+                <div class="mini-stat">
+                  <span class="mini-stat__label"><%= t(".min") %>:</span>
+                  <span class="mini-stat__value"><%= data[:min].value %> <%= data[:min].measurement_type.unit.symbol %></span>
+                </div>
+              <% end %>
+              <% if data[:max] %>
+                <div class="mini-stat">
+                  <span class="mini-stat__label"><%= t(".max") %>:</span>
+                  <span class="mini-stat__value"><%= data[:max].value %> <%= data[:max].measurement_type.unit.symbol %></span>
+                </div>
+              <% end %>
+              <% if data[:avg] %>
+                <div class="mini-stat">
+                  <span class="mini-stat__label"><%= t(".average") %>:</span>
+                  <span class="mini-stat__value"><%= data[:avg].round(1) %> <%= data[:max].measurement_type.unit.symbol if data[:max] %></span>
+                </div>
+              <% end %>
+            </div>
+            <% if data[:within_limits] && data[:within_limits] < data[:count] %>
+              <p class="measurement-type-summary__warning">
+                <i class="ri-alert-line"></i>
+                <%= t(".some_out_of_limits", count: data[:count] - data[:within_limits]) %>
+              </p>
+            <% end %>
+          </div>
+        <% end %>
+      </div>
+    </div>
+
+    <div class="dash-group">
+      <header class="dash-group__header">
+        <h2 class="dash-group__title">
+          <i class="ri-time-line dash-group__title__icon"></i>
+          <%= t(".all_measurements") %>
+        </h2>
+        <div class="dash-group__actions"></div>
+      </header>
+      <div class="dash-group__content">
+        <ul class="measurements-list">
+          <% @measurements.each do |measurement| %>
+            <% measurement_name = measurement.measurement_type.name %>
+            <li class="measurement-item measurement-item--<%= measurement_name %> <%= "measurement-item--dangerous" unless measurement.is_within_limits %>">
+              <div class="measurement-item__left">
+                <div class="measurement-item__label">
+                  <%= I18n.t("activerecord.attributes.measurement_types.#{measurement_name}") %>
+                </div>
+                <div class="measurement-item__value">
+                  <%= measurement.value %>
+                  <span class="measurement-item__symbol">
+                    <%= measurement.measurement_type.unit.symbol %>
+                  </span>
+                </div>
+              </div>
+              <div class="measurement-item__time">
+                <%= l(measurement.measurement_date, format: "%H:%M") %>
+              </div>
+            </li>
+          <% end %>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>

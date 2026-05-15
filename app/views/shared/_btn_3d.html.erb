@@ -1,0 +1,5 @@
+<!-- 3D Button Component -->
+<!-- Usage: Render this partial with locals for text and optional classes -->
+<% text = local_assigns[:text] || "Learn More" %>
+<% extra_class = local_assigns[:class] || "" %>
+<button class="btn-3d <%= extra_class %>"><%= text %></button>

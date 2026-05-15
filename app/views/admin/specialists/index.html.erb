@@ -1,0 +1,108 @@
+<div class="dash-home">
+  <div class="dash-home__content">
+    <header class="dash-header">
+      <div class="dash-header__left">
+        <h1 class="dash-header__title">
+          <i class="ri-user-star-line dash-header__title__icon"></i>
+          Specialists
+        </h1>
+        <p class="dash-header__desc">Manage specialist accounts</p>
+      </div>
+      <div class="dash-header__right">
+        <%= link_to new_admin_specialist_path, class: "dash-button dash-button--new" do %>
+          <i class="ri-add-line dash-button__icon"></i>
+          Add Specialist
+        <% end %>
+        <span class="dash-stat__badge">
+          <i class="ri-user-star-line"></i>
+          <%= @pagy.count %> total
+        </span>
+      </div>
+    </header>
+
+    <div class="dash-group">
+      <div class="dash-filter-bar">
+        <div class="dash-filter-bar__search">
+          <%= form_with url: admin_specialists_path, method: :get, class: "dash-table-search" do |f| %>
+            <div class="search-input-wrapper">
+              <i class="ri-search-line search-input-icon"></i>
+              <%= f.text_field :search, value: params[:search], placeholder: "Search by name, email, or specialization...", class: "search-input" %>
+            </div>
+            <% if params[:search].present? %>
+              <%= link_to admin_specialists_path, class: "dash-button dash-button--small dash-button--gray" do %>
+                <i class="ri-close-line"></i>
+                Clear
+              <% end %>
+            <% end %>
+          <% end %>
+        </div>
+      </div>
+
+      <div class="dash-group__content">
+        <% if @specialists.any? %>
+          <div class="dash-table-wrapper">
+            <table class="dash-table">
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Email</th>
+                  <th>Expertise</th>
+                  <th>Specialization</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                <% @specialists.each do |specialist| %>
+                  <tr class="dash-table__row">
+                    <td>
+                      <div class="patient-list-item__info">
+                        <p class="patient-list-item__name"><%= specialist.account&.full_name || specialist.email %></p>
+                      </div>
+                    </td>
+                    <td><%= specialist.email %></td>
+                    <td><%= specialist.specialist&.field_of_expertise %></td>
+                    <td><%= specialist.specialist&.specialization %></td>
+                    <td>
+                      <span class="badge badge--<%= specialist.specialist&.status == 'active' ? 'success' : 'warning' %>">
+                        <%= specialist.specialist&.status || 'pending' %>
+                      </span>
+                    </td>
+                    <td>
+                      <%= link_to admin_specialist_path(specialist), class: "dash-button dash-button--small dash-button--gray" do %>
+                        <i class="ri-eye-line"></i>
+                        View
+                      <% end %>
+                    </td>
+                  </tr>
+                <% end %>
+              </tbody>
+            </table>
+          </div>
+          <% if @pagy.pages > 1 %>
+            <div class="dash-pagination">
+              <div class="dash-pagination__controls">
+                <%== pagy_nav(@pagy) %>
+              </div>
+            </div>
+          <% end %>
+        <% else %>
+          <div class="dash-empty-state">
+            <div class="dash-empty-state__icon-wrapper">
+              <i class="ri-user-search-line dash-empty-state__icon"></i>
+            </div>
+            <p class="dash-empty-state__text">No specialists found</p>
+            <% if params[:search].present? %>
+              <div class="dash-empty-state__actions">
+                <%= link_to admin_specialists_path, class: "dash-button dash-button--gray" do %>
+                  <i class="ri-close-line"></i>
+                  Clear search
+                <% end %>
+              </div>
+            <% end %>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  </div>
+</div>

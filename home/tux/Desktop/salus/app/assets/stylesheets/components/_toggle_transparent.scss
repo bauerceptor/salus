@@ -1,0 +1,55 @@
+// _toggle_transparent.scss
+.toggle-wrapper {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+}
+
+.toggle.transparent {
+  label.toggle-item {
+    width: 7em;
+    background: transparent;
+    border: 3px solid #fff;
+    height: 3.35em;
+    display: inline-block;
+    border-radius: 50px;
+    position: relative;
+    transition: all .3s ease;
+    transform-origin: 20% center;
+    cursor: pointer;
+
+    &::before {
+      display: block;
+      transition: all .2s ease;
+      width: 2em;
+      height: 2em;
+      top: .3em;
+      left: .3em;
+      border-radius: 2em;
+      border: 3px solid #fff;
+      background: #fff;
+    }
+  }
+
+  input:checked + label.toggle-item::before {
+    transform: translateX(59px);
+  }
+}
+
+input[type="checkbox"] {
+  height: 40px;
+  left: 0;
+  opacity: 0;
+  position: absolute;
+  top: 0;
+  width: 40px;
+}
+
+.name {
+  font: 500 14px 'Rubik', sans-serif;
+  letter-spacing: .5px;
+  text-transform: uppercase;
+  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.4);
+  margin-top: 10px;
+}

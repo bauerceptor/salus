@@ -1,0 +1,62 @@
+<div class="dash-home">
+  <div class="dash-home__content">
+    <header class="dash-header">
+      <div class="dash-header__left">
+        <h1 class="dash-header__title">
+          <i class="ri-file-text-line dash-header__title__icon"></i>
+          My Documents
+        </h1>
+        <%= render "shared/breadcrumbs" %>
+      </div>
+    </header>
+
+  <% if @documents.any? %>
+    <div class="dash-group">
+      <div class="dash-table-wrapper">
+        <table class="dash-table">
+          <thead>
+            <tr>
+              <th>Document Type</th>
+              <th>Filename</th>
+              <th>Imported</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% @documents.each do |doc| %>
+              <tr class="dash-table__row">
+                <td>
+                  <span class="badge badge--info">
+                    <%= doc.document_type.humanize %>
+                  </span>
+                </td>
+                <td><%= doc.file_data["filename"] || "Unnamed document" %></td>
+                <td><%= doc.created_at.strftime("%B %d, %Y at %I:%M %p") %></td>
+                <td>
+                  <%= link_to patient_document_path(id: doc, format: :pdf), target: "_blank",
+                              class: "dash-button dash-button--small dash-button--gray" do %>
+                    <i class="ri-eye-line"></i> View PDF
+                  <% end %>
+                </td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  <% else %>
+    <div class="dash-group">
+      <div class="dash-group__content">
+        <div class="dash-empty-state">
+          <div class="dash-empty-state__icon-wrapper">
+            <i class="ri-file-text-line dash-empty-state__icon"></i>
+          </div>
+          <p class="dash-empty-state__text">No documents imported yet.</p>
+          <div class="dash-empty-state__actions">
+            <%= link_to "Import a document", fhir_import_new_path, class: "dash-button dash-button--new" %>
+          </div>
+        </div>
+      </div>
+    </div>
+  <% end %>
+</div>

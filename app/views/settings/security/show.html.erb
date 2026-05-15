@@ -1,0 +1,67 @@
+<div class="page-settings">
+  <header class="dash-header">
+    <div class="dash-header__left">
+      <h1 class="dash-header__title">
+        <i class="ri-lock-line dash-header__title__icon"></i>
+        <%= t(".title") %>
+      </h1>
+      <%= render "shared/breadcrumbs" %>
+    </div>
+    <div class="dash-header__right">
+      <%= link_to authenticated_root_path, class: "dash-button dash-button--back" do %>
+        <i class="ri-arrow-left-line dash-button__icon"></i>
+      <% end %>
+    </div>
+  </header>
+  <div class="dash-flash-messages">
+    <%= turbo_frame_tag "flash" do %>
+      <%= render "shared/dash_flash" %>
+    <% end %>
+  </div>
+  <div class="page-settings__content">
+    <div class="page-settings__nav">
+      <%= render "settings/nav" %>
+    </div>
+    <div class="page-settings__frame">
+      <div class="settings-group">
+        <header class="settings-group__header">
+          <h3 class="settings-group__header__title"><%= t(".password.title") %></h3>
+        </header>
+        <div class="settings-group__content">
+          <% if @resource.oauth_account? %>
+            <p class="settings-group__text"><%= t(".password.disabled") %></p>
+          <% else %>
+            <p class="settings-group__text"><%= t(".password.not_available") %></p>
+          <% end %>
+        </div>
+      </div>
+      <div class="settings-group">
+        <header class="settings-group__header">
+          <h3 class="settings-group__header__title"><%= t(".two_factor.title") %></h3>
+        </header>
+        <div class="settings-group__content">
+          <% if current_user.otp_enabled? %>
+            <div class="settings-group__text-button">
+              <p class="settings-group__text"><%= t(".two_factor.enabled") %></p>
+              <div class="settings-group__buttons">
+                <%= link_to t(".two_factor.button.codes"),
+                    settings_two_factor_authentication_recovery_codes_path,
+                    class: "dash-button dash-button--new", data: { turbo: false } %>
+                <%= button_to t(".two_factor.button.disable.title"),
+                    settings_two_factor_authentication_otp_path, method: :delete,
+                    class: "dash-button dash-button--delete", data: { action: "dropdown#toggle",
+                    confirm: t(".two_factor.button.disable.turbo.confirm"),
+                    turbo_confirm: t(".two_factor.button.disable.turbo.confirm") } %>
+              </div>
+            </div>
+          <% else %>
+            <div class="settings-group__text-button">
+              <p class="settings-group__text"><%= t(".two_factor.not_enabled") %></p>
+              <%= button_to t(".two_factor.button.enable"), settings_two_factor_authentication_otp_path, method: :post, class: "dash-button dash-button--new" %>
+            </div>
+          <% end %>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

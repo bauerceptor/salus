@@ -1,0 +1,54 @@
+<!-- _gooey_menu.html.erb -->
+<nav class="gooey-menu">
+  <input type="checkbox" href="#" class="menu-open" name="menu-close" id="menu-open">
+  <label class="menu-open-button" for="menu-open">
+    <span class="hamburger hamburger-1"></span>
+    <span class="hamburger hamburger-2"></span>
+    <span class="hamburger hamburger-3"></span>
+  </label>
+
+  <a href="#" class="menu-item">
+    <i class="ri-bar-chart-line"></i>
+  </a>
+  <a href="#" class="menu-item">
+    <i class="ri-add-line"></i>
+  </a>
+  <a href="#" class="menu-item">
+    <i class="ri-heart-line"></i>
+  </a>
+  <a href="#" class="menu-item">
+    <i class="ri-mail-line"></i>
+  </a>
+  <a href="#" class="menu-item">
+    <i class="ri-settings-line"></i>
+  </a>
+</nav>
+
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1" class="gooey-filters">
+  <defs>
+    <filter id="shadowed-goo">
+      <feGaussianBlur in="SourceGraphic" result="blur" stdDeviation="10">
+      </feGaussianBlur>
+      <feColorMatrix in="blur" mode="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 18 -7" result="goo">
+      </feColorMatrix>
+      <feGaussianBlur in="goo" stdDeviation="3" result="shadow">
+      </feGaussianBlur>
+      <feColorMatrix in="shadow" mode="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 1 -0.2" result="shadow">
+      </feColorMatrix>
+      <feOffset in="shadow" dx="1" dy="1" result="shadow">
+      </feOffset>
+      <feBlend in2="shadow" in="goo" result="goo">
+      </feBlend>
+      <feBlend in2="goo" in="SourceGraphic" result="mix">
+      </feBlend>
+    </filter>
+    <filter id="goo">
+      <feGaussianBlur in="SourceGraphic" result="blur" stdDeviation="10">
+      </feGaussianBlur>
+      <feColorMatrix in="blur" mode="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 18 -7" result="goo">
+      </feColorMatrix>
+      <feBlend in2="goo" in="SourceGraphic" result="mix">
+      </feBlend>
+    </filter>
+  </defs>
+</svg>

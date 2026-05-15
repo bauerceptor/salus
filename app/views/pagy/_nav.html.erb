@@ -1,0 +1,62 @@
+<%#
+  Bootstrap 5 Templates for Pagy
+  https://ddnexus.github.io/pagy/docs/api/templates/
+%>
+
+<%# Extra variables for Bootstrap templates
+  link_tail = align == "center" ? " justify-content-center" : ""
+  link_tail = align == "right" ? " justify-content-end" : ""
+%>
+
+<% if pagy.pages > 1 %>
+  <nav aria-label="paginator" class="dash-pagination">
+    <div class="dash-pagination__controls">
+      <% if pagy.prev %>
+        <%= link_to pagy_url(pagy.prev), class: "dash-button dash-button--small", rel: "prev", aria_label: "Previous" do %>
+          <i class="ri-arrow-left-s-line"></i>
+        <% end %>
+      <% else %>
+        <span class="dash-button dash-button--small dash-button--disabled">
+          <i class="ri-arrow-left-s-line"></i>
+        </span>
+      <% end %>
+
+      <% pagy.series.each do |item| %>
+        <% if item.is_a?(Integer) %>
+          <%= link_to item, pagy_url(item), class: "dash-button dash-button--small #{item == pagy.page ? 'dash-button--active' : ''}", aria_label: "Page #{item}" %>
+        <% elsif item == :gap %>
+          <span class="dash-pagination__gap">...</span>
+        <% elsif item.is_a?(Symbol) %>
+          <% case item %>
+          <% when :first %>
+            <%= link_to pagy_url(1), class: "dash-button dash-button--small", aria_label: "First" do %>
+              <i class="ri-skip-back-mini-line"></i>
+            <% end %>
+          <% when :last %>
+            <%= link_to pagy_url(pagy.last), class: "dash-button dash-button--small", aria_label: "Last" do %>
+              <i class="ri-skip-forward-mini-line"></i>
+            <% end %>
+          <% when :prev %>
+            <%= link_to pagy_url(pagy.prev), class: "dash-button dash-button--small", rel: "prev", aria_label: "Previous" do %>
+              <i class="ri-arrow-left-s-line"></i>
+            <% end %>
+          <% when :next %>
+            <%= link_to pagy_url(pagy.next), class: "dash-button dash-button--small", rel: "next", aria_label: "Next" do %>
+              <i class="ri-arrow-right-s-line"></i>
+            <% end %>
+          <% end %>
+        <% end %>
+      <% end %>
+
+      <% if pagy.next %>
+        <%= link_to pagy_url(pagy.next), class: "dash-button dash-button--small", rel: "next", aria_label: "Next" do %>
+          <i class="ri-arrow-right-s-line"></i>
+        <% end %>
+      <% else %>
+        <span class="dash-button dash-button--small dash-button--disabled">
+          <i class="ri-arrow-right-s-line"></i>
+        </span>
+      <% end %>
+    </div>
+  </nav>
+<% end %>

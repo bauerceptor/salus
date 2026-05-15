@@ -1,0 +1,99 @@
+<%= form_with(model: @treatment, html: { class: "dash-form" }) do |form| %>
+  <div class="dash-form__container">
+    <div class="dash-form__group">
+      <div class="dash-form__group__container">
+        <div class="dash-form__group__left">
+          <div class="dash-form__group__title"><%= t(".title.title") %></div>
+          <p class="dash-form__group__description"><%= t(".title.description") %></p>
+        </div>
+        <div class="dash-form__group__right">
+          <%= form.text_field :title, class: "dash-form__input", placeholder: t(".title.description") %>
+        </div>
+      </div>
+      <%= render DashFormErrorComponent.new(model: @treatment, field: :title) %>
+    </div>
+  </div>
+  <div class="dash-form__container">
+    <div class="dash-form__group">
+      <div class="dash-form__group__container">
+        <div class="dash-form__group__left">
+          <div class="dash-form__group__title"><%= t(".description.title") %></div>
+          <p class="dash-form__group__description"><%= t(".description.description") %></p>
+        </div>
+        <div class="dash-form__group__right">
+          <%= form.text_area :description, class: "dash-form__input dash-form__textarea",
+              placeholder: t(".description.placeholder") %>
+        </div>
+      </div>
+      <%= render DashFormErrorComponent.new(model: @treatment, field: :description) %>
+    </div>
+  </div>
+  <div class="dash-form__container">
+    <div class="dash-form__group">
+      <div class="dash-form__group__container">
+        <div class="dash-form__group__left">
+          <div class="dash-form__group__title"><%= t(".start_date.title") %></div>
+          <p class="dash-form__group__description"><%= t(".start_date.description") %></p>
+        </div>
+        <div class="dash-form__group__right">
+          <%= form.date_field :start_date, class: "dash-form__input" %>
+        </div>
+      </div>
+      <%= render DashFormErrorComponent.new(model: @treatment, field: :start_date) %>
+    </div>
+  </div>
+  <div class="dash-form__container">
+    <div class="dash-form__group">
+      <div class="dash-form__group__container">
+        <div class="dash-form__group__left">
+          <div class="dash-form__group__title"><%= t(".end_date.title") %></div>
+          <p class="dash-form__group__description"><%= t(".end_date.description") %></p>
+        </div>
+        <div class="dash-form__group__right">
+          <%= form.date_field :end_date, class: "dash-form__input" %>
+        </div>
+      </div>
+      <%= render DashFormErrorComponent.new(model: @treatment, field: :end_date) %>
+    </div>
+  </div>
+  <div class="dash-form__container">
+    <div class="dash-form__group">
+      <div class="dash-form__group__container">
+        <div class="dash-form__group__left">
+          <div class="dash-form__group__title"><%= t(".effectiveness.title") %></div>
+          <p class="dash-form__group__description"><%= t(".effectiveness.description") %></p>
+        </div>
+        <div class="dash-form__group__right">
+          <div class="dash-form__range" data-controller="range-slider">
+            <%= form.range_field :effectiveness, min: 1, max: 5, class: "dash-form__range__input",
+            data: { range_slider_target: "value", action: "input->range-slider#updateValue"}  %>
+            <span class="dash-form__range__value" data-range-slider-target="output">1</span>
+          </div>
+        </div>
+      </div>
+      <%= render DashFormErrorComponent.new(model: @treatment, field: :effectiveness) %>
+    </div>
+  </div>
+  <div class="dash-form__container">
+    <div class="dash-form__group">
+      <div class="dash-form__group__container">
+        <div class="dash-form__group__left">
+          <div class="dash-form__group__title"><%= t(".is_finished.title") %></div>
+          <p class="dash-form__group__description"><%= t(".is_finished.description") %></p>
+        </div>
+        <div class="dash-form__group__right">
+          <div class="dash-form__checkbox">
+            <%= form.check_box :is_finished, class: "dash-form__checkbox__input" %>
+            <%= form.label :is_finished, class: "dash-form__checkbox__label" do %>
+              <%= t(".is_finished.label") %>
+            <% end %>
+          </div>
+        </div>
+      </div>
+      <%= render DashFormErrorComponent.new(model: @treatment, field: :is_finished) %>
+    </div>
+  </div>
+  <div class="dash-form__group">
+    <%= form.submit t("dash_form.submit"), class: "dash-form__submit dash-button dash-button--new" %>
+  </div>
+<% end %>

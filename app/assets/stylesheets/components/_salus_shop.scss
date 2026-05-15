@@ -1,0 +1,764 @@
+$stromboli: #2d6548;
+$everglade: #19432f;
+$apple: #64b346;
+$viridian: #468361;
+$coconut-cream: #f7f2d5;
+$salem: #0f8d44;
+$sea-green: #28783b;
+$cranberry: #d35376;
+$jambalaya: #5b3713;
+$jewel: #156132;
+$eucalyptus: #26823f;
+$loulou: #5d124a;
+$killarney: #2b6533;
+$forest-green: #1f7f37;
+$sunflower: #eacb22;
+$green-pea: #1a5127;
+$razzmatazz: #df0d7b;
+$sun: #fea817;
+$fire-bush: #e39825;
+$pewter: #a0b0a5;
+$racing-green: #0d1d12;
+$celtic: #122d17;
+$espresso: #522714;
+$moccaccino: #6b2213;
+$parsley: #194e24;
+$cape-cod: #303b35;
+$mule-fawn: #905c2c;
+$seaweed: #14391a;
+$comet: #505374;
+$finn: #6e2a63;
+$flamingo: #ee4b28;
+$lightning-yellow: #f9c72a;
+$mandy: #e66373;
+$gondola: #28131c;
+$amaranth: #e51867;
+$mojo: #bf3b48;
+$chestnut-rose: #cf4b60;
+$chateau-green: #3da449;
+$mulberry: #bb5392;
+$cannon-pink: #984571;
+$half-spanish-white: #fef2dc;
+$white: #fff;
+
+.salus-shop {
+  position: relative;
+  width: 28em;
+  height: 27.1875em;
+  box-sizing: border-box;
+  background-color: $stromboli;
+
+  &__roof {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    top: 0;
+    width: calc(100% + 2.25em);
+    height: 6.5em;
+    background-color: $everglade;
+
+    &::before {
+      content: "";
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+      bottom: 0;
+      width: calc(100% + 2.5em);
+      height: 1.875em;
+      background-color: $apple;
+    }
+
+    &::after {
+      content: "";
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+      bottom: -0.9375em;
+      width: calc(100% - 2.25em);
+      height: 0.9375em;
+      background-color: inherit;
+    }
+  }
+
+  &__name-container {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    top: 0.3125em;
+    width: 90%;
+    height: calc(100% - 2.5em);
+    background-color: $stromboli;
+    box-sizing: border-box;
+    border: 0.4375em solid $viridian;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  &__name {
+    font-family: "Roboto Slab", serif;
+    font-size: 3em;
+    font-weight: 700;
+    letter-spacing: 0.1875em;
+    text-transform: uppercase;
+    color: $coconut-cream;
+  }
+
+  &__curved-plant {
+    position: absolute;
+    top: -2.09375em;
+    left: -3.125em;
+    width: 4.5625em;
+    height: 11.0625em;
+    border: 2.0625em solid $salem;
+    border-right: 0;
+    border-bottom: 0;
+    box-sizing: border-box;
+    border-radius: 4.5625em 0 0 0;
+    z-index: -2;
+
+    &::before {
+      content: "";
+      position: absolute;
+      width: 2.0625em;
+      height: 2.0625em;
+      border-radius: 50%;
+      background-color: $salem;
+      left: -2.0625em;
+      bottom: -1.03125em;
+    }
+
+    &::after {
+      content: "";
+      position: absolute;
+      width: 2.375em;
+      height: 2.375em;
+      border-radius: 50%;
+      background-color: $cranberry;
+      bottom: -0.3125em;
+      right: 1.25em;
+      box-shadow:
+        0 -5.25em 0 -0.375em $cranberry,
+        -1.6875em -7.5em 0 -0.25em,
+        0.875em -9.8125em 0 -0.6875em $cranberry;
+    }
+  }
+
+  &__curved-plant-extension {
+    position: absolute;
+    bottom: -6.5625em;
+    left: calc(-1.03125em - 0.25em);
+    width: 0.5em;
+    height: 5.875em;
+    background-color: $jambalaya;
+    z-index: -1;
+  }
+
+  &__curved-plant-extension-leaves {
+    width: 3.125em;
+    height: 3.125em;
+    border-radius: 50%;
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    top: 0.9375em;
+    background-color: $jewel;
+
+    &::before {
+      content: "";
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+      top: 3.75em;
+      width: 2em;
+      height: 4.25em;
+      border-radius: 2em;
+      background-color: inherit;
+    }
+
+    &::after {
+      content: "";
+      position: absolute;
+      width: 1.5625em;
+      height: 1.5625em;
+      border-radius: 50%;
+      top: 5em;
+      left: -0.125em;
+      background-color: $eucalyptus;
+    }
+  }
+
+  &__roof-pot-flower {
+    position: absolute;
+    width: 6.625em;
+    height: 1.875em;
+    background-color: $loulou;
+
+    &:not(.salus-shop__roof-pot-flower--second) {
+      top: -1.875em;
+    }
+
+    &::before {
+      content: "";
+      position: absolute;
+      width: 1.65625em;
+      height: 1.65625em;
+      border-radius: 50%;
+      top: -0.828125em;
+      background-color: $killarney;
+      z-index: -1;
+    }
+  }
+
+  &__roof-pot-flower-wrapper {
+    position: absolute;
+    width: 6.625em;
+    height: 1.875em;
+    top: -1.875em;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+
+  &__roof-pot-flower--first {
+    left: 1.125em;
+
+    &::before {
+      box-shadow:
+        1.65625em 0 $forest-green,
+        calc(1.65625em * 2) 0 $forest-green,
+        calc(1.65625em * 3) 0 $sunflower,
+        0.828125em -0.828125em $sunflower,
+        calc(0.828125em * 3) -0.828125em,
+        calc(0.828125em * 5) -0.828125em,
+        calc(0.828125em * 2) calc(-0.828125em * 2) $green-pea,
+        calc(0.828125em * 4) calc(-0.828125em * 2) $sunflower;
+    }
+  }
+
+  &__roof-pot-flower--second {
+    &::before {
+      box-shadow:
+        1.65625em 0 $forest-green,
+        calc(1.65625em * 2) 0 $forest-green,
+        calc(1.65625em * 3) 0 $razzmatazz,
+        0.828125em -0.828125em,
+        calc(0.828125em * 3) -0.828125em $razzmatazz,
+        calc(0.828125em * 5) -0.828125em,
+        calc(0.828125em * 2) calc(-0.828125em * 2) $green-pea,
+        calc(0.828125em * 4) calc(-0.828125em * 2) $green-pea;
+    }
+  }
+
+  &__roof-pot-flower--third {
+    right: 1.125em;
+
+    &::before {
+      box-shadow:
+        1.65625em 0 $sun,
+        calc(1.65625em * 2) 0 $forest-green,
+        calc(1.65625em * 3) 0 $sun,
+        0.828125em -0.828125em,
+        calc(0.828125em * 3) -0.828125em,
+        calc(0.828125em * 5) -0.828125em,
+        calc(0.828125em * 2) calc(-0.828125em * 2) $green-pea,
+        calc(0.828125em * 4) calc(-0.828125em * 2) $sun;
+    }
+  }
+
+  &__roof-cactus {
+    position: absolute;
+    left: 8.5625em;
+    top: -3.125em;
+    width: 2.375em;
+    height: 3.125em;
+    border-radius: 2.375em 2.375em 0 0;
+    background-color: $fire-bush;
+    box-shadow: 10.75em 0 $apple;
+  }
+
+  &__front {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    bottom: calc(1.6875em + 0.9375em);
+    width: 25em;
+    height: 16.6875em;
+    display: grid;
+    grid-template-columns: 17.0625em 1fr;
+    grid-column-gap: 1.0625em;
+  }
+
+  &__window {
+    position: relative;
+    width: 100%;
+    height: 12.1875em;
+    border: 0.5em solid $pewter;
+    box-sizing: border-box;
+    background-color: $racing-green;
+    overflow: hidden;
+    z-index: 1;
+
+    &::before {
+      content: "";
+      height: 150%;
+      width: 1.875em;
+      color: rgba($white, 0.1);
+      background-color: currentColor;
+      transform: rotate(45deg);
+      box-shadow: -1.875em 0 0 -0.625em;
+      z-index: 2;
+      position: absolute;
+      top: -7.875em;
+      left: 6.625em;
+    }
+  }
+
+  &__window-vines {
+    &--curve {
+      position: absolute;
+      top: -6.3125em;
+      left: -2.5em;
+      width: 9.375em;
+      height: 9.375em;
+      border-radius: 50%;
+      border: 0.375em solid $celtic;
+      box-sizing: border-box;
+      z-index: -1;
+
+      &::before,
+      &::after {
+        content: "";
+        position: inherit;
+        width: inherit;
+        height: inherit;
+        border-radius: inherit;
+        border: inherit;
+        box-sizing: inherit;
+      }
+
+      &::before {
+        top: -1.3125em;
+        right: -4.0625em;
+      }
+
+      &::after {
+        top: 1.5em;
+        left: -0.875em;
+      }
+    }
+
+    &--straight {
+      position: absolute;
+      right: 1.125em;
+      width: 0.375em;
+      height: 110%;
+      background-color: $seaweed;
+
+      &::after {
+        content: "";
+        width: 1.25em;
+        height: 1.25em;
+        border-radius: 50%;
+        background-color: $everglade;
+        position: absolute;
+        left: 50%;
+        transform: translateX(-50%);
+        bottom: 1.875em;
+        box-shadow: 0 -1.875em, 0 -3.75em;
+      }
+    }
+  }
+
+  &__window-red-plant {
+    position: absolute;
+    bottom: 0;
+    width: 7.5em;
+    height: 3.75em;
+    z-index: 1;
+
+    &::before {
+      content: "";
+      display: block;
+      width: inherit;
+      height: inherit;
+      border-radius: 3.75em 3.75em 0 0;
+      background-color: $espresso;
+    }
+
+    &::after {
+      content: "";
+      position: absolute;
+      bottom: 0;
+      right: -1.25em;
+      width: 5em;
+      height: 2.5em;
+      border-radius: 2.5em 2.5em 0 0;
+      background-color: $moccaccino;
+    }
+  }
+
+  &__window-red-plant-leaves {
+    position: absolute;
+    top: -2.5em;
+    left: 2.5625em;
+    width: 1.125em;
+    height: 3.125em;
+    border-radius: 1.125em 0 0 1.125em;
+    background-color: $killarney;
+    z-index: -1;
+
+    &::before,
+    &::after {
+      content: "";
+      position: absolute;
+      width: inherit;
+      height: inherit;
+      border-radius: inherit;
+    }
+
+    &::before {
+      bottom: -0.3125em;
+      left: -0.625em;
+      transform: rotate(-30deg);
+      background-color: $parsley;
+    }
+
+    &::after {
+      bottom: -1.25em;
+      left: -0.9375em;
+      transform: rotate(-60deg);
+      background-color: $everglade;
+    }
+
+    &--second {
+      left: unset;
+      right: 2.5625em;
+      transform: scaleX(-1);
+    }
+  }
+
+  &__window-pot-flower {
+    position: absolute;
+    bottom: 0;
+    right: 3.75em;
+    width: 2.875em;
+    height: 2.375em;
+
+    &::before {
+      content: "";
+      position: relative;
+      bottom: 0.1875em;
+      display: block;
+      width: inherit;
+      height: inherit;
+      background-color: $cape-cod;
+      transform: perspective(0.625em) rotateX(-5deg);
+      z-index: 1;
+    }
+
+    &::after {
+      content: "";
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+      top: -2.5em;
+      width: 2.1875em;
+      height: 3.75em;
+      background-color: $mule-fawn;
+      border-radius: 2.1875em;
+    }
+  }
+
+  &__window-pot-flower-leaves {
+    position: absolute;
+    top: -2.5625em;
+    left: -0.4375em;
+    width: 1.125em;
+    height: 3.125em;
+    z-index: 1;
+    transform: rotate(15deg);
+
+    &::before,
+    &::after {
+      content: "";
+      position: absolute;
+      width: inherit;
+      height: inherit;
+      border-radius: 1.125em 0 0 1.125em;
+      background-color: $parsley;
+    }
+
+    &::before {
+      top: -0.0625em;
+      left: 0.03125em;
+      transform: rotate(-45deg);
+    }
+
+    &::after {
+      bottom: -0.625em;
+      left: -0.125em;
+      transform: rotate(-70deg);
+      background-color: $everglade;
+    }
+
+    &--second {
+      left: unset;
+      right: -0.4375em;
+      transform: rotate(-15deg) scaleX(-1);
+    }
+  }
+
+  &__window-bottom {
+    grid-row: 2;
+    width: 100%;
+    height: calc(16.6875em - 12.1875em);
+    display: flex;
+    align-items: center;
+
+    &::before {
+      content: "";
+      display: block;
+      width: 100%;
+      height: 2.9375em;
+      box-sizing: border-box;
+      border: 0.5em solid $viridian;
+    }
+  }
+
+  &__door {
+    grid-column: 2;
+    grid-row: 1 / 3;
+    position: relative;
+    border: 0.5em solid $pewter;
+    border-bottom: 0;
+    background-color: $viridian;
+  }
+
+  &__door-inner {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    top: 0.9375em;
+    width: 4.5625em;
+    height: 11.0625em;
+    border-radius: 4.5625em 4.5625em 0 0;
+    background-color: $racing-green;
+    overflow: hidden;
+
+    &::before {
+      content: "";
+      width: 1.25em;
+      height: 1.25em;
+      border-radius: 50%;
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+      bottom: 1.25em;
+      background-color: $everglade;
+      box-shadow:
+        -1.25em -1.875em,
+        0 -3.75em,
+        1.25em -1.875em,
+        -1.25em -5.625em,
+        1.25em -5.625em;
+      z-index: 1;
+    }
+
+    &::after {
+      content: "";
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 0.375em;
+      height: 110%;
+      background-color: $seaweed;
+      box-shadow: 1.25em 0, -1.25em 0;
+    }
+  }
+
+  &__door-mirror-shines {
+    height: 150%;
+    width: 1.875em;
+    color: rgba($white, 0.1);
+    background-color: currentColor;
+    transform: rotate(45deg);
+    box-shadow: -1.875em 0 0 -0.625em;
+    position: absolute;
+    top: -2.5em;
+  }
+
+  &__floor {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    bottom: 0;
+    width: calc(100% + 2.5em);
+    height: 1.6875em;
+    background-color: $comet;
+
+    &::before {
+      content: "";
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+      top: -0.9375em;
+      width: calc(100% - 2.5em);
+      height: 0.9375em;
+      background-color: $everglade;
+    }
+  }
+
+  &__floor-flower-wrapper {
+    position: absolute;
+    z-index: 1;
+
+    &--first {
+      left: -0.625em;
+      bottom: 1.6875em;
+      width: 6.0625em;
+      height: 3.125em;
+    }
+
+    &--second {
+      bottom: 0;
+      right: -6.5em;
+      width: 5.625em;
+      height: 5em;
+
+      &::before {
+        content: "";
+        position: absolute;
+        left: 50%;
+        transform: translateX(-50%);
+        top: -0.5em;
+        width: 6.875em;
+        height: 0.625em;
+        background-color: $mandy;
+        border-radius: 0.625em;
+        z-index: 1;
+      }
+    }
+  }
+
+  &__floor-flower {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+
+    .salus-shop__floor-flower-wrapper--first & {
+      width: 5em;
+      height: 5em;
+      border-radius: 50%;
+      background-color: $green-pea;
+      top: -2.5em;
+
+      &::before {
+        content: "";
+        width: 1em;
+        height: 1em;
+        border-radius: 50%;
+        position: absolute;
+        top: 1.875em;
+        left: -0.5em;
+        background-color: $apple;
+        box-shadow:
+          5em 0 $lightning-yellow,
+          1.5625em -0.625em,
+          3.4375em -0.625em $apple,
+          0.9375em -1.75em $lightning-yellow,
+          4.0625em -1.75em,
+          2.5em -2.5em;
+      }
+    }
+
+    .salus-shop__floor-flower-wrapper--second & {
+      top: -14.6875em;
+      border-radius: 0.4375em;
+      width: 0.4375em;
+      height: 14.6875em;
+      background-color: $gondola;
+
+      &::before {
+        content: "";
+        width: 4.375em;
+        height: 4.375em;
+        border-radius: 50%;
+        position: absolute;
+        left: 50%;
+        transform: translateX(-50%);
+        bottom: -1.875em;
+        background-color: $jewel;
+        box-shadow:
+          0 -3.625em 0 -0.625em,
+          0 -6.6875em 0 -1.375em $amaranth,
+          0 -9.75em 0 -0.625em,
+          0 -12.6875em 0 -1.375em $amaranth,
+          0 -14.5625em 0 -1.6875em;
+      }
+    }
+  }
+
+  &__floor-pot {
+    position: absolute;
+    left: 50%;
+
+    .salus-shop__floor-flower-wrapper--first & {
+      bottom: -0.125em;
+      width: inherit;
+      height: inherit;
+      transform: translateX(-50%) perspective(0.625em) rotateX(-2deg);
+      background-color: $finn;
+    }
+
+    .salus-shop__floor-flower-wrapper--second & {
+      bottom: -0.3125em;
+      width: inherit;
+      height: inherit;
+      transform: translateX(-50%) perspective(0.625em) rotateX(-2deg);
+      background-color: $mojo;
+
+      &::before {
+        content: "";
+        display: block;
+        width: 50%;
+        height: 100%;
+        background-color: $chestnut-rose;
+      }
+    }
+  }
+
+  &__floor-pot-flower {
+    width: 2.3125em;
+    height: 2.3125em;
+    border-radius: 50%;
+    position: absolute;
+    bottom: 2.625em;
+    left: 11.25em;
+    background-color: $chateau-green;
+    box-shadow: 1.875em 0, -1.875em 0;
+    z-index: 1;
+
+    &::before,
+    &::after {
+      content: "";
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+    }
+
+    &::before {
+      bottom: 0.625em;
+      width: 7.5em;
+      height: 0.5625em;
+      background-color: $mulberry;
+      z-index: 1;
+    }
+
+    &::after {
+      width: 7.1875em;
+      bottom: -0.9375em;
+      height: 1.875em;
+      background-color: $cannon-pink;
+    }
+  }
+}

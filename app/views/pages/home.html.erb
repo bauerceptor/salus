@@ -1,0 +1,62 @@
+<div class="home">
+  <header class="nav">
+    <div class="container">
+      <div class="nav__content">
+        <%= localized_logo_image_tag class: "nav__logo", alt: "" %>
+        <div class="nav__right">
+          <ul class="nav__list">
+            <li class="nav__item">
+              <%= link_to t(".nav.contact"), contact_path, class: "nav__link" %>
+            </li>
+          </ul>
+          <div class="nav__buttons">
+            <%= link_to t(".nav.sign_in"), auth_new_session_path, class: "nav__button nav__button--login" %>
+            <%= link_to t(".nav.sign_up"), auth_new_registration_path, class: "nav__button nav__button--register" %>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+  <div class="hero">
+    <div class="container">
+      <div class="hero__content">
+        <div class="hero__text-group">
+          <p class="hero__overtitle"><%= t(".hero.overtitle") %> <i class="ri-trophy-line"></i></p>
+          <h1 class="hero__title"><%= t(".hero.title.non_color") %> <span class="hero__title__color"><%= t(".hero.title.color") %></span> <span class="hero__title__emoji"><i class="ri-emotion-happy-line"></i></span></h1>
+          <p class="hero__desc"><%= t(".hero.desc") %></p>
+          <%= link_to t(".hero.link"), root_path, class: "hero__link" %>
+        </div>
+        <%= image_tag "happy-people.png", class: "hero__photo", alt: "" %>
+      </div>
+    </div>
+  </div>
+  <div class="showcase">
+    <div class="container">
+      <div class="showcase__inner">
+        <div class="showcase__group">
+          <div class="showcase__group__left">
+            <%= image_tag "ss1.svg", alt: "", class: "showcase__group__photo" %>
+          </div>
+          <div class="showcase__group__right">
+            <h2 class="showcase__group__title"><%= t(".showcase.monitoring.title") %></h2>
+            <p class="showcase__group__desc"><%= t(".showcase.monitoring.content") %></p>
+            <%= link_to "#{t(".showcase.monitoring.link")}", root_path, class: "showcase__group__link" %>
+          </div>
+        </div>
+        <div class="showcase__group">
+          <div class="showcase__group__left">
+            <%= image_tag "ss3.svg", alt: "", class: "showcase__group__photo" %>
+          </div>
+          <div class="showcase__group__right">
+            <h2 class="showcase__group__title"><%= t(".showcase.security.title") %></h2>
+            <p class="showcase__group__desc"><%= t(".showcase.security.content") %></p>
+            <%= link_to "#{t(".showcase.security.link")}", root_path, class: "showcase__group__link" %>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="footer">
+    <%= t(".footer.text") %>
+  </div>
+</div>

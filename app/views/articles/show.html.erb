@@ -1,0 +1,49 @@
+<div class="page-article">
+  <header class="dash-header">
+    <div class="dash-header__left">
+      <h1 class="dash-header__title"><%= @article.title %></h1>
+      <%= render "shared/breadcrumbs" %>
+    </div>
+    <div class="dash-header__right">
+      <% if policy(@article).owner? %>
+        <%= link_to edit_article_path(id: @article.id, locale: I18n.locale), class: "dash-button dash-button--edit" do %>
+          <i class="ri-edit-line dash-button__icon"></i>
+          <%= t(".button.edit") %>
+        <% end %>
+      <% end %>
+      <%= link_to articles_path, class: "dash-button dash-button--back" do %>
+        <i class="ri-arrow-left-line dash-button__icon"></i>
+      <% end %>
+    </div>
+  </header>
+  <div class="dash-flash-messages">
+    <%= turbo_frame_tag "flash" do %>
+      <%= render "shared/dash_flash" %>
+    <% end %>
+  </div>
+  <div class="page-article__content">
+    <div class="article-preview">
+      <div class="article-preview__image-container">
+        <%= image_tag "article-default.png", alt: "", class: "article-preview__image" %>
+      </div>
+      <div class="article-preview__content">
+        <div class="article-preview__content__info">
+          <div class="article-preview__content__info__item article-preview__author">
+            <i class="ri-user-line article-preview__content__info__item__icon"></i>
+            <%= link_to account_path(id: @article.account.id, locale: I18n.locale) do %>
+              <%= @article.account.full_name %>
+            <% end %>
+          </div>
+          &bull;
+          <div class="article-preview__content__info__item">
+            <i class="ri-calendar-line article-preview__content__info__item__icon"></i>
+            <%= @article.updated_at.strftime("%d.%m.%Y") %>
+          </div>
+        </div>
+        <div class="article-preview__content__body">
+          <%= @article.body.html_safe %>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

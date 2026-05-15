@@ -1,0 +1,496 @@
+<div class="dash-chat-layout">
+  <% if @assigned_doctor %>
+    <aside class="dash-chat-sidebar">
+      <div class="dash-chat-sidebar__profile">
+        <div class="dash-chat-sidebar__profile__header">
+          <div class="dash-chat-sidebar__profile__avatar">
+            <i class="ri-user-3-line"></i>
+          </div>
+          <div class="dash-chat-sidebar__profile__info">
+            <h2 class="dash-chat-sidebar__profile__name">Dr. <%= @specialist_user.account.full_name %></h2>
+            <p class="dash-chat-sidebar__profile__role"><%= @specialist_profile.specialization || 'General Practitioner' %></p>
+          </div>
+        </div>
+        <div class="dash-chat-sidebar__profile__status">
+          <span class="dash-chat-sidebar__profile__status-dot"></span>
+          <span>Available for appointments</span>
+        </div>
+      </div>
+
+      <div class="dash-chat-sidebar__section">
+        <h3 class="dash-chat-sidebar__section-title">
+          <i class="ri-calendar-line"></i>
+          Request Appointment
+        </h3>
+        <% if @schedules&.any? %>
+          <div class="dash-chat-sidebar__schedule">
+            <% @schedules.group_by(&:day_of_week).reject { |day, _| day.nil? }.each do |day, day_schedules| %>
+              <div class="dash-chat-sidebar__schedule-day">
+                <div class="dash-chat-sidebar__schedule-day__label">
+                  <%= Date::DAYNAMES[day].capitalize %>
+                </div>
+                <div class="dash-chat-sidebar__schedule-day__slots">
+                  <% day_schedules.each do |schedule| %>
+                    <button class="dash-chat-sidebar__slot"
+                            data-schedule-id="<%= schedule.id %>"
+                            data-day="<%= day %>"
+                            data-start="<%= schedule.start_time %>"
+                            data-end="<%= schedule.end_time %>">
+                      <%= schedule.start_time %>
+                    </button>
+                  <% end %>
+                </div>
+              </div>
+            <% end %>
+          </div>
+        <% else %>
+          <p class="dash-chat-sidebar__empty">No available slots</p>
+        <% end %>
+      </div>
+
+      <div class="dash-chat-sidebar__appointments">
+        <h3 class="dash-chat-sidebar__section-title">
+          <i class="ri-file-list-3-line"></i>
+          My Appointments
+        </h3>
+        <% if @appointments.any? %>
+          <div class="dash-chat-sidebar__appointment-list">
+            <% @appointments.each do |apt| %>
+              <div class="dash-appointment-item dash-appointment-item--<%= apt.status %>">
+                <div class="dash-appointment-item__header">
+                  <div class="dash-appointment-item__info">
+                    <div class="dash-appointment-item__date"><%= apt.appointment_date.strftime('%b %d') %></div>
+                    <div class="dash-appointment-item__time">
+                      <%= apt.start_time %> - <%= apt.end_time %>
+                    </div>
+                    <div class="dash-appointment-item__type"><%= apt.schedule&.appointment_type || 'Consultation' %></div>
+                  </div>
+                  <span class="badge badge--<%= apt.status %>"><%= apt.status %></span>
+                </div>
+              </div>
+            <% end %>
+          </div>
+        <% else %>
+          <p class="dash-chat-sidebar__empty">No appointments yet</p>
+        <% end %>
+      </div>
+    </aside>
+
+    <main class="dash-chat-main">
+      <header class="dash-chat-main__header">
+        <div class="dash-chat-main__header__left">
+          <div class="dash-chat-main__header__avatar">
+            <i class="ri-user-3-line"></i>
+          </div>
+          <div class="dash-chat-main__header__info">
+            <h2 class="dash-chat-main__header__name">Dr. <%= @specialist_user.account.full_name %></h2>
+            <p class="dash-chat-main__header__desc">Chat with your doctor</p>
+          </div>
+        </div>
+        <div class="dash-chat-main__header__actions">
+          <button class="dash-button dash-button--circle dash-button--gray" title="Voice Call">
+            <i class="ri-phone-line"></i>
+          </button>
+          <button class="dash-button dash-button--circle dash-button--gray" title="Video Call">
+            <i class="ri-vidicon-line"></i>
+          </button>
+        </div>
+      </header>
+
+      <div class="dash-chat-main__messages" id="messages-container" data-specialist-id="<%= @specialist_user&.id %>" data-current-account-id="<%= current_account.id %>">
+        <% if @messages&.any? %>
+          <% @messages.each do |msg| %>
+            <% is_sent = msg.sender_type == 'patient' %>
+            <div class="dash-message dash-message--<%= is_sent ? 'sent' : 'received' %>" data-specialist-id="<%= msg.specialist_id %>">
+              <div class="dash-message__bubble">
+                <% if msg.attachments.any? %>
+                  <div class="dash-message__attachments">
+                    <% msg.attachments.each do |attachment| %>
+                      <% case attachment.file_type %>
+                      <% when 'image' %>
+                        <img src="<%== attachment.url %>" class="dash-message__attachment-image" alt="">
+                      <% when 'voice', 'audio' %>
+                        <audio controls class="dash-message__attachment-audio <%= is_sent ? 'dash-message__attachment-audio--inverted' : '' %>"><source src="<%== attachment.url %>" type="<%= attachment.content_type %>"></audio>
+                      <% when 'video' %>
+                        <video controls class="dash-message__attachment-video"><source src="<%== attachment.url %>" type="<%= attachment.content_type %>"></video>
+                      <% else %>
+                        <div class="dash-message__attachment-file <%= is_sent ? 'dash-message__attachment-file--sent' : '' %>">
+                          <i class="ri-file-line"></i>
+                          <span><%= attachment.filename %></span>
+                        </div>
+                      <% end %>
+                    <% end %>
+                  </div>
+                <% end %>
+                <% if msg.body.present? %>
+                  <p class="dash-message__text"><%= msg.body %></p>
+                <% end %>
+                <div class="dash-message__meta">
+                  <span class="dash-message__time"><%= msg.created_at.strftime("%H:%M") %></span>
+                  <% if is_sent %>
+                    <i class="<%= msg.is_read ? 'ri-check-double-line' : 'ri-check-line' %> dash-message__status"></i>
+                  <% end %>
+                </div>
+              </div>
+            </div>
+          <% end %>
+        <% else %>
+          <div class="dash-chat-main__empty">
+            <i class="ri-message-3-line"></i>
+            <h3>Start a conversation</h3>
+            <p>Send a message to your doctor or request an appointment.</p>
+          </div>
+        <% end %>
+      </div>
+
+      <div class="dash-chat-main__input-area">
+        <div class="dash-chat-main__input-row">
+          <button class="dash-button dash-button--circle dash-button--gray" id="attachBtn" title="Attach">
+            <i class="ri-attachment-2"></i>
+          </button>
+          <button class="dash-button dash-button--circle dash-button--gray" id="voiceBtn" title="Voice">
+            <i class="ri-mic-line"></i>
+          </button>
+          <input type="text" id="message-body" class="dash-chat-main__input" placeholder="Type a message...">
+          <button class="dash-button dash-button--circle" id="send-message" title="Send">
+            <i class="ri-send-line"></i>
+          </button>
+        </div>
+        <input type="file" id="fileInput" class="hidden" accept="image/*,video/*,.pdf,.doc,.docx">
+      </div>
+    </main>
+
+    <dialog id="appointmentModal" class="dash-modal">
+      <div class="dash-modal__box">
+        <h3 class="dash-modal__title">Request Appointment</h3>
+        <form id="appointmentForm">
+          <input type="hidden" name="schedule_id" id="scheduleId">
+          <div class="dash-form__group">
+            <label class="dash-form__label" for="appointmentDate">Date</label>
+            <input type="date" name="appointment_date" id="appointmentDate" class="dash-form__input" required>
+          </div>
+          <div class="dash-form__group">
+            <label class="dash-form__label" for="appointmentTime">Time</label>
+            <input type="time" name="start_time" id="appointmentTime" class="dash-form__input" required>
+          </div>
+          <div class="dash-form__group">
+            <label class="dash-form__label" for="appointmentNotes">Notes (optional)</label>
+            <textarea name="notes" id="appointmentNotes" class="dash-form__input" rows="3" placeholder="Describe your concern..."></textarea>
+          </div>
+          <div class="dash-modal__actions">
+            <button type="button" class="dash-button dash-button--gray" onclick="appointmentModal.close()">Cancel</button>
+            <button type="submit" class="dash-button">Send Request</button>
+          </div>
+        </form>
+      </div>
+      <form method="dialog" class="dash-modal__backdrop"><button>close</button></form>
+    </dialog>
+
+  <% else %>
+    <main class="dash-chat-main dash-chat-main--centered">
+      <div class="dash-chat-main__empty-state">
+        <div class="dash-chat-main__empty-state__icon">
+          <i class="ri-user-search-line"></i>
+        </div>
+        <h2 class="dash-chat-main__empty-state__title">No Doctor Assigned</h2>
+        <p class="dash-chat-main__empty-state__desc">You will be assigned a doctor by the administrator. Please wait for notification.</p>
+        <%= link_to "Go to Home", authenticated_root_path, class: "dash-button" %>
+      </div>
+    </main>
+  <% end %>
+</div>
+
+<script>
+(function() {
+  var chat = document.querySelector('.dash-chat-main');
+  if (!chat) return;
+
+  var body = document.getElementById('message-body');
+  var sendBtn = document.getElementById('send-message');
+  var attachBtn = document.getElementById('attachBtn');
+  var voiceBtn = document.getElementById('voiceBtn');
+  var fileInput = document.getElementById('fileInput');
+  var recordingDuration = document.getElementById('recording-duration');
+
+  if (body) {
+    body.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        sendMessage();
+      }
+    });
+  }
+
+  if (sendBtn) {
+    sendBtn.addEventListener('click', sendMessage);
+  }
+
+  if (attachBtn) {
+    attachBtn.addEventListener('click', function() {
+      if (fileInput) fileInput.click();
+    });
+  }
+
+  if (fileInput) {
+    fileInput.addEventListener('change', function(e) {
+      if (e.target.files.length > 0) {
+        sendMessage(e.target.files[0]);
+      }
+    });
+  }
+
+  if (voiceBtn) {
+    var isRecording = false;
+    var mediaRecorder = null;
+    var audioChunks = [];
+    var recordingTimer = null;
+    var recordingStartTime = null;
+
+    voiceBtn.addEventListener('click', function() {
+      if (!isRecording) {
+        // Start recording
+        navigator.mediaDevices.getUserMedia({ audio: true })
+          .then(function(stream) {
+            audioChunks = [];
+            mediaRecorder = new MediaRecorder(stream, { mimeType: 'audio/webm;codecs=opus' });
+
+            mediaRecorder.ondataavailable = function(e) {
+              if (e.data.size > 0) {
+                audioChunks.push(e.data);
+              }
+            };
+
+            mediaRecorder.onstop = function() {
+              var blob = new Blob(audioChunks, { type: 'audio/webm' });
+              var file = new File([blob], 'voice_note_' + Date.now() + '.webm', { type: 'audio/webm' });
+              sendMessage(file);
+              stream.getTracks().forEach(function(track) { track.stop(); });
+            };
+
+            mediaRecorder.start();
+            isRecording = true;
+            recordingStartTime = Date.now();
+            voiceBtn.classList.add('recording');
+            voiceBtn.style.color = '#dc2626';
+
+            // Update duration display
+            recordingTimer = setInterval(function() {
+              var elapsed = Math.floor((Date.now() - recordingStartTime) / 1000);
+              var mins = Math.floor(elapsed / 60);
+              var secs = elapsed % 60;
+              if (recordingDuration) {
+                recordingDuration.textContent = mins + ':' + (secs < 10 ? '0' : '') + secs;
+                recordingDuration.classList.remove('hidden');
+              }
+            }, 1000);
+          })
+          .catch(function(err) {
+            console.error('Microphone access error:', err);
+            alert('Could not access microphone. Please allow microphone access.');
+          });
+      } else {
+        // Stop recording
+        if (mediaRecorder && mediaRecorder.state !== 'inactive') {
+          mediaRecorder.stop();
+        }
+        if (recordingTimer) {
+          clearInterval(recordingTimer);
+          recordingTimer = null;
+        }
+        isRecording = false;
+        voiceBtn.classList.remove('recording');
+        voiceBtn.style.color = '';
+        if (recordingDuration) {
+          recordingDuration.classList.add('hidden');
+          recordingDuration.textContent = '0:00';
+        }
+      }
+    });
+  }
+
+  function sendMessage(file) {
+    var specialistId = document.querySelector('[data-specialist-id]')?.dataset?.specialistId;
+    if (!specialistId) return;
+
+    var bodyText = body?.value?.trim() || '';
+    if (!bodyText && !file) return;
+
+    var formData = new FormData();
+    formData.append('specialist_message[body]', bodyText || (file ? 'Sent an attachment' : ''));
+    formData.append('specialist_message[specialist_id]', specialistId);
+    formData.append('specialist_message[subject]', 'Chat Message');
+    if (file) {
+      formData.append('attachment', file);
+    }
+
+    // Optimistic UI - show immediately
+    var container = document.getElementById('messages-container');
+    var msgDiv = document.createElement('div');
+    msgDiv.className = 'dash-message dash-message--sent';
+    var attachmentsHtml = '';
+    if (file) {
+      var fileUrl = URL.createObjectURL(file);
+      if (file.type.startsWith('image/')) {
+        attachmentsHtml = '<div class="dash-message__attachments"><img src="' + fileUrl + '" class="dash-message__attachment-image" alt=""></div>';
+      } else if (file.type.startsWith('audio/')) {
+        attachmentsHtml = '<div class="dash-message__attachments"><audio controls src="' + fileUrl + '" class="dash-message__attachment-audio"></audio></div>';
+      } else {
+        attachmentsHtml = '<div class="dash-message__attachments"><a href="' + fileUrl + '" download="' + file.name + '" class="dash-message__attachment-file"><i class="ri-file-line"></i><span>' + file.name + '</span></a></div>';
+      }
+    }
+    msgDiv.innerHTML = '<div class="dash-message__bubble">' + attachmentsHtml + '<p class="dash-message__text">' + escapeHtml(bodyText || 'Sent an attachment') + '</p><div class="dash-message__meta"><span class="dash-message__time">' + new Date().toLocaleTimeString([], {hour: '2-digit', minute: '2-digit'}) + '</span></div></div>';
+    container.appendChild(msgDiv);
+    container.scrollTop = container.scrollHeight;
+
+    // Clean up object URL after a delay
+    if (file) {
+      setTimeout(function() { URL.revokeObjectURL(fileUrl); }, 60000);
+    }
+
+    fetch('/en/specialist_messages', {
+      method: 'POST',
+      headers: {
+        'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]')?.content,
+        'Accept': 'application/json'
+      },
+      body: formData
+    }).then(function(response) {
+      return response.json();
+    }).then(function(data) {
+      if (data.success) {
+        if (body) body.value = '';
+        // Remove optimistic message and add real one
+        container.removeChild(msgDiv);
+        if (data.message && data.message.attachments) {
+          addMessageToChat({
+            body: data.message.body,
+            created_at: data.message.created_at,
+            attachments: data.message.attachments
+          }, true);
+        }
+      } else {
+        container.removeChild(msgDiv);
+        console.error('Message failed:', data.errors);
+        alert('Failed to send: ' + (data.errors?.join(', ') || 'Unknown error'));
+      }
+    }).catch(function(err) {
+      container.removeChild(msgDiv);
+      console.error('Send error:', err);
+    });
+  }
+
+  var container = document.getElementById('messages-container');
+  if (container) {
+    container.scrollTop = container.scrollHeight;
+  }
+
+  // ActionCable real-time subscription
+  var accountId = container?.dataset?.currentAccountId;
+  if (accountId && typeof ActionCable !== 'undefined') {
+    var consumer = ActionCable.createConsumer();
+    consumer.subscriptions.create({
+      channel: 'SpecialistMessagesChannel',
+      account_id: accountId
+    }, {
+      received: function(data) {
+        console.log('Received message via ActionCable:', data);
+        if (data.type === 'new_message' || data.type === 'specialist_message') {
+          addMessageToChat(data, false);
+        }
+      }
+    });
+  }
+
+  function addMessageToChat(data, isSent) {
+    var container = document.getElementById('messages-container');
+    if (!container) return;
+
+    var msgDiv = document.createElement('div');
+    msgDiv.className = 'dash-message dash-message--' + (isSent ? 'sent' : 'received');
+
+    var attachmentsHtml = '';
+    if (data.attachments && data.attachments.length > 0) {
+      attachmentsHtml = '<div class="dash-message__attachments">';
+      data.attachments.forEach(function(att) {
+        if (att.file_type === 'image') {
+          attachmentsHtml += '<img src="' + att.url + '" class="dash-message__attachment-image" alt="">';
+        } else if (att.file_type === 'voice' || att.file_type === 'audio') {
+          attachmentsHtml += '<audio controls class="dash-message__attachment-audio"><source src="' + att.url + '" type="' + (att.content_type || 'audio/webm') + '"></audio>';
+        } else if (att.file_type === 'video') {
+          attachmentsHtml += '<video controls class="dash-message__attachment-video"><source src="' + att.url + '" type="' + (att.content_type || 'video/mp4') + '"></video>';
+        } else {
+          attachmentsHtml += '<a href="' + att.url + '" download="' + att.filename + '" class="dash-message__attachment-file"><i class="ri-file-line"></i><span>' + att.filename + '</span></a>';
+        }
+      });
+      attachmentsHtml += '</div>';
+    }
+
+    var time = new Date(data.created_at).toLocaleTimeString([], {hour: '2-digit', minute: '2-digit'});
+    msgDiv.innerHTML = '<div class="dash-message__bubble">' + attachmentsHtml + '<p class="dash-message__text">' + escapeHtml(data.body || '') + '</p><div class="dash-message__meta"><span class="dash-message__time">' + time + '</span></div></div>';
+
+    container.appendChild(msgDiv);
+    container.scrollTop = container.scrollHeight;
+  }
+
+  function escapeHtml(text) {
+    var div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+  }
+
+  var slots = document.querySelectorAll('[data-schedule-id]');
+  var modal = document.getElementById('appointmentModal');
+  var scheduleIdInput = document.getElementById('scheduleId');
+  var appointmentDate = document.getElementById('appointmentDate');
+  var appointmentTime = document.getElementById('appointmentTime');
+
+  slots.forEach(function(slot) {
+    slot.addEventListener('click', function() {
+      scheduleIdInput.value = slot.dataset.scheduleId;
+      var today = new Date();
+      var day = parseInt(slot.dataset.day);
+      var targetDate = new Date(today);
+      targetDate.setDate(today.getDate() + ((day + 7 - today.getDay()) % 7 || 7));
+      appointmentDate.value = targetDate.toISOString().split('T')[0];
+      appointmentTime.value = slot.dataset.start;
+      if (modal) modal.showModal();
+    });
+  });
+
+  var appointmentForm = document.getElementById('appointmentForm');
+  if (appointmentForm) {
+    appointmentForm.addEventListener('submit', function(e) {
+      e.preventDefault();
+      var formData = new FormData(appointmentForm);
+      var specialistId = document.querySelector('[data-specialist-id]')?.dataset?.specialistId;
+      formData.append('specialist_id', specialistId);
+
+      fetch('/appointment-request', {
+        method: 'POST',
+        headers: {
+          'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]').content,
+          'Accept': 'text/html'
+        },
+        body: formData
+      }).then(function(response) {
+        if (response.redirected) {
+          window.location.href = response.url;
+        } else if (response.ok) {
+          alert('Appointment request sent! Your doctor will confirm shortly.');
+          if (modal) modal.close();
+          location.reload();
+        } else {
+          response.text().then(function(html) {
+            var parser = new DOMParser();
+            var doc = parser.parseFromString(html, 'text/html');
+            var alertMsg = doc.querySelector('.alert')?.textContent;
+            alert(alertMsg || 'Failed to send appointment request.');
+          });
+        }
+      }).catch(function() {
+        alert('Network error. Please try again.');
+      });
+    });
+  }
+})();
+</script>

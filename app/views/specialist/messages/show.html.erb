@@ -1,0 +1,763 @@
+<div class="wa-app">
+
+  <!-- Left: Conversation List (40%) -->
+  <aside class="wa-conversations">
+    <div class="wa-conversations__header">
+      <h1 class="wa-conversations__title">Chats</h1>
+    </div>
+    <div class="wa-conversations__list">
+      <% if @conversations.any? %>
+        <% @conversations.each do |msg| %>
+          <% last_message = current_user.specialist_messages.where(account_id: msg.account_id).order(created_at: :desc).first %>
+          <% unread_count = current_user.specialist_messages.where(account_id: msg.account_id, is_read: false, sender_type: 'patient').count %>
+          <% is_active = @message && msg.account_id == @message.account_id %>
+          <%= link_to specialist_message_path(id: last_message.id, locale: I18n.locale), class: "wa-conversation-item #{is_active ? 'wa-conversation-item--active' : ''}" do %>
+            <div class="wa-conversation-item__avatar">
+              <i class="ri-user-3-line"></i>
+            </div>
+            <div class="wa-conversation-item__content">
+              <div class="wa-conversation-item__row">
+                <span class="wa-conversation-item__name"><%= msg.account.full_name %></span>
+                <span class="wa-conversation-item__time"><%= last_message.created_at.strftime("%H:%M") %></span>
+              </div>
+              <div class="wa-conversation-item__row">
+                <span class="wa-conversation-item__preview">
+                  <% if last_message.reply_from_patient? %>
+                    <i class="ri-check-line"></i>
+                  <% end %>
+                  <%= last_message.subject %>
+                </span>
+                <% if unread_count > 0 %>
+                  <span class="wa-conversation-item__badge"><%= unread_count %></span>
+                <% end %>
+              </div>
+            </div>
+          <% end %>
+        <% end %>
+      <% else %>
+        <div class="wa-conversations__empty">
+          <p>No conversations yet</p>
+        </div>
+      <% end %>
+    </div>
+  </aside>
+
+  <!-- Right: Chat Screen (60%) -->
+  <main class="wa-chat">
+    <% if @message %>
+      <header class="wa-chat__header">
+        <div class="wa-chat__user">
+          <div class="wa-chat__avatar">
+            <i class="ri-user-3-line"></i>
+          </div>
+          <div class="wa-chat__info">
+            <h2 class="wa-chat__name"><%= @message.account.full_name %></h2>
+            <p class="wa-chat__status">patient</p>
+          </div>
+        </div>
+      </header>
+
+      <div class="wa-chat__messages" id="messages-container" data-account-id="<%= @message.account_id if @message %>" data-specialist-id="<%= current_user.id %>">
+        <% @conversation.each do |msg| %>
+          <% is_sent = msg.reply_from_specialist? %>
+          <div class="wa-msg wa-msg--<%= is_sent ? 'out' : 'in' %>">
+            <div class="wa-msg__bubble">
+              <% if msg.attachments.any? %>
+                <div class="wa-msg__attachments">
+                  <% msg.attachments.each do |attachment| %>
+                    <% case attachment.file_type %>
+                    <% when 'image' %>
+                      <img src="<%== attachment.url %>" class="wa-msg__image" alt="">
+                    <% when 'voice', 'audio' %>
+                      <audio controls class="wa-msg__audio"><source src="<%== attachment.url %>" type="<%= attachment.content_type %>"></audio>
+                    <% when 'video' %>
+                      <video controls class="wa-msg__video"><source src="<%== attachment.url %>" type="<%= attachment.content_type %>"></video>
+                    <% else %>
+                      <a href="<%== attachment.url %>" download="<%= attachment.filename %>" class="wa-msg__file">
+                        <i class="ri-file-line"></i>
+                        <span><%= attachment.filename %></span>
+                      </a>
+                    <% end %>
+                  <% end %>
+                </div>
+              <% end %>
+              <% if msg.body.present? %>
+                <p class="wa-msg__text"><%= msg.body %></p>
+              <% end %>
+              <div class="wa-msg__meta">
+                <span class="wa-msg__time"><%= msg.created_at.strftime("%H:%M") %></span>
+                <% unless is_sent %>
+                  <i class="<%= msg.is_read ? 'ri-check-double-line wa-msg__read' : 'ri-check-line' %>"></i>
+                <% end %>
+              </div>
+            </div>
+          </div>
+        <% end %>
+      </div>
+
+      <div class="wa-chat__input">
+        <button class="wa-chat__tool" id="attach-btn"><i class="ri-attachment-2"></i></button>
+        <button class="wa-chat__tool" id="voice-btn"><i class="ri-mic-line"></i></button>
+        <div class="wa-chat__field">
+          <textarea id="message-body" rows="1" placeholder="Reply"></textarea>
+        </div>
+        <button class="wa-chat__send" id="send-message">
+          <i class="ri-send-line"></i>
+        </button>
+        <input type="file" id="file-input" class="hidden" accept="image/*,video/*,.pdf,.doc,.docx">
+      </div>
+    <% else %>
+      <div class="wa-chat__placeholder">
+        <div class="wa-chat__placeholder-icon">
+          <i class="ri-chat-smile-3-line"></i>
+        </div>
+        <p>Select a conversation</p>
+      </div>
+    <% end %>
+  </main>
+</div>
+
+<style>
+.wa-app {
+  display: flex;
+  height: 100vh;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+.wa-conversations {
+  width: 30%;
+  min-width: 280px;
+  max-width: 380px;
+  border-right: 1px solid #e0e0e0;
+  display: flex;
+  flex-direction: column;
+  background: #fff;
+}
+
+.wa-conversations__header {
+  padding: 15px 16px;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.wa-conversations__title {
+  font-size: 20px;
+  font-weight: 600;
+  color: #111;
+  margin: 0;
+}
+
+.wa-conversations__list {
+  flex: 1;
+  overflow-y: auto;
+}
+
+.wa-conversations__empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 200px;
+  color: #667781;
+}
+
+.wa-conversation-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.wa-conversation-item:hover {
+  background: #f5f5f5;
+}
+
+.wa-conversation-item--active {
+  background: #efeae2;
+}
+
+.wa-conversation-item__avatar {
+  width: 50px;
+  height: 50px;
+  background: #d9d9d9;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #666;
+  font-size: 24px;
+  flex-shrink: 0;
+}
+
+.wa-conversation-item__content {
+  flex: 1;
+  min-width: 0;
+}
+
+.wa-conversation-item__row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.wa-conversation-item__name {
+  font-size: 16px;
+  font-weight: 500;
+  color: #111;
+}
+
+.wa-conversation-item__time {
+  font-size: 12px;
+  color: #667781;
+  flex-shrink: 0;
+}
+
+.wa-conversation-item__preview {
+  font-size: 14px;
+  color: #667781;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.wa-conversation-item__badge {
+  background: #00a884;
+  color: #fff;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 10px;
+  flex-shrink: 0;
+}
+
+.wa-chat {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  background: #efeae2;
+}
+
+.wa-chat__header {
+  padding: 10px 16px;
+  background: #f0f2f5;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.wa-chat__user {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.wa-chat__avatar {
+  width: 40px;
+  height: 40px;
+  background: #00a884;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-size: 20px;
+}
+
+.wa-chat__name {
+  font-size: 16px;
+  font-weight: 500;
+  color: #111;
+  margin: 0;
+}
+
+.wa-chat__status {
+  font-size: 13px;
+  color: #667781;
+  margin: 0;
+}
+
+.wa-chat__messages {
+  flex: 1;
+  overflow-y: auto;
+  padding: 8px 12%;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.wa-msg {
+  display: flex;
+  margin-bottom: 4px;
+}
+
+.wa-msg--in {
+  justify-content: flex-start;
+}
+
+.wa-msg--out {
+  justify-content: flex-end;
+}
+
+.wa-msg__bubble {
+  max-width: 55%;
+  padding: 6px 8px 4px 8px;
+  position: relative;
+  border-radius: 7.5px;
+}
+
+.wa-msg--in .wa-msg__bubble {
+  background: #fff;
+  box-shadow: 0 1px 0.5px rgba(11, 20, 26, 0.13);
+}
+
+.wa-msg--in .wa-msg__bubble::before {
+  content: '';
+  position: absolute;
+  left: -8px;
+  top: 0;
+  width: 0;
+  height: 0;
+  border-top: 10px solid transparent;
+  border-bottom: 10px solid transparent;
+  border-right: 10px solid #fff;
+}
+
+.wa-msg--out .wa-msg__bubble {
+  background: #dcf8c6;
+}
+
+.wa-msg--out .wa-msg__bubble::after {
+  content: '';
+  position: absolute;
+  right: -8px;
+  top: 0;
+  width: 0;
+  height: 0;
+  border-top: 10px solid transparent;
+  border-bottom: 10px solid transparent;
+  border-left: 10px solid #dcf8c6;
+}
+
+.wa-msg__text {
+  font-size: 14.2px;
+  line-height: 1.35;
+  color: #111;
+  margin: 0;
+  word-wrap: break-word;
+}
+
+.wa-msg__attachments {
+  margin-bottom: 4px;
+}
+
+.wa-msg__image {
+  max-width: 280px;
+  border-radius: 6px;
+  display: block;
+}
+
+.wa-msg__audio {
+  height: 30px;
+  width: 220px;
+}
+
+.wa-msg__video {
+  max-width: 280px;
+  border-radius: 6px;
+}
+
+.wa-msg__file {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  background: rgba(0,0,0,0.05);
+  border-radius: 6px;
+  font-size: 13px;
+}
+
+.wa-msg__meta {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 3px;
+  margin-top: 2px;
+}
+
+.wa-msg__time {
+  font-size: 11px;
+  color: #667781;
+}
+
+.wa-msg__read {
+  color: #53bdeb;
+  font-size: 16px;
+}
+
+.wa-chat__input {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px;
+  background: #f0f2f5;
+}
+
+.wa-chat__tool {
+  width: 44px;
+  height: 44px;
+  background: transparent;
+  border: none;
+  border-radius: 50%;
+  color: #54656f;
+  font-size: 22px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.wa-chat__tool:hover {
+  background: rgba(84, 101, 111, 0.1);
+}
+
+.wa-chat__field {
+  flex: 1;
+  background: #fff;
+  border-radius: 24px;
+  padding: 6px 12px;
+}
+
+.wa-chat__field textarea {
+  width: 100%;
+  border: none;
+  background: transparent;
+  resize: none;
+  font-size: 15px;
+  line-height: 1.4;
+  max-height: 100px;
+  outline: none;
+}
+
+.wa-chat__send {
+  width: 48px;
+  height: 48px;
+  background: #00a884;
+  border: none;
+  border-radius: 50%;
+  color: #fff;
+  font-size: 22px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.wa-chat__placeholder {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: #f0f2f5;
+  color: #667781;
+}
+
+.wa-chat__placeholder-icon {
+  font-size: 80px;
+  margin-bottom: 16px;
+  opacity: 0.3;
+}
+
+.wa-chat__placeholder p {
+  font-size: 16px;
+}
+</style>
+
+<script>
+(function() {
+  var chat = document.querySelector('.wa-chat');
+  if (!chat) return;
+
+  var body = document.getElementById('message-body');
+  var sendBtn = document.getElementById('send-message');
+  var voiceBtn = document.getElementById('voice-btn');
+  var attachBtn = document.getElementById('attach-btn');
+  var fileInput = document.getElementById('file-input');
+  var container = document.getElementById('messages-container');
+  var specialistId = container?.dataset?.specialistId;
+  var accountId = container?.dataset?.accountId;
+
+  if (attachBtn && fileInput) {
+    attachBtn.addEventListener('click', function() {
+      fileInput.click();
+    });
+    fileInput.addEventListener('change', function(e) {
+      if (e.target.files.length > 0) {
+        sendFileMessage(e.target.files[0]);
+      }
+    });
+  }
+
+  if (body) {
+    body.addEventListener('input', function() {
+      this.style.height = 'auto';
+      this.style.height = Math.min(this.scrollHeight, 100) + 'px';
+    });
+
+    body.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        sendMessage();
+      }
+    });
+  }
+
+  if (sendBtn) {
+    sendBtn.addEventListener('click', sendMessage);
+  }
+
+  if (voiceBtn) {
+    var isRecording = false;
+    var mediaRecorder = null;
+    var audioChunks = [];
+    var recordingTimer = null;
+    var recordingStartTime = null;
+
+    voiceBtn.addEventListener('click', function() {
+      if (!isRecording) {
+        navigator.mediaDevices.getUserMedia({ audio: true })
+          .then(function(stream) {
+            audioChunks = [];
+            mediaRecorder = new MediaRecorder(stream, { mimeType: 'audio/webm;codecs=opus' });
+
+            mediaRecorder.ondataavailable = function(e) {
+              if (e.data.size > 0) {
+                audioChunks.push(e.data);
+              }
+            };
+
+            mediaRecorder.onstop = function() {
+              var blob = new Blob(audioChunks, { type: 'audio/webm' });
+              var file = new File([blob], 'voice_note_' + Date.now() + '.webm', { type: 'audio/webm' });
+              sendVoiceMessage(file);
+              stream.getTracks().forEach(function(track) { track.stop(); });
+            };
+
+            mediaRecorder.start();
+            isRecording = true;
+            recordingStartTime = Date.now();
+            voiceBtn.style.color = '#dc2626';
+
+            recordingTimer = setInterval(function() {
+              var elapsed = Math.floor((Date.now() - recordingStartTime) / 1000);
+              var mins = Math.floor(elapsed / 60);
+              var secs = elapsed % 60;
+              voiceBtn.title = mins + ':' + (secs < 10 ? '0' : '') + secs + ' - Click to stop';
+            }, 1000);
+          })
+          .catch(function(err) {
+            console.error('Microphone access error:', err);
+            alert('Could not access microphone. Please allow microphone access.');
+          });
+      } else {
+        if (mediaRecorder && mediaRecorder.state !== 'inactive') {
+          mediaRecorder.stop();
+        }
+        if (recordingTimer) {
+          clearInterval(recordingTimer);
+          recordingTimer = null;
+        }
+        isRecording = false;
+        voiceBtn.style.color = '';
+        voiceBtn.title = 'Voice';
+      }
+    });
+  }
+
+function sendMessage() {
+    if (!body || !body.value.trim()) return;
+    if (!accountId) return;
+
+    var formData = new FormData();
+    formData.append('specialist_message[body]', body.value.trim());
+    formData.append('specialist_message[account_id]', accountId);
+    formData.append('specialist_message[subject]', 'Chat Reply');
+
+    // Optimistic UI
+    var msgDiv = document.createElement('div');
+    msgDiv.className = 'wa-msg wa-msg--out';
+    msgDiv.innerHTML = '<div class="wa-msg__bubble"><p class="wa-msg__text">' + escapeHtml(body.value.trim()) + '</p><div class="wa-msg__meta"><span class="wa-msg__time">' + new Date().toLocaleTimeString([], {hour: '2-digit', minute: '2-digit'}) + '</span></div></div>';
+    container.appendChild(msgDiv);
+    container.scrollTop = container.scrollHeight;
+
+    fetch('/en/specialist/messages', {
+      method: 'POST',
+      headers: {
+        'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]')?.content,
+        'Accept': 'application/json'
+      },
+      body: formData
+    }).then(function(response) {
+      return response.json();
+    }).then(function(data) {
+      if (data.success) {
+        if (body) {
+          body.value = '';
+          body.style.height = 'auto';
+        }
+        // Remove optimistic and add real
+        container.removeChild(msgDiv);
+        if (data.message) {
+          addMessageToChat(data.message, true);
+        }
+      }
+    }).catch(function(err) {
+      container.removeChild(msgDiv);
+      console.error('Send error:', err);
+    });
+  }
+
+  function sendVoiceMessage(file) {
+    if (!accountId) return;
+
+    var formData = new FormData();
+    formData.append('specialist_message[body]', 'Voice message');
+    formData.append('specialist_message[account_id]', accountId);
+    formData.append('specialist_message[subject]', 'Voice Message');
+    formData.append('attachment', file);
+
+    // Optimistic UI
+    var msgDiv = document.createElement('div');
+    msgDiv.className = 'wa-msg wa-msg--out';
+    msgDiv.innerHTML = '<div class="wa-msg__bubble"><audio controls src="' + URL.createObjectURL(file) + '" class="wa-msg__audio"></audio><p class="wa-msg__text">Voice message</p><div class="wa-msg__meta"><span class="wa-msg__time">' + new Date().toLocaleTimeString([], {hour: '2-digit', minute: '2-digit'}) + '</span></div></div>';
+    container.appendChild(msgDiv);
+    container.scrollTop = container.scrollHeight;
+
+    fetch('/en/specialist/messages', {
+      method: 'POST',
+      headers: {
+        'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]')?.content,
+        'Accept': 'application/json'
+      },
+      body: formData
+    }).then(function(response) {
+      return response.json();
+    }).then(function(data) {
+      if (data.success) {
+        container.removeChild(msgDiv);
+        if (data.message) {
+          addMessageToChat(data.message, true);
+        }
+      }
+    }).catch(function(err) {
+      container.removeChild(msgDiv);
+      console.error('Send error:', err);
+    });
+  }
+
+  function sendFileMessage(file) {
+    if (!accountId) return;
+
+    var formData = new FormData();
+    formData.append('specialist_message[body]', 'Sent an attachment: ' + file.name);
+    formData.append('specialist_message[account_id]', accountId);
+    formData.append('specialist_message[subject]', 'Attachment');
+    formData.append('attachment', file);
+
+    // Optimistic UI
+    var msgDiv = document.createElement('div');
+    msgDiv.className = 'wa-msg wa-msg--out';
+    var fileUrl = URL.createObjectURL(file);
+    var attachmentsHtml = '';
+    if (file.type.startsWith('image/')) {
+      attachmentsHtml = '<div class="wa-msg__attachments"><img src="' + fileUrl + '" class="wa-msg__image" alt=""></div>';
+    } else if (file.type.startsWith('audio/')) {
+      attachmentsHtml = '<div class="wa-msg__attachments"><audio controls src="' + fileUrl + '" class="wa-msg__audio"></audio></div>';
+    } else if (file.type.startsWith('video/')) {
+      attachmentsHtml = '<div class="wa-msg__attachments"><video controls src="' + fileUrl + '" class="wa-msg__video"></video></div>';
+    } else {
+      attachmentsHtml = '<div class="wa-msg__attachments"><a href="' + fileUrl + '" download="' + file.name + '" class="wa-msg__file"><i class="ri-file-line"></i><span>' + file.name + '</span></a></div>';
+    }
+    msgDiv.innerHTML = '<div class="wa-msg__bubble">' + attachmentsHtml + '<p class="wa-msg__text">Sent an attachment</p><div class="wa-msg__meta"><span class="wa-msg__time">' + new Date().toLocaleTimeString([], {hour: '2-digit', minute: '2-digit'}) + '</span></div></div>';
+    container.appendChild(msgDiv);
+    container.scrollTop = container.scrollHeight;
+
+    fetch('/en/specialist/messages', {
+      method: 'POST',
+      headers: {
+        'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]')?.content,
+        'Accept': 'application/json'
+      },
+      body: formData
+    }).then(function(response) {
+      return response.json();
+    }).then(function(data) {
+      if (data.success) {
+        container.removeChild(msgDiv);
+        if (data.message) {
+          addMessageToChat(data.message, true);
+        }
+      }
+    }).catch(function(err) {
+      container.removeChild(msgDiv);
+      console.error('Send error:', err);
+    });
+  }
+
+  function escapeHtml(text) {
+    var div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+  }
+
+  // ActionCable subscription for real-time updates
+  if (specialistId && typeof ActionCable !== 'undefined') {
+    var consumer = ActionCable.createConsumer();
+    consumer.subscriptions.create({
+      channel: 'SpecialistMessagesChannel',
+      specialist_id: specialistId
+    }, {
+      received: function(data) {
+        console.log('Received:', data);
+        if (data.type === 'new_message' || data.type === 'specialist_message') {
+          addMessageToChat(data, true);
+        }
+      }
+    });
+  }
+
+  function addMessageToChat(data, isSent) {
+    if (!container) return;
+    var msgDiv = document.createElement('div');
+    msgDiv.className = 'wa-msg wa-msg--' + (isSent ? 'out' : 'in');
+
+    var attachmentsHtml = '';
+    if (data.attachments && data.attachments.length > 0) {
+      attachmentsHtml = '<div class="wa-msg__attachments">';
+      data.attachments.forEach(function(att) {
+        if (att.file_type === 'image') {
+          attachmentsHtml += '<img src="' + att.url + '" class="wa-msg__image" alt="">';
+        } else if (att.file_type === 'voice' || att.file_type === 'audio') {
+          attachmentsHtml += '<audio controls class="wa-msg__audio"><source src="' + att.url + '" type="' + (att.content_type || 'audio/webm') + '"></audio>';
+        } else if (att.file_type === 'video') {
+          attachmentsHtml += '<video controls class="wa-msg__video"><source src="' + att.url + '" type="' + (att.content_type || 'video/mp4') + '"></video>';
+        } else {
+          attachmentsHtml += '<a href="' + att.url + '" download="' + att.filename + '" class="wa-msg__file"><i class="ri-file-line"></i><span>' + att.filename + '</span></a>';
+        }
+      });
+      attachmentsHtml += '</div>';
+    }
+
+    var time = new Date(data.created_at).toLocaleTimeString([], {hour: '2-digit', minute: '2-digit'});
+    msgDiv.innerHTML = '<div class="wa-msg__bubble">' + attachmentsHtml + '<p class="wa-msg__text">' + escapeHtml(data.body || '') + '</p><div class="wa-msg__meta"><span class="wa-msg__time">' + time + '</span></div></div>';
+    container.appendChild(msgDiv);
+    container.scrollTop = container.scrollHeight;
+  }
+
+  if (container) {
+    container.scrollTop = container.scrollHeight;
+  }
+})();
+</script>

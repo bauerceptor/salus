@@ -1,0 +1,33 @@
+<div class="new-note">
+  <header class="dash-header">
+    <div class="dash-header__left">
+      <% if @measurement.measurement_type.name == 'weight' %>
+        <h1 class="dash-header__title"><%= t(".weight") %></h1>
+      <% elsif @measurement.measurement_type.name == 'heart_beat' %>
+        <h1 class="dash-header__title"><%= t(".heart_beat") %></h1>
+      <% elsif @measurement.measurement_type.name == 'blood_pressure' %>
+        <h1 class="dash-header__title"><%= t(".blood_pressure") %></h1>
+      <% elsif @measurement.measurement_type.name == 'sugar' %>
+        <h1 class="dash-header__title"><%= t(".sugar") %></h1>
+      <% elsif @measurement.measurement_type.name == 'spo2' %>
+        <h1 class="dash-header__title"><%= t(".spo2") %></h1>
+      <% else%>
+        <h1 class="dash-header__title"><%= t(".other") %></h1>
+      <% end %>
+      <%= render "shared/breadcrumbs" %>
+    </div>
+    <div class="dash-header__right">
+      <%= link_to measurements_path, class: "dash-button dash-button--back" do %>
+        <i class="ri-arrow-left-line dash-button__icon"></i>
+      <% end %>
+    </div>
+  </header>
+  <div class="dash-flash-messages">
+    <%= turbo_frame_tag "flash" do %>
+      <%= render "shared/dash_flash" %>
+    <% end %>
+  </div>
+  <div>
+    <%= render "form" %>
+  </div>
+</div>

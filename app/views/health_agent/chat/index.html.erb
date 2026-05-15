@@ -1,0 +1,370 @@
+<div class="flex flex-col h-[calc(100vh-4rem)]" style="background: linear-gradient(180deg, #8696a0 0%, #f8f9fa 8%, #f8f9fa 92%, #f8f9fa 100%);">
+  <div class="bg-[#f0f2f5] border-b border-[#d1d7db] px-4 py-3">
+    <div class="flex items-center gap-3">
+      <%= link_to authenticated_root_path, class: "btn btn-ghost btn-sm btn-circle" do %>
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+        </svg>
+      <% end %>
+      <div class="avatar relative">
+        <div class="w-10 h-10 rounded-full bg-[#00a884] text-white flex items-center justify-center">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+          </svg>
+        </div>
+        <div class="absolute bottom-0 right-0 w-3 h-3 bg-[#00a884] rounded-full border-2 border-[#f0f2f5]"></div>
+      </div>
+      <div>
+        <h3 class="font-semibold text-[#111b21]">Health Agent</h3>
+        <p class="text-xs text-[#667781]">AI Health Assistant</p>
+      </div>
+      <div class="ml-auto flex items-center gap-2">
+        <span class="text-xs text-[#667781] px-2 py-1 bg-[#d9fdd3] rounded-full">Salus AI</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="flex-1 overflow-y-auto p-4" id="messages-container" data-conversation-id="<%= @conversation.id %>">
+    <% if @messages.any? %>
+      <div class="messages space-y-2" id="messages-list">
+        <% @messages.each do |message| %>
+          <% is_assistant = message.role.to_sym == :assistant || message.role == "assistant" %>
+          <div class="flex <%= is_assistant ? '' : 'justify-end' %>" data-message-id="<%= message.id %>">
+            <div class="max-w-[70%] <%= is_assistant ? 'bg-[#dcf8c6]' : 'bg-[#d9fdd3]' %> rounded-2xl px-4 py-2 <%= is_assistant ? 'rounded-tl-none' : 'rounded-tr-none' %>">
+              <p class="text-[#111b21] text-sm whitespace-pre-wrap"><%= simple_format(message.content) %></p>
+              <% if message.attachment.attached? %>
+                <% if message.attachment.image? %>
+                  <%= link_to url_for(message.attachment), target: "_blank", class: "block mt-2 rounded-lg overflow-hidden" do %>
+                    <%= image_tag message.attachment, class: "max-w-full h-auto rounded-lg" %>
+                  <% end %>
+                <% elsif message.attachment.audio? %>
+                  <audio controls class="mt-2 w-full">
+                    <source src="<%= url_for(message.attachment) %>" type="<%= message.attachment.content_type %>">
+                  </audio>
+                <% else %>
+                  <%= link_to url_for(message.attachment), target: "_blank", class: "flex items-center gap-2 mt-2 text-[#00a884] hover:underline" do %>
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                    </svg>
+                    <span><%= message.attachment.filename %></span>
+                  <% end %>
+                <% end %>
+              <% end %>
+              <div class="flex items-center gap-1 mt-1 <%= is_assistant ? 'justify-start' : 'justify-end' %>">
+                <span class="text-[10px] text-[#667781]"><%= message.created_at.strftime("%H:%M") %></span>
+                <% if is_assistant %>
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 text-[#00a884]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+                  </svg>
+                <% end %>
+              </div>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    <% else %>
+      <div class="flex items-center justify-center h-full" id="no-messages">
+        <div class="bg-[#f0f2f5] rounded-lg px-6 py-4 text-center">
+          <div class="w-16 h-16 mx-auto mb-3 rounded-full bg-[#d9fdd3] flex items-center justify-center">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-[#00a884]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+            </svg>
+          </div>
+          <p class="text-[#111b21] font-medium">Start a conversation</p>
+          <p class="text-sm text-[#667781]">Ask about your health, medications, or symptoms</p>
+        </div>
+      </div>
+    <% end %>
+  </div>
+
+  <div class="p-2 bg-[#f0f2f5] border-t border-[#d1d7db]" id="message-input-area">
+    <form id="new-message-form" class="flex items-end gap-2">
+      <input type="hidden" name="conversation_id" id="conversationId" value="<%= @conversation.id %>" />
+
+      <div class="dropdown dropdown-top">
+        <div tabindex="0" role="button" class="btn btn-circle bg-[#f0f2f5] hover:bg-[#d9fdd3] text-[#54656f] border-0">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+          </svg>
+        </div>
+        <ul tabindex="0" class="dropdown-content z-50 menu p-2 shadow-xl bg-white rounded-2xl w-56">
+          <li>
+            <label class="flex items-center gap-3 cursor-pointer hover:bg-[#f0f2f5] rounded-xl px-4 py-3">
+              <div class="w-10 h-10 rounded-full bg-[#d9fdd3] flex items-center justify-center">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-[#00a884]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                </svg>
+              </div>
+              <div>
+                <span class="text-[#111b21] font-medium">Photo</span>
+              </div>
+              <input type="file" name="attachment" id="attachment-photo" class="hidden" accept="image/*" />
+            </label>
+          </li>
+          <li>
+            <label class="flex items-center gap-3 cursor-pointer hover:bg-[#f0f2f5] rounded-xl px-4 py-3">
+              <div class="w-10 h-10 rounded-full bg-[#d9fdd3] flex items-center justify-center">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-[#00a884]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                </svg>
+              </div>
+              <div>
+                <span class="text-[#111b21] font-medium">Document</span>
+              </div>
+              <input type="file" name="attachment" id="attachment-doc" class="hidden" accept=".pdf,.doc,.docx,.txt" />
+            </label>
+          </li>
+        </ul>
+      </div>
+
+      <div class="flex-1">
+        <textarea name="content" id="message-content" class="w-full px-4 py-3 bg-white rounded-lg resize-none text-[#111b21] placeholder-[#667781] border border-[#d1d7db] focus:border-[#00a884] focus:outline-none" placeholder="Ask Health Agent..." rows="1"></textarea>
+      </div>
+
+      <div id="voice-recorder-container" class="flex items-center gap-2">
+        <button type="button" id="voice-btn" class="btn btn-circle bg-[#00a884] hover:bg-[#008069] text-white border-0">
+          <svg id="mic-icon" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
+          </svg>
+          <svg id="stop-icon" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <rect x="6" y="6" width="12" height="12" rx="2" stroke-width="2" stroke="currentColor" fill="currentColor" />
+          </svg>
+        </button>
+        <span id="recording-duration" class="text-sm text-[#667781] hidden font-mono">0:00</span>
+      </div>
+
+      <button type="submit" id="send-btn" class="btn btn-circle bg-[#00a884] hover:bg-[#008069] text-white border-0">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 rotate-90" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+        </svg>
+      </button>
+    </form>
+  </div>
+</div>
+
+<script>
+(function() {
+  const form = document.getElementById('new-message-form');
+  const messageContent = document.getElementById('message-content');
+  const messagesContainer = document.getElementById('messages-container');
+  const conversationId = document.getElementById('conversationId')?.value;
+
+  if (!form || !messageContent) return;
+
+  let mediaRecorder = null;
+  let audioChunks = [];
+  let recordedAudioBlob = null;
+
+  messageContent.addEventListener('keydown', function(e) {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      form.requestSubmit();
+    }
+  });
+
+  messageContent.addEventListener('input', function() {
+    this.style.height = 'auto';
+    this.style.height = Math.min(this.scrollHeight, 150) + 'px';
+  });
+
+  const voiceBtn = document.getElementById('voice-btn');
+  const micIcon = document.getElementById('mic-icon');
+  const stopIcon = document.getElementById('stop-icon');
+  const recordingDuration = document.getElementById('recording-duration');
+
+  if (voiceBtn) {
+    voiceBtn.addEventListener('click', function() {
+      if (mediaRecorder && mediaRecorder.state === 'recording') {
+        stopRecording();
+      } else {
+        startRecording();
+      }
+    });
+  }
+
+  function startRecording() {
+    audioChunks = [];
+    recordedAudioBlob = null;
+
+    navigator.mediaDevices.getUserMedia({ audio: true }).then(function(stream) {
+      mediaRecorder = new MediaRecorder(stream);
+
+      mediaRecorder.addEventListener('dataavailable', function(e) {
+        if (e.data.size > 0) {
+          audioChunks.push(e.data);
+        }
+      });
+
+      mediaRecorder.addEventListener('stop', function() {
+        recordedAudioBlob = new Blob(audioChunks, { type: 'audio/mpeg' });
+        stream.getTracks().forEach(function(track) { track.stop(); });
+      });
+
+      mediaRecorder.start();
+      updateRecordingUI(true);
+
+      let seconds = 0;
+      const durationInterval = setInterval(function() {
+        seconds++;
+        const mins = Math.floor(seconds / 60);
+        const secs = seconds % 60;
+        recordingDuration.textContent = mins + ':' + (secs < 10 ? '0' : '') + secs;
+      }, 1000);
+
+      mediaRecorder.addEventListener('stop', function() {
+        clearInterval(durationInterval);
+        recordingDuration.classList.add('hidden');
+      });
+
+    }).catch(function(err) {
+      console.error('Microphone access denied:', err);
+      showToast('Microphone access denied');
+    });
+  }
+
+  function stopRecording() {
+    if (mediaRecorder && mediaRecorder.state === 'recording') {
+      mediaRecorder.stop();
+      updateRecordingUI(false);
+    }
+  }
+
+  function updateRecordingUI(recording) {
+    if (recording) {
+      micIcon.classList.add('hidden');
+      stopIcon.classList.remove('hidden');
+      recordingDuration.classList.remove('hidden');
+      voiceBtn.classList.add('bg-red-500', 'hover:bg-red-600');
+      voiceBtn.classList.remove('bg-[#00a884]', 'hover:bg-[#008069]');
+    } else {
+      micIcon.classList.remove('hidden');
+      stopIcon.classList.add('hidden');
+      voiceBtn.classList.remove('bg-red-500', 'hover:bg-red-600');
+      voiceBtn.classList.add('bg-[#00a884]', 'hover:bg-[#008069]');
+    }
+  }
+
+  form.addEventListener('submit', function(e) {
+    e.preventDefault();
+
+    const content = messageContent.value.trim();
+    if (!content && !recordedAudioBlob) return;
+
+    const submitBtn = document.getElementById('send-btn');
+    submitBtn.disabled = true;
+
+    const formData = new FormData();
+    formData.append('content', content || 'Voice message');
+
+    if (recordedAudioBlob) {
+      formData.append('attachment', recordedAudioBlob, 'voice_message.mp3');
+      recordedAudioBlob = null;
+    } else {
+      const photoInput = document.getElementById('attachment-photo');
+      const docInput = document.getElementById('attachment-doc');
+
+      if (photoInput && photoInput.files && photoInput.files[0]) {
+        formData.append('attachment', photoInput.files[0]);
+        photoInput.value = '';
+      } else if (docInput && docInput.files && docInput.files[0]) {
+        formData.append('attachment', docInput.files[0]);
+        docInput.value = '';
+      }
+    }
+
+    fetch('/health_agent/chat', {
+      method: 'POST',
+      headers: {
+        'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]').content
+      },
+      body: formData
+    }).then(function(response) {
+      return response.json();
+    }).then(function(data) {
+      messageContent.value = '';
+      messageContent.style.height = 'auto';
+      appendUserMessage(data.user_message);
+      appendAiMessage(data.ai_response);
+      scrollToBottom();
+    }).catch(function(error) {
+      console.error('Error:', error);
+      showToast('Failed to send message');
+    }).finally(function() {
+      submitBtn.disabled = false;
+    });
+  });
+
+  function appendUserMessage(message) {
+    const messagesList = document.getElementById('messages-list');
+    const noMessages = document.getElementById('no-messages');
+    if (noMessages) noMessages.remove();
+
+    let attachmentHtml = '';
+
+    if (message.attachment_url) {
+      if (message.attachment_content_type && message.attachment_content_type.startsWith('image/')) {
+        attachmentHtml = '<a href="' + message.attachment_url + '" target="_blank" class="block mt-2 rounded-lg overflow-hidden"><img src="' + message.attachment_url + '" alt="Attachment" class="max-w-full h-auto rounded-lg"></a>';
+      } else if (message.attachment_content_type && message.attachment_content_type.startsWith('audio/')) {
+        attachmentHtml = '<audio controls class="mt-2 w-full"><source src="' + message.attachment_url + '" type="' + message.attachment_content_type + '"></audio>';
+      } else {
+        attachmentHtml = '<div class="mt-2"><a href="' + message.attachment_url + '" target="_blank" class="flex items-center gap-2 text-[#00a884] hover:underline"><svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" /></svg>' + (message.attachment_filename || 'Download') + '</a></div>';
+      }
+    }
+
+    const div = document.createElement('div');
+    div.className = 'flex justify-end';
+    div.dataset.messageId = message.id;
+    div.innerHTML = '<div class="max-w-[70%] bg-[#d9fdd3] rounded-2xl rounded-tr-none px-4 py-2"><p class="text-[#111b21] text-sm whitespace-pre-wrap">' + escapeHtml(message.content) + '</p>' + attachmentHtml + '<div class="flex items-center gap-1 mt-1 justify-end"><span class="text-[10px] text-[#667781]">' + message.created_at + '</span></div></div>';
+
+    if (messagesList) {
+      messagesList.appendChild(div);
+    } else {
+      const container = document.createElement('div');
+      container.className = 'messages space-y-2';
+      container.id = 'messages-list';
+      container.appendChild(div);
+      messagesContainer.appendChild(container);
+    }
+  }
+
+  function appendAiMessage(message) {
+    const messagesList = document.getElementById('messages-list');
+    const div = document.createElement('div');
+    div.className = 'flex';
+    div.dataset.messageId = message.id;
+    div.innerHTML = '<div class="max-w-[70%] bg-[#dcf8c6] rounded-2xl rounded-tl-none px-4 py-2"><p class="text-[#111b21] text-sm whitespace-pre-wrap">' + escapeHtml(message.content) + '</p><div class="flex items-center gap-1 mt-1 justify-start"><span class="text-[10px] text-[#667781]">' + message.created_at + '</span><svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 text-[#00a884]" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" /></svg></div></div>';
+
+    if (messagesList) {
+      messagesList.appendChild(div);
+    } else {
+      const container = document.createElement('div');
+      container.className = 'messages space-y-2';
+      container.id = 'messages-list';
+      container.appendChild(div);
+      messagesContainer.appendChild(container);
+    }
+  }
+
+  function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+  }
+
+  function scrollToBottom() {
+    if (messagesContainer) {
+      messagesContainer.scrollTop = messagesContainer.scrollHeight;
+    }
+  }
+
+  function showToast(message) {
+    const toast = document.createElement('div');
+    toast.className = 'toast toast-bottom toast-center z-50';
+    toast.innerHTML = '<div class="badge bg-[#00a884] text-white gap-2 px-4 py-3"><span>' + message + '</span></div>';
+    document.body.appendChild(toast);
+    setTimeout(function() { toast.remove(); }, 2500);
+  }
+
+  scrollToBottom();
+})();
+</script>

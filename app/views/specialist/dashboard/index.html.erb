@@ -1,0 +1,328 @@
+<div class="dash-home">
+  <div class="dash-home__content">
+    <%= render "specialist/shared/quick_actions_toolbar", patient: nil, current_page: "dashboard" %>
+    <header class="dash-home__header">
+      <div class="dash-home__header__left">
+        <h1 class="dash-home__header__title">
+          <i class="ri-nurse-line dash-home__header__title__icon"></i>
+          <%= t(".welcome", name: current_account.full_name) %>
+        </h1>
+        <p class="dash-home__header__text">
+          <i class="ri-verified-badge-line"></i>
+          <%= current_user.specialist&.specialization || current_user.specialist&.field_of_expertise || "Specialist" %>
+        </p>
+      </div>
+      <div class="dash-home__header__right">
+        <div class="dash-header-card">
+          <i class="ri-calendar-check-line"></i>
+          <div class="dash-header-card__content">
+            <span class="dash-header-card__label">Today</span>
+            <span class="dash-header-card__value"><%= l Date.today, format: "%d %B %Y" %></span>
+          </div>
+        </div>
+        <div class="dash-header-card dash-header-card--accent">
+          <i class="ri-time-line"></i>
+          <div class="dash-header-card__content">
+            <span class="dash-header-card__label">Active Patients</span>
+            <span class="dash-header-card__value"><%= @stats[:total_patients] %></span>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <div class="dash-home__flash">
+      <%= turbo_frame_tag "flash" do %>
+        <%= render "shared/dash_flash" %>
+      <% end %>
+    </div>
+
+    <div class="dash-home__group">
+      <div class="dash-home__group__left">
+        <div class="dash-group dash-group--enhanced">
+          <header class="dash-group__header dash-group__header--gradient">
+            <h2 class="dash-group__title">
+              <i class="ri-user-search-line dash-group__title__icon"></i>
+              <%= t(".my_patients.title") %>
+            </h2>
+            <div class="dash-group__actions">
+              <%= link_to specialist_patients_path,
+                  class: "dash-button dash-button--gray dash-button--small" do %>
+                <i class="ri-arrow-right-line dash-button__icon"></i>
+                <%= t(".button.view_all") %>
+              <% end %>
+            </div>
+          </header>
+          <div class="dash-group__content">
+            <% if @patients.any? %>
+              <div class="dash-home__patients">
+                <% @patients.each do |sp| %>
+                  <%= link_to specialist_patient_path(id: sp.account_id, locale: I18n.locale), class: "patient-card" do %>
+                    <div class="patient-card__avatar">
+                      <%= render "shared/avatar", account: sp.account, css_class: "", alt: "" %>
+                    </div>
+                    <div class="patient-card__info">
+                      <p class="patient-card__name"><%= sp.account.full_name %></p>
+                      <p class="patient-card__meta">
+                        <% if sp.account.diseases.any? %>
+                          <i class="ri-heart-pulse-line"></i>
+                          <%= sp.account.diseases.first.predefined_disease&.name || sp.account.diseases.first.name %>
+                        <% else %>
+                          <i class="ri-user-line"></i>
+                          <%= t(".patient.no_disease") %>
+                        <% end %>
+                      </p>
+                    </div>
+                    <div class="patient-card__badges">
+                      <span class="risk-badge risk-badge--<%= sp.account.risk_level.downcase %>">
+                        <i class="ri-<%= sp.account.risk_level == 'HIGH' ? 'error-warning' : sp.account.risk_level == 'MODERATE' ? 'alert' : 'shield-check' %>-line"></i>
+                        <%= sp.account.risk_level %>
+                      </span>
+                    </div>
+                    <i class="ri-arrow-right-s-line patient-card__arrow"></i>
+                  <% end %>
+                <% end %>
+              </div>
+            <% else %>
+              <div class="dash-empty-state">
+                <i class="ri-user-search-line"></i>
+                <p><%= t(".my_patients.empty") %></p>
+              </div>
+            <% end %>
+          </div>
+        </div>
+      </div>
+
+      <div class="dash-home__group__right">
+        <div class="dash-stats-grid">
+          <div class="dash-stat-card dash-stat-card--primary">
+            <div class="dash-stat-card__icon">
+              <i class="ri-user-follow-line"></i>
+            </div>
+            <div class="dash-stat-card__content">
+              <p class="dash-stat-card__value"><%= @stats[:total_patients] %></p>
+              <h3 class="dash-stat-card__label">Total Patients</h3>
+            </div>
+          </div>
+          <div class="dash-stat-card dash-stat-card--danger">
+            <div class="dash-stat-card__icon">
+              <i class="ri-heart-pulse-line"></i>
+            </div>
+            <div class="dash-stat-card__content">
+              <p class="dash-stat-card__value"><%= @stats[:high_risk] %></p>
+              <h3 class="dash-stat-card__label">High Risk</h3>
+            </div>
+          </div>
+          <div class="dash-stat-card dash-stat-card--warning">
+            <div class="dash-stat-card__icon">
+              <i class="ri-notification-3-line"></i>
+            </div>
+            <div class="dash-stat-card__content">
+              <p class="dash-stat-card__value"><%= @stats[:active_alerts] %></p>
+              <h3 class="dash-stat-card__label">Active Alerts</h3>
+            </div>
+          </div>
+          <div class="dash-stat-card dash-stat-card--success">
+            <div class="dash-stat-card__icon">
+              <i class="ri-file-list-3-line"></i>
+            </div>
+            <div class="dash-stat-card__content">
+              <p class="dash-stat-card__value"><%= @stats[:pending_recommendations] %></p>
+              <h3 class="dash-stat-card__label">Pending Recs</h3>
+            </div>
+          </div>
+        </div>
+
+        <div class="dash-group dash-group--enhanced">
+          <header class="dash-group__header">
+            <h2 class="dash-group__title">
+              <i class="ri-pie-chart-line dash-group__title__icon"></i>
+              <%= t(".charts.patient_risk") %>
+            </h2>
+          </header>
+          <div class="dash-group__content">
+            <div class="chart-container chart-container--pie">
+              <%= pie_chart @risk_distribution, colors: ["#10b981", "#f59e0b", "#ef4444"], height: "200px" %>
+            </div>
+          </div>
+        </div>
+
+        <div class="dash-group dash-group--enhanced">
+          <header class="dash-group__header">
+            <h2 class="dash-group__title">
+              <i class="ri-line-chart-line dash-group__title__icon"></i>
+              <%= t(".charts.weekly_activity") %>
+            </h2>
+          </header>
+          <div class="dash-group__content">
+            <div class="chart-container">
+              <%= line_chart @weekly_activity, colors: ["#0d7377"], height: "180px", points: true, curve: false %>
+            </div>
+          </div>
+        </div>
+
+        <div class="dash-group dash-group--enhanced">
+          <header class="dash-group__header">
+            <h2 class="dash-group__title">
+              <i class="ri-bar-chart-2-line dash-group__title__icon"></i>
+              <%= t(".charts.monthly_appointments") %>
+            </h2>
+          </header>
+          <div class="dash-group__content">
+            <div class="chart-container">
+              <%= bar_chart @monthly_appointments, colors: ["#0ea5e9"], height: "180px" %>
+            </div>
+          </div>
+        </div>
+
+        <% if @pending_requests.any? %>
+          <div class="dash-group dash-group--enhanced dash-group--highlight">
+            <header class="dash-group__header dash-group__header--warning">
+              <h2 class="dash-group__title">
+                <i class="ri-user-follow-line dash-group__title__icon"></i>
+                <%= t(".pending_requests.title") %>
+                <span class="badge badge--warning"><%= @pending_requests.size %></span>
+              </h2>
+            </header>
+            <div class="dash-group__content">
+              <div class="dash-requests-list">
+                <% @pending_requests.each do |pr| %>
+                  <div class="request-card">
+                    <div class="request-card__avatar">
+                      <i class="ri-user-line"></i>
+                    </div>
+                    <div class="request-card__info">
+                      <p class="request-card__name"><%= pr.account.full_name %></p>
+                      <p class="request-card__date"><i class="ri-time-line"></i><%= time_ago_in_words(pr.created_at) %> ago</p>
+                    </div>
+                    <div class="request-card__actions">
+                      <%= button_to specialist_patient_path(id: pr.account_id, locale: I18n.locale, status: "active"),
+                          method: :patch,
+                          class: "dash-btn dash-btn--success dash-btn--sm" do %>
+                        <i class="ri-check-line"></i>
+                      <% end %>
+                      <%= button_to specialist_patient_path(id: pr.account_id, locale: I18n.locale, status: "inactive"),
+                          method: :patch,
+                          class: "dash-btn dash-btn--danger dash-btn--sm" do %>
+                        <i class="ri-close-line"></i>
+                      <% end %>
+                    </div>
+                  </div>
+                <% end %>
+              </div>
+            </div>
+          </div>
+        <% end %>
+
+        <% if @pending_treatment_requests.any? %>
+          <div class="dash-group dash-group--enhanced dash-group--highlight">
+            <header class="dash-group__header dash-group__header--warning">
+              <h2 class="dash-group__title">
+                <i class="ri-hospital-line dash-group__title__icon"></i>
+                <%= t(".pending_treatment_requests.title") %>
+                <span class="badge badge--warning"><%= @pending_treatment_requests.size %></span>
+              </h2>
+              <div class="dash-group__actions">
+                <%= link_to specialist_treatment_requests_path,
+                    class: "dash-button dash-button--gray dash-button--small" do %>
+                  <i class="ri-arrow-right-line dash-button__icon"></i>
+                  <%= t(".button.view_all") %>
+                <% end %>
+              </div>
+            </header>
+            <div class="dash-group__content">
+              <div class="dash-requests-list">
+                <% @pending_treatment_requests.each do |tr| %>
+                  <div class="request-card">
+                    <div class="request-card__icon-wrapper">
+                      <i class="ri-file-text-line"></i>
+                    </div>
+                    <div class="request-card__info">
+                      <p class="request-card__name"><%= tr.account.full_name %></p>
+                      <p class="request-card__meta"><%= tr.title %></p>
+                      <p class="request-card__date"><i class="ri-time-line"></i><%= time_ago_in_words(tr.requested_at) %> ago</p>
+                    </div>
+                    <div class="request-card__actions">
+                      <%= button_to specialist_treatment_request_path(id: tr.id, status: "approved"),
+                          method: :patch,
+                          class: "dash-btn dash-btn--success dash-btn--sm" do %>
+                        <i class="ri-check-line"></i>
+                      <% end %>
+                      <%= button_to specialist_treatment_request_path(id: tr.id, status: "rejected"),
+                          method: :patch,
+                          class: "dash-btn dash-btn--danger dash-btn--sm" do %>
+                        <i class="ri-close-line"></i>
+                      <% end %>
+                    </div>
+                  </div>
+                <% end %>
+              </div>
+            </div>
+          </div>
+        <% end %>
+
+        <div class="dash-group dash-group--enhanced">
+          <header class="dash-group__header">
+            <h2 class="dash-group__title">
+              <i class="ri-notification-3-line dash-group__title__icon"></i>
+              <%= t(".recent_alerts.title") %>
+            </h2>
+            <div class="dash-group__actions">
+              <%= link_to specialist_notifications_path, class: "dash-button dash-button--gray dash-button--small" do %>
+                <i class="ri-arrow-right-line dash-button__icon"></i>
+                <%= t(".button.view_all") %>
+              <% end %>
+            </div>
+          </header>
+          <div class="dash-group__content">
+            <% if @critical_alerts.any? || @warning_alerts.any? || @info_alerts.any? %>
+              <% if @critical_alerts.any? %>
+                <div class="dash-alerts-section dash-alerts-section--critical">
+                  <h3 class="dash-alerts-section__title">
+                    <i class="ri-error-warning-line"></i>
+                    <%= t(".alerts.critical") %> (<%= @critical_alerts.size %>)
+                  </h3>
+                  <div class="dash-alerts-section__list">
+                    <% @critical_alerts.each do |alert| %>
+                      <%= render "specialist/notifications/alert", alert: alert %>
+                    <% end %>
+                  </div>
+                </div>
+              <% end %>
+              <% if @warning_alerts.any? %>
+                <div class="dash-alerts-section dash-alerts-section--warning">
+                  <h3 class="dash-alerts-section__title">
+                    <i class="ri-alert-line"></i>
+                    <%= t(".alerts.warning") %> (<%= @warning_alerts.size %>)
+                  </h3>
+                  <div class="dash-alerts-section__list">
+                    <% @warning_alerts.each do |alert| %>
+                      <%= render "specialist/notifications/alert", alert: alert %>
+                    <% end %>
+                  </div>
+                </div>
+              <% end %>
+              <% if @info_alerts.any? %>
+                <div class="dash-alerts-section dash-alerts-section--info">
+                  <h3 class="dash-alerts-section__title">
+                    <i class="ri-information-line"></i>
+                    <%= t(".alerts.info") %> (<%= @info_alerts.size %>)
+                  </h3>
+                  <div class="dash-alerts-section__list">
+                    <% @info_alerts.each do |alert| %>
+                      <%= render "specialist/notifications/alert", alert: alert %>
+                    <% end %>
+                  </div>
+                </div>
+              <% end %>
+            <% else %>
+              <div class="dash-empty-state">
+                <i class="ri-checkbox-circle-line"></i>
+                <p><%= t(".recent_alerts.empty") %></p>
+              </div>
+            <% end %>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

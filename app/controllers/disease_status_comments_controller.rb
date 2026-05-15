@@ -1,0 +1,95 @@
+class DiseaseStatusCommentsController < BaseController
+  before_action :set_commentable
+  before_action :set_comment, only: %i[show edit update destroy]
+
+  def index
+    @pagy, @comments = pagy_countless(
+      @disease_status
+      .comments
+      .joins(:account)
+      .includes(:account)
+      .order(updated_at: :desc),
+      items: 3
+    )
+
+    respond_to do |format|
+      format.turbo_stream
+      format.html
+    end
+  end
+
+  def create
+    @comment = @disease_status.comments.build comment_params
+    @comment.account = current_account
+
+    respond_to do |format|
+      if @comment.save
+        format.turbo_stream
+        format.html do
+          redirect_to disease_status_url(disease_id: @disease.id, id: @disease_status.id, locale: I18n.locale),
+                      notice: t(".success")
+        end
+      else
+        format.turbo_stream do
+          render turbo_stream: turbo_stream.update(
+            :dash_toast,
+            partial: "shared/dash_toast",
+            locals: { message: @comment.errors.full_messages.first, icon: "error" }
+          )
+        end
+        format.html { render :new, status: :unprocessable_content }
+      end
+    end
+  end
+
+  def update
+    authorize @comment
+
+    respond_to do |format|
+      if @comment.update(comment_params)
+        format.turbo_stream
+        format.html do
+          redirect_to disease_status_url(disease_id: @disease.id, id: @disease_status.id, locale: I18n.locale),
+                      notice: t(".success")
+        end
+      else
+        format.turbo_stream do
+          render turbo_stream: turbo_stream.update(
+            :dash_toast,
+            partial: "shared/dash_toast",
+            locals: { message: @comment.errors.full_messages.first, icon: "error" }
+          )
+        end
+        format.html { render :new, status: :unprocessable_content }
+      end
+    end
+  end
+
+  def destroy
+    authorize @comment
+    @comment.destroy
+
+    respond_to do |format|
+      format.turbo_stream
+      format.html do
+        redirect_to disease_status_url(disease_id: @disease.id, id: @disease_status.id, locale: I18n.locale),
+                    notice: t(".success")
+      end
+    end
+  end
+
+  private
+
+  def set_commentable
+    @disease = Disease.find(params[:disease_id])
+    @disease_status = DiseaseStatus.find(params[:status_id])
+  end
+
+  def set_comment
+    @comment = @disease_status.comments.find(params[:id])
+  end
+
+  def comment_params
+    params.expect(comment: [:body])
+  end
+end

@@ -1,0 +1,13 @@
+<% flash.keys.each do |type| %>
+  <% if flash[type].present? %>
+    <div class="dash-flash dash-flash--<%= alert_class_for(type) %>" role="alert">
+      <div class="dash-flash__content">
+        <i class="dash-flash__icon ri-<%= alert_icon_for(type) %>"></i>
+        <span class="dash-flash__message"><%= flash[type] %></span>
+      </div>
+      <button class="dash-flash__close" onclick="this.parentElement.remove()">
+        <i class="ri-close-line"></i>
+      </button>
+    </div>
+  <% end %>
+<% end %>

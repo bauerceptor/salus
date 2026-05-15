@@ -1,0 +1,89 @@
+plugins:
+  - rubocop-performance
+  - rubocop-rake
+  - rubocop-rails
+  - rubocop-rspec
+
+AllCops:
+  NewCops: enable
+  TargetRubyVersion: 3.2.0
+  Exclude:
+    - db/schema.rb
+    - 'bin/*'
+    - 'Vagrantfile'
+    - 'vendor/**/*'
+    - '.git/**/*'
+    - 'tmp/**/*'
+
+Layout/LineLength:
+  Max: 120
+  Exclude:
+    - "db/**/*"
+
+Style/Documentation:
+  Enabled: false
+
+Style/StringLiterals:
+  EnforcedStyle: double_quotes
+
+Style/SymbolArray:
+  Enabled: true
+
+Bundler/OrderedGems:
+  Enabled: false
+
+Rails/FilePath:
+  Enabled: false
+
+Metrics/BlockLength:
+  Enabled: false
+
+Metrics/MethodLength:
+  Enabled: false
+
+Metrics/AbcSize:
+  Enabled: false
+
+Style/ClassAndModuleChildren:
+  Enabled: false
+
+Rails/LexicallyScopedActionFilter:
+  Enabled: false
+
+Style/FrozenStringLiteralComment:
+  Enabled: false
+
+Lint/MissingSuper:
+  Exclude:
+    - 'app/components/**/*'
+    - 'app/services/**/*'
+
+Rails/UniqueValidationWithoutIndex:
+  Enabled: false
+
+Metrics/ClassLength:
+  Enabled: false
+
+RSpec/SpecFilePathFormat:
+  Enabled: false
+
+RSpec/SpecFilePathSuffix:
+  Enabled: false
+
+RSpec/NestedGroups:
+  Enabled: false
+
+RSpec/MultipleExpectations:
+  Enabled: false
+
+RSpec/ImplicitSubject:
+  Enabled: false
+
+RSpec/ExampleLength:
+  Enabled: false
+
+Rails/HasAndBelongsToMany:
+  Enabled: false
+
+Rails/NotNullColumn:
+  Enabled: false
